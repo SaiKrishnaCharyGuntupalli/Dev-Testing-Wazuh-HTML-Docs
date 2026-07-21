@@ -1,0 +1,3129 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Production implementation guide for multi-tenant Wazuh MSSP on single-node Docker">
+      
+      
+      
+      
+        <link rel="prev" href="../../Wazuh%20Multi%20Node%20Runbook/Wazuh%20Multi%20Node%20Runbook/">
+      
+      
+        <link rel="next" href="../../../Junaid/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>High Availability Log Ingestion Pipeline Deployment Guide - Wazuh MSSP Multi-Tenant Implementation Guide</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../../stylesheets/responsive-nav.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#high-availability-log-ingestion-pipeline-deployment-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-header__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Wazuh MSSP Multi-Tenant Implementation Guide
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              High Availability Log Ingestion Pipeline Deployment Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-nav__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    Wazuh MSSP Multi-Tenant Implementation Guide
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../01-Getting_started/Getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment & Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment & Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../02-index-template-filebeat/index_template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index Template & Filebeat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../04-agent-configuration/agent_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & Access
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Security & Access
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../06-rbac/rbac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RBAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../07-dls/dls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Document Level Security (DLS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../08-sso-entra/sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSO - Microsoft Entra ID
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster and Index Verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../10-reference/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC's
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    POC's
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/GitHub_Webhook_to_Logstash/GitHub_Webhook_to_Logstash_POC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub_Webhook_to_Logstash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Rules-as-Code%20Implementation%20Guide/Wazuh%20Rules-as-Code%20Implementation%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Rules-as-Code Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Windows Agent Deployment & Security Detection logs Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetFlowlogs_to_Logstash_and_Wazuh_Indexer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/XDR%20Implementation%20Process/XDR%20Implementation%20Process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XDR Implementation Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Second%20use%20case%20of%20XDR/Second%20use%20case%20of%20XDR/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Second use case of XDR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Pipelines_and_Challenges/Pipelines_and_Challenges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipelines_and_Challenges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jira API → Logstash → Wazuh Integration for Non-Agent Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LOGSTASH PIPELINE WORKERS & BATCHSIZE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/GitHub_Logstash_Wazuh_NonAgent_Implementation/GitHub_Logstash_Wazuh_NonAgent_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Logstash Wazuh NonAgent Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/MySQL_Log_Monitoring_Using_Wazuh_Agent/MySQL_Log_Monitoring_Using_Wazuh_Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MySQL_Log_Monitoring_Using_Wazuh_Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Agent_Log_Buffering_and_Resynchronization/Wazuh_Agent_Log_Buffering_and_Resynchronization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Agent_Log_Buffering_and_Resynchronization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Process%20to%20Monitor%20Filebeat%20Health/Implementation_Process_to_Monitor_Filebeat_Health/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor Filebeat Health
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20AWS%20CloudTrail%20%E2%86%92%20S3%20%E2%86%92%20SQS%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh/Implementation_Guide_AWS_CloudTrail_S3_SQS_Logstash_Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide AWS CloudTrail → S3 → SQS → Logstash → Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Prometheus/Prometheus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prometheus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/SOC%20Logstash%20Multi-Pipeline%20Architecture%20Implementation%20Guide/SOC_Logstash_Multi_Pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Multi-Pipeline Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/SOC%20Logstash%20Pipeline-to-Pipeline%20%28P2P%29%20Architecture%20Implementation%20Guide/SOC_Logstash_P2P/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Multi_Tenant_MSSP_Implementation/Wazuh_Multi_Tenant_MSSP_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Multi_Tenant_MSSP_Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Wazuh%20Multi%20Node%20Runbook/Wazuh%20Multi%20Node%20Runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Multi Node Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Availability Log Ingestion Pipeline Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Availability Log Ingestion Pipeline Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture diagram
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-ssl-certs-generation-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. SSL certs generation guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. SSL certs generation guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ca-workstation-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CA workstation setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-create-the-correct-directory-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Create the correct directory structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-root-ca-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 — Root CA config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-generate-root-ca-ecdsa-p-256" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 — Generate Root CA (ECDSA P-256)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-intermediate-ca-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 — Intermediate CA config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-generate-and-sign-the-intermediate-ca" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5 — Generate and sign the Intermediate CA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#16-generate-crl-for-both-cas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.6 — Generate CRL for both CAs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#17-node-certificate-generation-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.7 — Node certificate generation script
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#18-generate-all-8-node-certificates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.8 — Generate all 8 node certificates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#19-distribute-certificates-securely" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9 — Distribute certificates securely
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-installation-of-filebeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Installation of Filebeat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Installation of Filebeat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-filebeat-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Filebeat config
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-installation-of-logstash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 Installation of Logstash
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3 Installation of Logstash">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-logstash-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Logstash config
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-installation-of-haproxy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 Installation of HAProxy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4 Installation of HAProxy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#41-haproxy-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 HAProxy configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-installation-of-rsyslog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 Installation of Rsyslog
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5 Installation of Rsyslog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-rsyslog-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Rsyslog configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zero Downtime Group Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operating System Based Group Creation in Wazuh GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture diagram
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-ssl-certs-generation-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. SSL certs generation guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. SSL certs generation guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ca-workstation-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CA workstation setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-create-the-correct-directory-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Create the correct directory structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-root-ca-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 — Root CA config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-generate-root-ca-ecdsa-p-256" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 — Generate Root CA (ECDSA P-256)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-intermediate-ca-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 — Intermediate CA config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-generate-and-sign-the-intermediate-ca" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5 — Generate and sign the Intermediate CA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#16-generate-crl-for-both-cas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.6 — Generate CRL for both CAs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#17-node-certificate-generation-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.7 — Node certificate generation script
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#18-generate-all-8-node-certificates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.8 — Generate all 8 node certificates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#19-distribute-certificates-securely" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9 — Distribute certificates securely
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-installation-of-filebeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Installation of Filebeat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Installation of Filebeat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-filebeat-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Filebeat config
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-installation-of-logstash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 Installation of Logstash
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3 Installation of Logstash">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-logstash-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Logstash config
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-installation-of-haproxy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 Installation of HAProxy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4 Installation of HAProxy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#41-haproxy-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 HAProxy configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-installation-of-rsyslog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 Installation of Rsyslog
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5 Installation of Rsyslog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-rsyslog-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Rsyslog configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="high-availability-log-ingestion-pipeline-deployment-guide">High Availability Log Ingestion Pipeline Deployment Guide</h1>
+<h2 id="overview">Overview</h2>
+<p>This document provides a step-by-step deployment guide for implementing a secure, highly available log ingestion pipeline integrated with Wazuh. The architecture uses Filebeat, Logstash, HAProxy, rsyslog, and Wazuh Manager nodes to securely collect, process, load balance, and forward log events.</p>
+<p>The solution implements mutual TLS (mTLS) communication using a private Public Key Infrastructure (PKI) consisting of a Root Certificate Authority (CA), an Intermediate CA, node certificates, certificate chains, and Certificate Revocation Lists (CRLs). Certificates are generated with appropriate server, client, or combined server/client roles based on each component's communication requirements. </p>
+<p>Filebeat collects logs from source systems and forwards them securely to the Logstash nodes. Logstash processes and enriches incoming events before forwarding them through HAProxy. HAProxy provides load balancing, TLS termination and re-encryption, certificate validation, backend health checking, and high availability across the Wazuh Manager nodes. rsyslog receives the forwarded events over TLS and reliably delivers them to the local Wazuh Manager using persistent disk queues. </p>
+<p>The document covers certificate generation and distribution, installation and configuration of each component, TLS and mTLS configuration, load balancing, backend health checks, persistent queue configuration, service management, and deployment across multiple nodes.</p>
+<h2 id="architecture-diagram">Architecture diagram</h2>
+<p><img alt="Logstash" src="../../../../assets/images/POC%27s/Vineeth/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/Logstash.png" /></p>
+<h2 id="1-ssl-certs-generation-guide">1. SSL certs generation guide</h2>
+<h3 id="ca-workstation-setup">CA workstation setup</h3>
+<p>This is done on any one of the 8 VMs.
+Choose one VM to act as the CA workstation and perform all root and intermediate CA operations there.</p>
+<h3 id="11-create-the-correct-directory-structure">1.1 Create the correct directory structure</h3>
+<p>Run the following commands on the selected CA workstation. Use sudo if required and keep private CA directories restricted.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a># Root CA directories
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>mkdir -p /opt/mtls-pki/ca/{certs,crl,newcerts,private}
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>chmod 700 /opt/mtls-pki/ca/private
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a># Intermediate CA directories
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>mkdir -p /opt/mtls-pki/intermediate/{certs,crl,newcerts,private}
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>chmod 700 /opt/mtls-pki/intermediate/private
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a># Issued node certs (one subdir per VM)
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>mkdir -p /opt/mtls-pki/issued/{vm1-filebeat,vm2-logstash1,vm3-logstash2,vm4-logstash3,vm5-haproxy,vm6-rsyslog1,vm7-rsyslog2,vm8-rsyslog3}
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a># Scripts
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>mkdir -p /opt/mtls-pki/scripts
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a># Root CA database
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>touch /opt/mtls-pki/ca/index.txt
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>echo 1000 &gt; /opt/mtls-pki/ca/serial
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>echo 1000 &gt; /opt/mtls-pki/ca/crlnumber
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a># Intermediate CA database
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>touch /opt/mtls-pki/intermediate/index.txt
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>echo 2000 &gt; /opt/mtls-pki/intermediate/serial
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>echo 2000 &gt; /opt/mtls-pki/intermediate/crlnumber
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a># Verify
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>find /opt/mtls-pki -type d | sort
+</code></pre></div>
+Verify the directory layout and permissions before continuing.</p>
+<h3 id="12-root-ca-config">1.2 — Root CA config</h3>
+<p>Create the root CA OpenSSL config file before generating any certificates. This file defines CA behavior and certificate constraints.
+Save as /opt/mtls-pki/ca/openssl-root.cnf:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[ ca ]
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>default_ca = CA_default
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>[ CA_default ]
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>dir               = /opt/mtls-pki/ca
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>certs             = $dir/certs
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>crl_dir           = $dir/crl
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>new_certs_dir     = $dir/newcerts
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>database          = $dir/index.txt
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>serial            = $dir/serial
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>RANDFILE          = $dir/private/.rand
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>private_key       = $dir/private/ca.key.pem
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>certificate       = $dir/certs/ca.cert.pem
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>crlnumber         = $dir/crlnumber
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>crl               = $dir/crl/ca.crl.pem
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>crl_extensions    = crl_ext
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>default_crl_days  = 30
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>default_md        = sha256
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>name_opt          = ca_default
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>cert_opt          = ca_default
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>default_days      = 3650
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>preserve          = no
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>policy            = policy_strict
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>[ policy_strict ]
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>countryName             = match
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>stateOrProvinceName     = match
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>organizationName        = match
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>organizationalUnitName  = optional
+<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a>commonName              = supplied
+<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a>emailAddress            = optional
+<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a>
+<a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a>[ req ]
+<a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a>default_bits        = 4096
+<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a>distinguished_name  = req_distinguished_name
+<a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a>string_mask         = utf8only
+<a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>default_md          = sha256
+<a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a>x509_extensions     = v3_ca
+<a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a>prompt              = no
+<a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a>
+<a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a>[ req_distinguished_name ]
+<a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a>countryName             = IN
+<a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a>stateOrProvinceName     = Telangana
+<a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a>localityName            = Hyderabad
+<a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a>organizationName        = MyOrg
+<a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a>organizationalUnitName  = IT Security
+<a id="__codelineno-1-47" name="__codelineno-1-47" href="#__codelineno-1-47"></a>commonName              = MyOrg Root CA
+<a id="__codelineno-1-48" name="__codelineno-1-48" href="#__codelineno-1-48"></a>
+<a id="__codelineno-1-49" name="__codelineno-1-49" href="#__codelineno-1-49"></a>[ v3_ca ]
+<a id="__codelineno-1-50" name="__codelineno-1-50" href="#__codelineno-1-50"></a>subjectKeyIdentifier   = hash
+<a id="__codelineno-1-51" name="__codelineno-1-51" href="#__codelineno-1-51"></a>authorityKeyIdentifier = keyid:always,issuer
+<a id="__codelineno-1-52" name="__codelineno-1-52" href="#__codelineno-1-52"></a>basicConstraints       = critical, CA:true, pathlen:1
+<a id="__codelineno-1-53" name="__codelineno-1-53" href="#__codelineno-1-53"></a>keyUsage               = critical, digitalSignature, cRLSign, keyCertSign
+<a id="__codelineno-1-54" name="__codelineno-1-54" href="#__codelineno-1-54"></a>
+<a id="__codelineno-1-55" name="__codelineno-1-55" href="#__codelineno-1-55"></a>[ v3_intermediate_ca ]
+<a id="__codelineno-1-56" name="__codelineno-1-56" href="#__codelineno-1-56"></a>subjectKeyIdentifier   = hash
+<a id="__codelineno-1-57" name="__codelineno-1-57" href="#__codelineno-1-57"></a>authorityKeyIdentifier = keyid:always,issuer
+<a id="__codelineno-1-58" name="__codelineno-1-58" href="#__codelineno-1-58"></a>basicConstraints       = critical, CA:true, pathlen:0
+<a id="__codelineno-1-59" name="__codelineno-1-59" href="#__codelineno-1-59"></a>keyUsage               = critical, digitalSignature, cRLSign, keyCertSign
+<a id="__codelineno-1-60" name="__codelineno-1-60" href="#__codelineno-1-60"></a>
+<a id="__codelineno-1-61" name="__codelineno-1-61" href="#__codelineno-1-61"></a>[ crl_ext ]
+<a id="__codelineno-1-62" name="__codelineno-1-62" href="#__codelineno-1-62"></a>authorityKeyIdentifier = keyid:always
+</code></pre></div>
+Double-check the file path and contents before moving on.</p>
+<h3 id="13-generate-root-ca-ecdsa-p-256">1.3 — Generate Root CA (ECDSA P-256)</h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a># Generate Root CA private key — ECDSA P-256
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>openssl ecparam \
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  -name prime256v1 \
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  -genkey \
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>  -noout \
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  -out /opt/mtls-pki/ca/private/ca.key.pem
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a># Encrypt the key at rest (you will be prompted for a passphrase — keep it safe)
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>openssl pkcs8 \
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>  -topk8 \
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>  -v2 aes-256-cbc \
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>  -in  /opt/mtls-pki/ca/private/ca.key.pem \
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>  -out /opt/mtls-pki/ca/private/ca.key.enc.pem
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>mv /opt/mtls-pki/ca/private/ca.key.enc.pem /opt/mtls-pki/ca/private/ca.key.pem
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>chmod 400 /opt/mtls-pki/ca/private/ca.key.pem
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a># Self-sign the Root CA cert (10 years)
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>openssl req \
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>  -config  /opt/mtls-pki/ca/openssl-root.cnf \
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>  -key     /opt/mtls-pki/ca/private/ca.key.pem \
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>  -new -x509 \
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>  -days 3650 \
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>  -sha256 \
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>  -extensions v3_ca \
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>  -out /opt/mtls-pki/ca/certs/ca.cert.pem
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>chmod 444 /opt/mtls-pki/ca/certs/ca.cert.pem
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a># Verify — you must see CA:TRUE and pathlen:1
+<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a>openssl x509 -noout -text -in /opt/mtls-pki/ca/certs/ca.cert.pem | \
+<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>  grep -A4 &quot;Basic Constraints&quot;
+</code></pre></div>
+Expected output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>X509v3 Basic Constraints: critical
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    CA:TRUE, pathlen:1
+</code></pre></div></p>
+<h3 id="14-intermediate-ca-config">1.4 — Intermediate CA config</h3>
+<p>Save as /opt/mtls-pki/intermediate/openssl-intermediate.cnf:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>[ ca ]
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>default_ca = CA_default
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>[ CA_default ]
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>dir               = /opt/mtls-pki/intermediate
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>certs             = $dir/certs
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>crl_dir           = $dir/crl
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>new_certs_dir     = $dir/newcerts
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>database          = $dir/index.txt
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>serial            = $dir/serial
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>RANDFILE          = $dir/private/.rand
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>private_key       = $dir/private/intermediate.key.pem
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>certificate       = $dir/certs/intermediate.cert.pem
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>crlnumber         = $dir/crlnumber
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>crl               = $dir/crl/intermediate.crl.pem
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>crl_extensions    = crl_ext
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>default_crl_days  = 15
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>default_md        = sha256
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>name_opt          = ca_default
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>cert_opt          = ca_default
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>default_days      = 825
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>preserve          = no
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>policy            = policy_loose
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>[ policy_loose ]
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>countryName             = optional
+<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>stateOrProvinceName     = optional
+<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>localityName            = optional
+<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>organizationName        = optional
+<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>organizationalUnitName  = optional
+<a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>commonName              = supplied
+<a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>emailAddress            = optional
+<a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a>
+<a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a>[ req ]
+<a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a>default_bits        = 4096
+<a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a>distinguished_name  = req_distinguished_name
+<a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a>string_mask         = utf8only
+<a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a>default_md          = sha256
+<a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a>prompt              = no
+<a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a>
+<a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a>[ req_distinguished_name ]
+<a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a>countryName             = IN
+<a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a>stateOrProvinceName     = Telangana
+<a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a>localityName            = Hyderabad
+<a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a>organizationName        = MyOrg
+<a id="__codelineno-4-46" name="__codelineno-4-46" href="#__codelineno-4-46"></a>organizationalUnitName  = IT Security
+<a id="__codelineno-4-47" name="__codelineno-4-47" href="#__codelineno-4-47"></a>commonName              = MyOrg Intermediate CA
+<a id="__codelineno-4-48" name="__codelineno-4-48" href="#__codelineno-4-48"></a>
+<a id="__codelineno-4-49" name="__codelineno-4-49" href="#__codelineno-4-49"></a>[ server_cert ]
+<a id="__codelineno-4-50" name="__codelineno-4-50" href="#__codelineno-4-50"></a>basicConstraints       = critical, CA:FALSE
+<a id="__codelineno-4-51" name="__codelineno-4-51" href="#__codelineno-4-51"></a>subjectKeyIdentifier   = hash
+<a id="__codelineno-4-52" name="__codelineno-4-52" href="#__codelineno-4-52"></a>authorityKeyIdentifier = keyid,issuer
+<a id="__codelineno-4-53" name="__codelineno-4-53" href="#__codelineno-4-53"></a>keyUsage               = critical, digitalSignature, keyEncipherment
+<a id="__codelineno-4-54" name="__codelineno-4-54" href="#__codelineno-4-54"></a>extendedKeyUsage       = serverAuth
+<a id="__codelineno-4-55" name="__codelineno-4-55" href="#__codelineno-4-55"></a>
+<a id="__codelineno-4-56" name="__codelineno-4-56" href="#__codelineno-4-56"></a>[ client_cert ]
+<a id="__codelineno-4-57" name="__codelineno-4-57" href="#__codelineno-4-57"></a>basicConstraints       = critical, CA:FALSE
+<a id="__codelineno-4-58" name="__codelineno-4-58" href="#__codelineno-4-58"></a>subjectKeyIdentifier   = hash
+<a id="__codelineno-4-59" name="__codelineno-4-59" href="#__codelineno-4-59"></a>authorityKeyIdentifier = keyid,issuer
+<a id="__codelineno-4-60" name="__codelineno-4-60" href="#__codelineno-4-60"></a>keyUsage               = critical, digitalSignature, keyEncipherment
+<a id="__codelineno-4-61" name="__codelineno-4-61" href="#__codelineno-4-61"></a>extendedKeyUsage       = clientAuth
+<a id="__codelineno-4-62" name="__codelineno-4-62" href="#__codelineno-4-62"></a>
+<a id="__codelineno-4-63" name="__codelineno-4-63" href="#__codelineno-4-63"></a>[ server_client_cert ]
+<a id="__codelineno-4-64" name="__codelineno-4-64" href="#__codelineno-4-64"></a>basicConstraints       = critical, CA:FALSE
+<a id="__codelineno-4-65" name="__codelineno-4-65" href="#__codelineno-4-65"></a>subjectKeyIdentifier   = hash
+<a id="__codelineno-4-66" name="__codelineno-4-66" href="#__codelineno-4-66"></a>authorityKeyIdentifier = keyid,issuer
+<a id="__codelineno-4-67" name="__codelineno-4-67" href="#__codelineno-4-67"></a>keyUsage               = critical, digitalSignature, keyEncipherment
+<a id="__codelineno-4-68" name="__codelineno-4-68" href="#__codelineno-4-68"></a>extendedKeyUsage       = serverAuth, clientAuth
+<a id="__codelineno-4-69" name="__codelineno-4-69" href="#__codelineno-4-69"></a>
+<a id="__codelineno-4-70" name="__codelineno-4-70" href="#__codelineno-4-70"></a>[ crl_ext ]
+<a id="__codelineno-4-71" name="__codelineno-4-71" href="#__codelineno-4-71"></a>authorityKeyIdentifier = keyid:always
+</code></pre></div>
+<h3 id="15-generate-and-sign-the-intermediate-ca">1.5 — Generate and sign the Intermediate CA</h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a># Generate Intermediate CA key — ECDSA P-256
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>openssl ecparam \
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>  -name prime256v1 \
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>  -genkey \
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>  -noout \
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>  -out /opt/mtls-pki/intermediate/private/intermediate.key.pem
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a># Encrypt it
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>openssl pkcs8 \
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>  -topk8 -v2 aes-256-cbc \
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>  -in  /opt/mtls-pki/intermediate/private/intermediate.key.pem \
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>  -out /opt/mtls-pki/intermediate/private/intermediate.key.enc.pem
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>mv /opt/mtls-pki/intermediate/private/intermediate.key.enc.pem \
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>   /opt/mtls-pki/intermediate/private/intermediate.key.pem
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>chmod 400 /opt/mtls-pki/intermediate/private/intermediate.key.pem
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a># Generate CSR for the Intermediate CA
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>openssl req \
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>  -config /opt/mtls-pki/intermediate/openssl-intermediate.cnf \
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>  -key    /opt/mtls-pki/intermediate/private/intermediate.key.pem \
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>  -new -sha256 \
+<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>  -out /opt/mtls-pki/intermediate/certs/intermediate.csr.pem
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>
+<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a># Root CA signs the Intermediate CA cert (5 years, pathlen:0)
+<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>openssl ca \
+<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>  -config     /opt/mtls-pki/ca/openssl-root.cnf \
+<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>  -extensions v3_intermediate_ca \
+<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>  -days       1825 \
+<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>  -notext -md sha256 \
+<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a>  -in  /opt/mtls-pki/intermediate/certs/intermediate.csr.pem \
+<a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a>  -out /opt/mtls-pki/intermediate/certs/intermediate.cert.pem
+<a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a>
+<a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a>chmod 444 /opt/mtls-pki/intermediate/certs/intermediate.cert.pem
+<a id="__codelineno-5-35" name="__codelineno-5-35" href="#__codelineno-5-35"></a>
+<a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a># Build the CA chain file (intermediate + root, ordered)
+<a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a>cat /opt/mtls-pki/intermediate/certs/intermediate.cert.pem \
+<a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a>    /opt/mtls-pki/ca/certs/ca.cert.pem \
+<a id="__codelineno-5-39" name="__codelineno-5-39" href="#__codelineno-5-39"></a>  &gt; /opt/mtls-pki/intermediate/certs/ca-chain.cert.pem
+<a id="__codelineno-5-40" name="__codelineno-5-40" href="#__codelineno-5-40"></a>chmod 444 /opt/mtls-pki/intermediate/certs/ca-chain.cert.pem
+<a id="__codelineno-5-41" name="__codelineno-5-41" href="#__codelineno-5-41"></a>
+<a id="__codelineno-5-42" name="__codelineno-5-42" href="#__codelineno-5-42"></a># Verify the intermediate against root — must say OK
+<a id="__codelineno-5-43" name="__codelineno-5-43" href="#__codelineno-5-43"></a>openssl verify \
+<a id="__codelineno-5-44" name="__codelineno-5-44" href="#__codelineno-5-44"></a>  -CAfile /opt/mtls-pki/ca/certs/ca.cert.pem \
+<a id="__codelineno-5-45" name="__codelineno-5-45" href="#__codelineno-5-45"></a>  /opt/mtls-pki/intermediate/certs/intermediate.cert.pem
+<a id="__codelineno-5-46" name="__codelineno-5-46" href="#__codelineno-5-46"></a>
+<a id="__codelineno-5-47" name="__codelineno-5-47" href="#__codelineno-5-47"></a># Verify pathlen:0
+<a id="__codelineno-5-48" name="__codelineno-5-48" href="#__codelineno-5-48"></a>openssl x509 -noout -text \
+<a id="__codelineno-5-49" name="__codelineno-5-49" href="#__codelineno-5-49"></a>  -in /opt/mtls-pki/intermediate/certs/intermediate.cert.pem | \
+<a id="__codelineno-5-50" name="__codelineno-5-50" href="#__codelineno-5-50"></a>  grep -A4 &quot;Basic Constraints&quot;
+</code></pre></div>
+Expected:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>X509v3 Basic Constraints: critical
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    CA:TRUE, pathlen:0
+</code></pre></div></p>
+<h3 id="16-generate-crl-for-both-cas">1.6 — Generate CRL for both CAs</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a># Root CA CRL
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>openssl ca \
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>  -config /opt/mtls-pki/ca/openssl-root.cnf \
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>  -gencrl \
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>  -out /opt/mtls-pki/ca/crl/ca.crl.pem
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a># Intermediate CA CRL
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>openssl ca \
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>  -config /opt/mtls-pki/intermediate/openssl-intermediate.cnf \
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>  -gencrl \
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>  -out /opt/mtls-pki/intermediate/crl/intermediate.crl.pem
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a># Combine for distribution (HAProxy and Logstash consume this)
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>cat /opt/mtls-pki/intermediate/crl/intermediate.crl.pem \
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>    /opt/mtls-pki/ca/crl/ca.crl.pem \
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>  &gt; /opt/mtls-pki/intermediate/crl/ca-chain.crl.pem
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a># Verify both CRLs
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>openssl crl -noout -text -in /opt/mtls-pki/ca/crl/ca.crl.pem | head -10
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>openssl crl -noout -text -in /opt/mtls-pki/intermediate/crl/intermediate.crl.pem | head -10
+</code></pre></div>
+<h3 id="17-node-certificate-generation-script">1.7 — Node certificate generation script</h3>
+<p>Save as /opt/mtls-pki/scripts/gen-cert.sh:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>#!/bin/bash
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a># Usage: ./gen-cert.sh &lt;hostname&gt; &lt;ip&gt; &lt;role&gt;
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a># role: server | client | server_client
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>set -euo pipefail
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>HOSTNAME=&quot;$1&quot;
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>IP=&quot;$2&quot;
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>ROLE=&quot;$3&quot;
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>DAYS=825     # Max enforced by Chrome/Apple — never exceed
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>INTDIR=&quot;/opt/mtls-pki/intermediate&quot;
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>OUTDIR=&quot;/opt/mtls-pki/issued/${HOSTNAME}&quot;
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>mkdir -p &quot;${OUTDIR}&quot;
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>echo &quot;&gt;&gt;&gt; Generating ECDSA P-256 key for ${HOSTNAME}&quot;
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>openssl ecparam \
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>  -name prime256v1 \
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>  -genkey -noout \
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>  -out &quot;${OUTDIR}/${HOSTNAME}.key.pem&quot;
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>chmod 400 &quot;${OUTDIR}/${HOSTNAME}.key.pem&quot;
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a># Build SAN extension file — this is what fixes the &quot;san section&quot; error
+<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a># We use -extfile with openssl x509, NOT openssl ca -extensions
+<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>EXT_FILE=&quot;$(mktemp /tmp/san-XXXXXX.cnf)&quot;
+<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>cat &gt; &quot;${EXT_FILE}&quot; &lt;&lt;EXTEOF
+<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a>[ req ]
+<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a>distinguished_name = req_distinguished_name
+<a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>prompt = no
+<a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a>
+<a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a>[ req_distinguished_name ]
+<a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a>C  = IN
+<a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a>ST = Telangana
+<a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a>L  = Hyderabad
+<a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a>O  = MyOrg
+<a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a>CN = ${HOSTNAME}
+<a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a>
+<a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a>[ v3_req ]
+<a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a>basicConstraints       = critical, CA:FALSE
+<a id="__codelineno-8-39" name="__codelineno-8-39" href="#__codelineno-8-39"></a>subjectKeyIdentifier   = hash
+<a id="__codelineno-8-40" name="__codelineno-8-40" href="#__codelineno-8-40"></a>authorityKeyIdentifier = keyid,issuer
+<a id="__codelineno-8-41" name="__codelineno-8-41" href="#__codelineno-8-41"></a>subjectAltName         = @alt_names
+<a id="__codelineno-8-42" name="__codelineno-8-42" href="#__codelineno-8-42"></a>keyUsage               = critical, digitalSignature, keyEncipherment
+<a id="__codelineno-8-43" name="__codelineno-8-43" href="#__codelineno-8-43"></a>EXTEOF
+<a id="__codelineno-8-44" name="__codelineno-8-44" href="#__codelineno-8-44"></a>
+<a id="__codelineno-8-45" name="__codelineno-8-45" href="#__codelineno-8-45"></a>case &quot;${ROLE}&quot; in
+<a id="__codelineno-8-46" name="__codelineno-8-46" href="#__codelineno-8-46"></a>  server)        echo &quot;extendedKeyUsage = serverAuth&quot;             &gt;&gt; &quot;${EXT_FILE}&quot; ;;
+<a id="__codelineno-8-47" name="__codelineno-8-47" href="#__codelineno-8-47"></a>  client)        echo &quot;extendedKeyUsage = clientAuth&quot;             &gt;&gt; &quot;${EXT_FILE}&quot; ;;
+<a id="__codelineno-8-48" name="__codelineno-8-48" href="#__codelineno-8-48"></a>  server_client) echo &quot;extendedKeyUsage = serverAuth, clientAuth&quot; &gt;&gt; &quot;${EXT_FILE}&quot; ;;
+<a id="__codelineno-8-49" name="__codelineno-8-49" href="#__codelineno-8-49"></a>  *) echo &quot;Unknown role: ${ROLE}. Use server|client|server_client&quot;; exit 1 ;;
+<a id="__codelineno-8-50" name="__codelineno-8-50" href="#__codelineno-8-50"></a>esac
+<a id="__codelineno-8-51" name="__codelineno-8-51" href="#__codelineno-8-51"></a>
+<a id="__codelineno-8-52" name="__codelineno-8-52" href="#__codelineno-8-52"></a>cat &gt;&gt; &quot;${EXT_FILE}&quot; &lt;&lt;ALTEOF
+<a id="__codelineno-8-53" name="__codelineno-8-53" href="#__codelineno-8-53"></a>
+<a id="__codelineno-8-54" name="__codelineno-8-54" href="#__codelineno-8-54"></a>[ alt_names ]
+<a id="__codelineno-8-55" name="__codelineno-8-55" href="#__codelineno-8-55"></a>DNS.1 = ${HOSTNAME}
+<a id="__codelineno-8-56" name="__codelineno-8-56" href="#__codelineno-8-56"></a>IP.1  = ${IP}
+<a id="__codelineno-8-57" name="__codelineno-8-57" href="#__codelineno-8-57"></a>ALTEOF
+<a id="__codelineno-8-58" name="__codelineno-8-58" href="#__codelineno-8-58"></a>
+<a id="__codelineno-8-59" name="__codelineno-8-59" href="#__codelineno-8-59"></a>echo &quot;&gt;&gt;&gt; Generating CSR&quot;
+<a id="__codelineno-8-60" name="__codelineno-8-60" href="#__codelineno-8-60"></a>openssl req \
+<a id="__codelineno-8-61" name="__codelineno-8-61" href="#__codelineno-8-61"></a>  -new -sha256 \
+<a id="__codelineno-8-62" name="__codelineno-8-62" href="#__codelineno-8-62"></a>  -key    &quot;${OUTDIR}/${HOSTNAME}.key.pem&quot; \
+<a id="__codelineno-8-63" name="__codelineno-8-63" href="#__codelineno-8-63"></a>  -config &quot;${EXT_FILE}&quot; \
+<a id="__codelineno-8-64" name="__codelineno-8-64" href="#__codelineno-8-64"></a>  -out    &quot;${OUTDIR}/${HOSTNAME}.csr.pem&quot;
+<a id="__codelineno-8-65" name="__codelineno-8-65" href="#__codelineno-8-65"></a>
+<a id="__codelineno-8-66" name="__codelineno-8-66" href="#__codelineno-8-66"></a>echo &quot;&gt;&gt;&gt; Signing with Intermediate CA&quot;
+<a id="__codelineno-8-67" name="__codelineno-8-67" href="#__codelineno-8-67"></a># Use openssl x509 -req + -extfile to avoid the [san] section issue entirely
+<a id="__codelineno-8-68" name="__codelineno-8-68" href="#__codelineno-8-68"></a>openssl x509 -req \
+<a id="__codelineno-8-69" name="__codelineno-8-69" href="#__codelineno-8-69"></a>  -in      &quot;${OUTDIR}/${HOSTNAME}.csr.pem&quot; \
+<a id="__codelineno-8-70" name="__codelineno-8-70" href="#__codelineno-8-70"></a>  -CA      &quot;${INTDIR}/certs/intermediate.cert.pem&quot; \
+<a id="__codelineno-8-71" name="__codelineno-8-71" href="#__codelineno-8-71"></a>  -CAkey   &quot;${INTDIR}/private/intermediate.key.pem&quot; \
+<a id="__codelineno-8-72" name="__codelineno-8-72" href="#__codelineno-8-72"></a>  -CAserial &quot;${INTDIR}/serial&quot; \
+<a id="__codelineno-8-73" name="__codelineno-8-73" href="#__codelineno-8-73"></a>  -days    &quot;${DAYS}&quot; \
+<a id="__codelineno-8-74" name="__codelineno-8-74" href="#__codelineno-8-74"></a>  -sha256 \
+<a id="__codelineno-8-75" name="__codelineno-8-75" href="#__codelineno-8-75"></a>  -extfile &quot;${EXT_FILE}&quot; \
+<a id="__codelineno-8-76" name="__codelineno-8-76" href="#__codelineno-8-76"></a>  -extensions v3_req \
+<a id="__codelineno-8-77" name="__codelineno-8-77" href="#__codelineno-8-77"></a>  -out     &quot;${OUTDIR}/${HOSTNAME}.cert.pem&quot;
+<a id="__codelineno-8-78" name="__codelineno-8-78" href="#__codelineno-8-78"></a>
+<a id="__codelineno-8-79" name="__codelineno-8-79" href="#__codelineno-8-79"></a>chmod 444 &quot;${OUTDIR}/${HOSTNAME}.cert.pem&quot;
+<a id="__codelineno-8-80" name="__codelineno-8-80" href="#__codelineno-8-80"></a>
+<a id="__codelineno-8-81" name="__codelineno-8-81" href="#__codelineno-8-81"></a># Full chain: node cert + intermediate cert + root cert
+<a id="__codelineno-8-82" name="__codelineno-8-82" href="#__codelineno-8-82"></a>cat &quot;${OUTDIR}/${HOSTNAME}.cert.pem&quot; \
+<a id="__codelineno-8-83" name="__codelineno-8-83" href="#__codelineno-8-83"></a>    &quot;${INTDIR}/certs/intermediate.cert.pem&quot; \
+<a id="__codelineno-8-84" name="__codelineno-8-84" href="#__codelineno-8-84"></a>    &quot;/opt/mtls-pki/ca/certs/ca.cert.pem&quot; \
+<a id="__codelineno-8-85" name="__codelineno-8-85" href="#__codelineno-8-85"></a>  &gt; &quot;${OUTDIR}/${HOSTNAME}.chain.pem&quot;
+<a id="__codelineno-8-86" name="__codelineno-8-86" href="#__codelineno-8-86"></a>
+<a id="__codelineno-8-87" name="__codelineno-8-87" href="#__codelineno-8-87"></a># Verify the signed cert against the full chain
+<a id="__codelineno-8-88" name="__codelineno-8-88" href="#__codelineno-8-88"></a>openssl verify \
+<a id="__codelineno-8-89" name="__codelineno-8-89" href="#__codelineno-8-89"></a>  -CAfile &quot;${INTDIR}/certs/ca-chain.cert.pem&quot; \
+<a id="__codelineno-8-90" name="__codelineno-8-90" href="#__codelineno-8-90"></a>  &quot;${OUTDIR}/${HOSTNAME}.cert.pem&quot;
+<a id="__codelineno-8-91" name="__codelineno-8-91" href="#__codelineno-8-91"></a>
+<a id="__codelineno-8-92" name="__codelineno-8-92" href="#__codelineno-8-92"></a># Print SANs and dates for confirmation
+<a id="__codelineno-8-93" name="__codelineno-8-93" href="#__codelineno-8-93"></a>openssl x509 -noout -subject -issuer -dates \
+<a id="__codelineno-8-94" name="__codelineno-8-94" href="#__codelineno-8-94"></a>  -ext subjectAltName,extendedKeyUsage \
+<a id="__codelineno-8-95" name="__codelineno-8-95" href="#__codelineno-8-95"></a>  -in &quot;${OUTDIR}/${HOSTNAME}.cert.pem&quot;
+<a id="__codelineno-8-96" name="__codelineno-8-96" href="#__codelineno-8-96"></a>
+<a id="__codelineno-8-97" name="__codelineno-8-97" href="#__codelineno-8-97"></a>rm -f &quot;${EXT_FILE}&quot;
+<a id="__codelineno-8-98" name="__codelineno-8-98" href="#__codelineno-8-98"></a>echo &quot;&gt;&gt;&gt; Done: ${OUTDIR}/&quot;
+<a id="__codelineno-8-99" name="__codelineno-8-99" href="#__codelineno-8-99"></a>ls -lh &quot;${OUTDIR}/&quot;
+</code></pre></div>
+Give the permissions to it</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>chmod +x /opt/mtls-pki/scripts/gen-cert.sh
+</code></pre></div>
+<h3 id="18-generate-all-8-node-certificates">1.8 — Generate all 8 node certificates</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>cd /opt/mtls-pki/scripts
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a># VM1 — Filebeat: connects OUT to HAProxy → client only
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>./gen-cert.sh vm1-filebeat   10.0.1.11  client
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a># VM5 — HAProxy: receives from Filebeat (server) + connects to Logstash (client)
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>./gen-cert.sh vm5-haproxy    10.0.1.15  server_client
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a># VM6 — rsyslog1: Logstash connects TO it → server only
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>./gen-cert.sh vm6-rsyslog1   10.0.1.16  server
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a># VM7 — rsyslog2
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>./gen-cert.sh vm7-rsyslog2   10.0.1.17  server
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a># VM8 — rsyslog3
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>./gen-cert.sh vm8-rsyslog3   10.0.1.18  server
+</code></pre></div>
+<p>To Generate the certs in logstash need to change few lines in gen-cert.sh as below</p>
+<p>From
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>echo &quot;&gt;&gt;&gt; Generating ECDSA P-256 key for ${HOSTNAME}&quot;
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>openssl ecparam \
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>  -name prime256v1 \
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>  -genkey -noout \
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>  -out &quot;${OUTDIR}/${HOSTNAME}.key.pem&quot;
+</code></pre></div>
+To
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>openssl genrsa \
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>-out &quot;${OUTDIR}/${HOSTNAME}.key.pem&quot; \
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>4096
+</code></pre></div>
+Then generate the certs for logstash
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a># VM2 — Logstash1: accepts connections (server) + connects to rsyslog (client)
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>./gen-cert.sh vm2-logstash1  10.0.1.12  server_client
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a># VM3 — Logstash2
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>./gen-cert.sh vm3-logstash2  10.0.1.13  server_client
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a># VM4 — Logstash3
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>./gen-cert.sh vm4-logstash3  10.0.1.14  server_client
+</code></pre></div></p>
+<h3 id="19-distribute-certificates-securely">1.9 — Distribute certificates securely</h3>
+<p>Distribute the certificates securely</p>
+<h2 id="2-installation-of-filebeat">2. Installation of Filebeat</h2>
+<h3 id="21-installation">2.1 Installation</h3>
+<p>Follow the below steps to install the filebeat
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>sudo apt update
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>sudo apt install filebeat -y
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>sudo systemctl enable filebeat
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>systemctl status filebeat
+</code></pre></div></p>
+<h3 id="22-filebeat-config">2.2 Filebeat config</h3>
+<p>Take the backup of original filebeat.yml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>cd /etc/filebeat/
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>mv filebeat.yml filebeat.yml-backup
+</code></pre></div>
+Add the below content in filebeat.yml file
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a># ============================================================
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a># INPUTS
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a># ============================================================
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>filebeat.inputs:
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>  - type: filestream          
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>    id: app-log-stream       
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>    enabled: true
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>    paths:
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>      - /var/log/applog/app.log
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>    encoding: utf-8
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>    close.inactive: 2m        
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>    clean_inactive: 72h       
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>    clean_removed: true       
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>    prospector.scanner.scan_frequency: 5s
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>    fields:
+<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a>      log_type: linux-auth
+<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a>      tenant: tenantB
+<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a>      source_app: fake_app_generator
+<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a>    fields_under_root: true
+<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a>
+<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a># ============================================================
+<a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a># DISK QUEUE  (replaces in-memory queue; survives Filebeat restart)
+<a id="__codelineno-16-24" name="__codelineno-16-24" href="#__codelineno-16-24"></a># ============================================================
+<a id="__codelineno-16-25" name="__codelineno-16-25" href="#__codelineno-16-25"></a>queue.disk:
+<a id="__codelineno-16-26" name="__codelineno-16-26" href="#__codelineno-16-26"></a>  path: &quot;${path.data}/diskqueue&quot;
+<a id="__codelineno-16-27" name="__codelineno-16-27" href="#__codelineno-16-27"></a>  max_size: 10GB
+<a id="__codelineno-16-28" name="__codelineno-16-28" href="#__codelineno-16-28"></a>  segment_size: 512MB         
+<a id="__codelineno-16-29" name="__codelineno-16-29" href="#__codelineno-16-29"></a>  read_ahead: 1024            
+<a id="__codelineno-16-30" name="__codelineno-16-30" href="#__codelineno-16-30"></a>
+<a id="__codelineno-16-31" name="__codelineno-16-31" href="#__codelineno-16-31"></a># ============================================================
+<a id="__codelineno-16-32" name="__codelineno-16-32" href="#__codelineno-16-32"></a># OUTPUT — point ONLY at HAProxy VIP, not individual Logstash nodes
+<a id="__codelineno-16-33" name="__codelineno-16-33" href="#__codelineno-16-33"></a># ============================================================
+<a id="__codelineno-16-34" name="__codelineno-16-34" href="#__codelineno-16-34"></a>output.logstash:
+<a id="__codelineno-16-35" name="__codelineno-16-35" href="#__codelineno-16-35"></a>  hosts:
+<a id="__codelineno-16-36" name="__codelineno-16-36" href="#__codelineno-16-36"></a>    - logstash_IP:5044
+<a id="__codelineno-16-37" name="__codelineno-16-37" href="#__codelineno-16-37"></a>    - logstash_IP:5044
+<a id="__codelineno-16-38" name="__codelineno-16-38" href="#__codelineno-16-38"></a>    - logstash_IP:5044
+<a id="__codelineno-16-39" name="__codelineno-16-39" href="#__codelineno-16-39"></a>  loadbalance: true           
+<a id="__codelineno-16-40" name="__codelineno-16-40" href="#__codelineno-16-40"></a>  worker: 4                   
+<a id="__codelineno-16-41" name="__codelineno-16-41" href="#__codelineno-16-41"></a>  bulk_max_size: 1024         
+<a id="__codelineno-16-42" name="__codelineno-16-42" href="#__codelineno-16-42"></a>  pipelining: 2               
+<a id="__codelineno-16-43" name="__codelineno-16-43" href="#__codelineno-16-43"></a>  compression_level: 3       
+<a id="__codelineno-16-44" name="__codelineno-16-44" href="#__codelineno-16-44"></a>  timeout: 30s                
+<a id="__codelineno-16-45" name="__codelineno-16-45" href="#__codelineno-16-45"></a>  backoff.init: 1s
+<a id="__codelineno-16-46" name="__codelineno-16-46" href="#__codelineno-16-46"></a>  backoff.max: 60s
+<a id="__codelineno-16-47" name="__codelineno-16-47" href="#__codelineno-16-47"></a>
+<a id="__codelineno-16-48" name="__codelineno-16-48" href="#__codelineno-16-48"></a>  ssl:
+<a id="__codelineno-16-49" name="__codelineno-16-49" href="#__codelineno-16-49"></a>    enabled: true
+<a id="__codelineno-16-50" name="__codelineno-16-50" href="#__codelineno-16-50"></a>    certificate_authorities:
+<a id="__codelineno-16-51" name="__codelineno-16-51" href="#__codelineno-16-51"></a>      - /etc/filebeat/mcerts/ca-chain.cert.pem
+<a id="__codelineno-16-52" name="__codelineno-16-52" href="#__codelineno-16-52"></a>    certificate: /etc/filebeat/mcerts/filebeat01.crt
+<a id="__codelineno-16-53" name="__codelineno-16-53" href="#__codelineno-16-53"></a>    key:         /etc/filebeat/mcerts/filebeat01.key
+<a id="__codelineno-16-54" name="__codelineno-16-54" href="#__codelineno-16-54"></a>    verification_mode: full  
+<a id="__codelineno-16-55" name="__codelineno-16-55" href="#__codelineno-16-55"></a>    supported_protocols:      
+<a id="__codelineno-16-56" name="__codelineno-16-56" href="#__codelineno-16-56"></a>      - TLSv1.2
+<a id="__codelineno-16-57" name="__codelineno-16-57" href="#__codelineno-16-57"></a>      - TLSv1.3
+<a id="__codelineno-16-58" name="__codelineno-16-58" href="#__codelineno-16-58"></a>    cipher_suites:
+<a id="__codelineno-16-59" name="__codelineno-16-59" href="#__codelineno-16-59"></a>      - ECDHE-ECDSA-AES-128-GCM-SHA256
+<a id="__codelineno-16-60" name="__codelineno-16-60" href="#__codelineno-16-60"></a>      - ECDHE-ECDSA-AES-256-GCM-SHA384
+<a id="__codelineno-16-61" name="__codelineno-16-61" href="#__codelineno-16-61"></a>      - ECDHE-ECDSA-CHACHA20-POLY1305
+<a id="__codelineno-16-62" name="__codelineno-16-62" href="#__codelineno-16-62"></a>    renegotiation: never
+</code></pre></div>
+change the path to logs path, replace the logstash_IP with 3 logstash ip's and relace the certs at exact directory as generated in the initial stage.</p>
+<p>Then restart the filebeat</p>
+<h2 id="3-installation-of-logstash">3 Installation of Logstash</h2>
+<h3 id="31-installation">3.1 Installation</h3>
+<p>Follow the below steps to install the logstash</p>
+<p>Download and install the Public Signing Key:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic-keyring.gpg
+</code></pre></div>
+You may need to install the apt-transport-https package on Debian before proceeding:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>sudo apt-get install apt-transport-https
+</code></pre></div>
+Save the repository definition to /etc/apt/sources.list.d/elastic-9.x.list:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>echo &quot;deb [signed-by=/usr/share/keyrings/elastic-keyring.gpg] https://artifacts.elastic.co/packages/9.x/apt stable main&quot; | sudo tee -a /etc/apt/sources.list.d/elastic-9.x.list
+</code></pre></div></p>
+<p>Run sudo apt-get update and the repository is ready for use. You can install it with:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>sudo apt-get update &amp;&amp; sudo apt-get install logstash
+</code></pre></div></p>
+<h3 id="32-logstash-config">3.2 Logstash config</h3>
+<p>Add Logstash pipeline configuration and SSL settings here. Ensure the input, filter, and output sections match the deployed certificate locations and that Logstash is configured to use the same CA chain as Filebeat.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>cd /etc/logstash/conf.d/
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>vi beats.conf
+</code></pre></div>
+add the below content here
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>input {
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>  beats {
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>    port =&gt; 5044
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>    ssl_enabled =&gt; true
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>    ssl_certificate =&gt; &quot;/etc/logstash/mcerts/logstash.crt&quot;
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>    ssl_key         =&gt; &quot;/etc/logstash/mcerts/logstash.key&quot;
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>    ssl_certificate_authorities =&gt; [
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>      &quot;/etc/logstash/mcerts/ca-chain.cert.pem&quot;
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>    ]
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>    ssl_client_authentication =&gt; &quot;required&quot;     # ✓ KEEP — Logstash is server here
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a>    ssl_supported_protocols =&gt; [&quot;TLSv1.2&quot;, &quot;TLSv1.3&quot;]
+<a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a>    ssl_cipher_suites =&gt; [
+<a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a>      &quot;TLS_AES_256_GCM_SHA384&quot;,
+<a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a>      &quot;TLS_AES_128_GCM_SHA256&quot;,
+<a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a>      &quot;TLS_CHACHA20_POLY1305_SHA256&quot;,
+<a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a>      &quot;TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384&quot;,
+<a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a>      &quot;TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256&quot;
+<a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a>    ]
+<a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a>  }
+<a id="__codelineno-22-20" name="__codelineno-22-20" href="#__codelineno-22-20"></a>}
+<a id="__codelineno-22-21" name="__codelineno-22-21" href="#__codelineno-22-21"></a>
+<a id="__codelineno-22-22" name="__codelineno-22-22" href="#__codelineno-22-22"></a>filter {
+<a id="__codelineno-22-23" name="__codelineno-22-23" href="#__codelineno-22-23"></a>  mutate {
+<a id="__codelineno-22-24" name="__codelineno-22-24" href="#__codelineno-22-24"></a>    add_field =&gt; {
+<a id="__codelineno-22-25" name="__codelineno-22-25" href="#__codelineno-22-25"></a>      &quot;application&quot; =&gt; &quot;app_generator&quot;
+<a id="__codelineno-22-26" name="__codelineno-22-26" href="#__codelineno-22-26"></a>      &quot;environment&quot; =&gt; &quot;lab&quot;
+<a id="__codelineno-22-27" name="__codelineno-22-27" href="#__codelineno-22-27"></a>    }
+<a id="__codelineno-22-28" name="__codelineno-22-28" href="#__codelineno-22-28"></a>    # Remove internal tags that add noise
+<a id="__codelineno-22-29" name="__codelineno-22-29" href="#__codelineno-22-29"></a>    remove_tag =&gt; [&quot;beats_input_codec_plain_applied&quot;]
+<a id="__codelineno-22-30" name="__codelineno-22-30" href="#__codelineno-22-30"></a>  }
+<a id="__codelineno-22-31" name="__codelineno-22-31" href="#__codelineno-22-31"></a>  mutate {
+<a id="__codelineno-22-32" name="__codelineno-22-32" href="#__codelineno-22-32"></a>    add_field =&gt; { &quot;logstash_node&quot; =&gt; &quot;logstash-2&quot; }  # change on node 2
+<a id="__codelineno-22-33" name="__codelineno-22-33" href="#__codelineno-22-33"></a>  }
+<a id="__codelineno-22-34" name="__codelineno-22-34" href="#__codelineno-22-34"></a>
+<a id="__codelineno-22-35" name="__codelineno-22-35" href="#__codelineno-22-35"></a>}
+<a id="__codelineno-22-36" name="__codelineno-22-36" href="#__codelineno-22-36"></a>
+<a id="__codelineno-22-37" name="__codelineno-22-37" href="#__codelineno-22-37"></a>
+<a id="__codelineno-22-38" name="__codelineno-22-38" href="#__codelineno-22-38"></a>output {
+<a id="__codelineno-22-39" name="__codelineno-22-39" href="#__codelineno-22-39"></a>  tcp {
+<a id="__codelineno-22-40" name="__codelineno-22-40" href="#__codelineno-22-40"></a>    host =&gt; &quot;ha_proxy_ip_address&quot;
+<a id="__codelineno-22-41" name="__codelineno-22-41" href="#__codelineno-22-41"></a>    port =&gt; 9065
+<a id="__codelineno-22-42" name="__codelineno-22-42" href="#__codelineno-22-42"></a>
+<a id="__codelineno-22-43" name="__codelineno-22-43" href="#__codelineno-22-43"></a>    ssl_enabled =&gt; true
+<a id="__codelineno-22-44" name="__codelineno-22-44" href="#__codelineno-22-44"></a>    ssl_certificate =&gt; &quot;/etc/logstash/mcerts/logstash.crt&quot;
+<a id="__codelineno-22-45" name="__codelineno-22-45" href="#__codelineno-22-45"></a>    ssl_key         =&gt; &quot;/etc/logstash/mcerts/logstash.key&quot;
+<a id="__codelineno-22-46" name="__codelineno-22-46" href="#__codelineno-22-46"></a>
+<a id="__codelineno-22-47" name="__codelineno-22-47" href="#__codelineno-22-47"></a>    ssl_certificate_authorities =&gt; [
+<a id="__codelineno-22-48" name="__codelineno-22-48" href="#__codelineno-22-48"></a>      &quot;/etc/logstash/mcerts/ca-chain.cert.pem&quot;
+<a id="__codelineno-22-49" name="__codelineno-22-49" href="#__codelineno-22-49"></a>    ]
+<a id="__codelineno-22-50" name="__codelineno-22-50" href="#__codelineno-22-50"></a>
+<a id="__codelineno-22-51" name="__codelineno-22-51" href="#__codelineno-22-51"></a>    ssl_verification_mode =&gt; &quot;full&quot;
+<a id="__codelineno-22-52" name="__codelineno-22-52" href="#__codelineno-22-52"></a>
+<a id="__codelineno-22-53" name="__codelineno-22-53" href="#__codelineno-22-53"></a>    codec =&gt; json_lines
+<a id="__codelineno-22-54" name="__codelineno-22-54" href="#__codelineno-22-54"></a>  }
+<a id="__codelineno-22-55" name="__codelineno-22-55" href="#__codelineno-22-55"></a>}
+</code></pre></div>
+Then restart the logstash</p>
+<p>Repeat the same process for logstash 2 and 3</p>
+<h2 id="4-installation-of-haproxy">4 Installation of HAProxy</h2>
+<h3 id="41-installation">4.1 Installation</h3>
+<p>Follow the below steps to install the HAProxy</p>
+<p>Run:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>sudo apt update
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>sudo apt install haproxy -y
+</code></pre></div>
+Verify the installation:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>haproxy -v
+</code></pre></div>
+Check the service:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>sudo systemctl status haproxy
+</code></pre></div>
+Enable HAProxy to start automatically after reboot:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>sudo systemctl enable haproxy
+</code></pre></div>
+Start HAProxy:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>sudo systemctl start haproxy
+</code></pre></div></p>
+<h3 id="41-haproxy-configuration">4.1 HAProxy configuration</h3>
+<p>The main configuration file is:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>/etc/haproxy/haproxy.cfg
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>cp -r haproxy.cfg haproxy.cfg-backup
+</code></pre></div>
+Paste the below content and change the IP address 
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>global
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>    log /dev/log local0
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>    log /dev/log local1 notice
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>    external-check
+<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>    insecure-fork-wanted
+<a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a>    spread-checks 5
+<a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a>
+<a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a>    daemon
+<a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a>    maxconn 100000
+<a id="__codelineno-29-11" name="__codelineno-29-11" href="#__codelineno-29-11"></a>    tune.ssl.default-dh-param 4096
+<a id="__codelineno-29-12" name="__codelineno-29-12" href="#__codelineno-29-12"></a>    ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305
+<a id="__codelineno-29-13" name="__codelineno-29-13" href="#__codelineno-29-13"></a>
+<a id="__codelineno-29-14" name="__codelineno-29-14" href="#__codelineno-29-14"></a>    ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+<a id="__codelineno-29-15" name="__codelineno-29-15" href="#__codelineno-29-15"></a>
+<a id="__codelineno-29-16" name="__codelineno-29-16" href="#__codelineno-29-16"></a>    user haproxy
+<a id="__codelineno-29-17" name="__codelineno-29-17" href="#__codelineno-29-17"></a>    group haproxy
+<a id="__codelineno-29-18" name="__codelineno-29-18" href="#__codelineno-29-18"></a>
+<a id="__codelineno-29-19" name="__codelineno-29-19" href="#__codelineno-29-19"></a>    stats socket /run/haproxy/admin.sock mode 660 level admin
+<a id="__codelineno-29-20" name="__codelineno-29-20" href="#__codelineno-29-20"></a>
+<a id="__codelineno-29-21" name="__codelineno-29-21" href="#__codelineno-29-21"></a>defaults
+<a id="__codelineno-29-22" name="__codelineno-29-22" href="#__codelineno-29-22"></a>    log global
+<a id="__codelineno-29-23" name="__codelineno-29-23" href="#__codelineno-29-23"></a>
+<a id="__codelineno-29-24" name="__codelineno-29-24" href="#__codelineno-29-24"></a>    mode tcp
+<a id="__codelineno-29-25" name="__codelineno-29-25" href="#__codelineno-29-25"></a>
+<a id="__codelineno-29-26" name="__codelineno-29-26" href="#__codelineno-29-26"></a>    option tcplog
+<a id="__codelineno-29-27" name="__codelineno-29-27" href="#__codelineno-29-27"></a>    option dontlognull
+<a id="__codelineno-29-28" name="__codelineno-29-28" href="#__codelineno-29-28"></a>    option tcpka
+<a id="__codelineno-29-29" name="__codelineno-29-29" href="#__codelineno-29-29"></a>
+<a id="__codelineno-29-30" name="__codelineno-29-30" href="#__codelineno-29-30"></a>    retries 3
+<a id="__codelineno-29-31" name="__codelineno-29-31" href="#__codelineno-29-31"></a>
+<a id="__codelineno-29-32" name="__codelineno-29-32" href="#__codelineno-29-32"></a>    timeout connect 10s
+<a id="__codelineno-29-33" name="__codelineno-29-33" href="#__codelineno-29-33"></a>    timeout client 5m
+<a id="__codelineno-29-34" name="__codelineno-29-34" href="#__codelineno-29-34"></a>    timeout server 5m
+<a id="__codelineno-29-35" name="__codelineno-29-35" href="#__codelineno-29-35"></a>    timeout check 10s
+<a id="__codelineno-29-36" name="__codelineno-29-36" href="#__codelineno-29-36"></a>#############################################
+<a id="__codelineno-29-37" name="__codelineno-29-37" href="#__codelineno-29-37"></a># Agent Registration
+<a id="__codelineno-29-38" name="__codelineno-29-38" href="#__codelineno-29-38"></a>#############################################
+<a id="__codelineno-29-39" name="__codelineno-29-39" href="#__codelineno-29-39"></a>
+<a id="__codelineno-29-40" name="__codelineno-29-40" href="#__codelineno-29-40"></a>frontend wazuh_registration_front
+<a id="__codelineno-29-41" name="__codelineno-29-41" href="#__codelineno-29-41"></a>    bind *:1515
+<a id="__codelineno-29-42" name="__codelineno-29-42" href="#__codelineno-29-42"></a>    mode tcp
+<a id="__codelineno-29-43" name="__codelineno-29-43" href="#__codelineno-29-43"></a>    default_backend wazuh_registration_back
+<a id="__codelineno-29-44" name="__codelineno-29-44" href="#__codelineno-29-44"></a>
+<a id="__codelineno-29-45" name="__codelineno-29-45" href="#__codelineno-29-45"></a>backend wazuh_registration_back
+<a id="__codelineno-29-46" name="__codelineno-29-46" href="#__codelineno-29-46"></a>    mode tcp
+<a id="__codelineno-29-47" name="__codelineno-29-47" href="#__codelineno-29-47"></a>
+<a id="__codelineno-29-48" name="__codelineno-29-48" href="#__codelineno-29-48"></a>    option tcp-check
+<a id="__codelineno-29-49" name="__codelineno-29-49" href="#__codelineno-29-49"></a>
+<a id="__codelineno-29-50" name="__codelineno-29-50" href="#__codelineno-29-50"></a>    server wazuh-master  wazuh_master_IP:1515 check inter 5s fall 3 rise 2
+<a id="__codelineno-29-51" name="__codelineno-29-51" href="#__codelineno-29-51"></a>    server wazuh-worker1 wazuh_worker1_IP:1515 check inter 5s fall 3 rise 2 backup
+<a id="__codelineno-29-52" name="__codelineno-29-52" href="#__codelineno-29-52"></a>    server wazuh-worker2 wazuh_worker2_IP:1515 check inter 5s fall 3 rise 2 backup
+<a id="__codelineno-29-53" name="__codelineno-29-53" href="#__codelineno-29-53"></a>
+<a id="__codelineno-29-54" name="__codelineno-29-54" href="#__codelineno-29-54"></a>#############################################
+<a id="__codelineno-29-55" name="__codelineno-29-55" href="#__codelineno-29-55"></a># Agent Events
+<a id="__codelineno-29-56" name="__codelineno-29-56" href="#__codelineno-29-56"></a>#############################################
+<a id="__codelineno-29-57" name="__codelineno-29-57" href="#__codelineno-29-57"></a>
+<a id="__codelineno-29-58" name="__codelineno-29-58" href="#__codelineno-29-58"></a>frontend wazuh_events_front
+<a id="__codelineno-29-59" name="__codelineno-29-59" href="#__codelineno-29-59"></a>    bind *:1514
+<a id="__codelineno-29-60" name="__codelineno-29-60" href="#__codelineno-29-60"></a>    mode tcp
+<a id="__codelineno-29-61" name="__codelineno-29-61" href="#__codelineno-29-61"></a>    default_backend wazuh_events_back
+<a id="__codelineno-29-62" name="__codelineno-29-62" href="#__codelineno-29-62"></a>
+<a id="__codelineno-29-63" name="__codelineno-29-63" href="#__codelineno-29-63"></a>backend wazuh_events_back
+<a id="__codelineno-29-64" name="__codelineno-29-64" href="#__codelineno-29-64"></a>    mode tcp
+<a id="__codelineno-29-65" name="__codelineno-29-65" href="#__codelineno-29-65"></a>    balance leastconn
+<a id="__codelineno-29-66" name="__codelineno-29-66" href="#__codelineno-29-66"></a>
+<a id="__codelineno-29-67" name="__codelineno-29-67" href="#__codelineno-29-67"></a>    option tcp-check
+<a id="__codelineno-29-68" name="__codelineno-29-68" href="#__codelineno-29-68"></a>
+<a id="__codelineno-29-69" name="__codelineno-29-69" href="#__codelineno-29-69"></a>    server wazuh-master  wazuh_master_IP:1514 check inter 5s fall 3 rise 2
+<a id="__codelineno-29-70" name="__codelineno-29-70" href="#__codelineno-29-70"></a>    server wazuh-worker1 wazuh_worker1_IP:1514 check inter 5s fall 3 rise 2
+<a id="__codelineno-29-71" name="__codelineno-29-71" href="#__codelineno-29-71"></a>    server wazuh-worker2 wazuh_worker2_IP:1514 check inter 5s fall 3 rise 2
+<a id="__codelineno-29-72" name="__codelineno-29-72" href="#__codelineno-29-72"></a>
+<a id="__codelineno-29-73" name="__codelineno-29-73" href="#__codelineno-29-73"></a>#############################################
+<a id="__codelineno-29-74" name="__codelineno-29-74" href="#__codelineno-29-74"></a># Custom Syslog / Logstash -&gt; Wazuh
+<a id="__codelineno-29-75" name="__codelineno-29-75" href="#__codelineno-29-75"></a>#############################################
+<a id="__codelineno-29-76" name="__codelineno-29-76" href="#__codelineno-29-76"></a>frontend rsyslog_front
+<a id="__codelineno-29-77" name="__codelineno-29-77" href="#__codelineno-29-77"></a>    bind ha_proxy_ip_address:9065 ssl crt /etc/haproxy/mcerts/haproxy.pem ca-file /etc/haproxy/mcerts/ca-chain.cert.pem crl-file /etc/haproxy/mcerts/ca-chain.crl.pem verify required
+<a id="__codelineno-29-78" name="__codelineno-29-78" href="#__codelineno-29-78"></a>    mode tcp
+<a id="__codelineno-29-79" name="__codelineno-29-79" href="#__codelineno-29-79"></a>    default_backend rsyslog_back
+<a id="__codelineno-29-80" name="__codelineno-29-80" href="#__codelineno-29-80"></a>
+<a id="__codelineno-29-81" name="__codelineno-29-81" href="#__codelineno-29-81"></a>backend rsyslog_back
+<a id="__codelineno-29-82" name="__codelineno-29-82" href="#__codelineno-29-82"></a>    mode tcp
+<a id="__codelineno-29-83" name="__codelineno-29-83" href="#__codelineno-29-83"></a>    balance leastconn
+<a id="__codelineno-29-84" name="__codelineno-29-84" href="#__codelineno-29-84"></a>    option external-check
+<a id="__codelineno-29-85" name="__codelineno-29-85" href="#__codelineno-29-85"></a>    external-check command /usr/local/bin/check_wazuh.sh
+<a id="__codelineno-29-86" name="__codelineno-29-86" href="#__codelineno-29-86"></a>    default-server inter 5s fall 2 rise 1 on-marked-down shutdown-sessions
+<a id="__codelineno-29-87" name="__codelineno-29-87" href="#__codelineno-29-87"></a>
+<a id="__codelineno-29-88" name="__codelineno-29-88" href="#__codelineno-29-88"></a>    server manager wazuh_master_IP:1549 ssl crt /etc/haproxy/mcerts/haproxy.pem ca-file /etc/haproxy/mcerts/ca-chain.cert.pem verify required check
+<a id="__codelineno-29-89" name="__codelineno-29-89" href="#__codelineno-29-89"></a>    server worker1 wazuh_worker1_IP:1549 ssl crt /etc/haproxy/mcerts/haproxy.pem ca-file /etc/haproxy/mcerts/ca-chain.cert.pem verify required check
+<a id="__codelineno-29-90" name="__codelineno-29-90" href="#__codelineno-29-90"></a>    server worker2 wazuh_worker2_IP:1549 ssl crt /etc/haproxy/mcerts/haproxy.pem ca-file /etc/haproxy/mcerts/ca-chain.cert.pem verify required check
+</code></pre></div>
+In /usr/local/bin/check_wazuh.sh add the below content by replacing the IP address
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>#!/bin/bash
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>case &quot;$HAPROXY_SERVER_NAME&quot; in
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>  manager)
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>    HOST=&quot;wazuh_master_IP&quot;
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>    ;;
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>  worker1)
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a>    HOST=&quot;wazuh_worker1_IP&quot;
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>    ;;
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a>  worker2)
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a>    HOST=&quot;wazuh_worker2_IP&quot;
+<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a>    ;;
+<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a>  *)
+<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a>    exit 1
+<a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a>    ;;
+<a id="__codelineno-30-15" name="__codelineno-30-15" href="#__codelineno-30-15"></a>esac
+<a id="__codelineno-30-16" name="__codelineno-30-16" href="#__codelineno-30-16"></a>
+<a id="__codelineno-30-17" name="__codelineno-30-17" href="#__codelineno-30-17"></a>/usr/bin/timeout 3 /bin/bash -c &quot;&lt;/dev/tcp/${HOST}/9065&quot; &gt;/dev/null 2&gt;&amp;1
+<a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a>exit $?
+</code></pre></div>
+Then restart the HAProxy service</p>
+<h2 id="5-installation-of-rsyslog">5 Installation of Rsyslog</h2>
+<h3 id="51-installation">5.1 Installation</h3>
+<p>Follow the below steps to install rsyslog
+Install rsyslog:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>sudo apt update
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>sudo apt install rsyslog rsyslog-gnutls -y
+</code></pre></div>
+Enable and start the service:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>sudo systemctl enable --now rsyslog
+</code></pre></div>
+Verify the service:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>sudo systemctl status rsyslog
+</code></pre></div></p>
+<h3 id="52-rsyslog-configuration">5.2 Rsyslog configuration</h3>
+<p>Create a file at /etc/rsyslog.d</p>
+<p>vi /etc/rsyslog.d/example.conf</p>
+<p>Add the below content
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>module(load=&quot;imtcp&quot; StreamDriver.Name=&quot;gtls&quot;
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>       StreamDriver.Mode=&quot;1&quot;
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>       StreamDriver.AuthMode=&quot;x509/certvalid&quot;)
+<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>
+<a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a>global(
+<a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a>  DefaultNetstreamDriver=&quot;gtls&quot;
+<a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a>  DefaultNetstreamDriverCAFile=&quot;/etc/rsyslog.d/certs/ca-chain.cert.pem&quot;
+<a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a>  DefaultNetstreamDriverCertFile=&quot;/etc/rsyslog.d/certs/rsyslog.crt&quot;
+<a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a>  DefaultNetstreamDriverKeyFile=&quot;/etc/rsyslog.d/certs/rsyslog.key&quot;
+<a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a>)
+<a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a>
+<a id="__codelineno-34-12" name="__codelineno-34-12" href="#__codelineno-34-12"></a>input(type=&quot;imtcp&quot; port=&quot;1549&quot;
+<a id="__codelineno-34-13" name="__codelineno-34-13" href="#__codelineno-34-13"></a>      StreamDriver.AuthMode=&quot;x509/certvalid&quot;
+<a id="__codelineno-34-14" name="__codelineno-34-14" href="#__codelineno-34-14"></a>      StreamDriver.Mode=&quot;1&quot;)
+<a id="__codelineno-34-15" name="__codelineno-34-15" href="#__codelineno-34-15"></a>
+<a id="__codelineno-34-16" name="__codelineno-34-16" href="#__codelineno-34-16"></a>*.* /var/log/remote/remote.log
+<a id="__codelineno-34-17" name="__codelineno-34-17" href="#__codelineno-34-17"></a>
+<a id="__codelineno-34-18" name="__codelineno-34-18" href="#__codelineno-34-18"></a>template(name=&quot;RawJson&quot; type=&quot;string&quot;
+<a id="__codelineno-34-19" name="__codelineno-34-19" href="#__codelineno-34-19"></a>string=&quot;%msg%\n&quot;)
+<a id="__codelineno-34-20" name="__codelineno-34-20" href="#__codelineno-34-20"></a>
+<a id="__codelineno-34-21" name="__codelineno-34-21" href="#__codelineno-34-21"></a>action(
+<a id="__codelineno-34-22" name="__codelineno-34-22" href="#__codelineno-34-22"></a>  type=&quot;omfwd&quot;
+<a id="__codelineno-34-23" name="__codelineno-34-23" href="#__codelineno-34-23"></a>
+<a id="__codelineno-34-24" name="__codelineno-34-24" href="#__codelineno-34-24"></a>  target=&quot;127.0.0.1&quot;
+<a id="__codelineno-34-25" name="__codelineno-34-25" href="#__codelineno-34-25"></a>  port=&quot;9065&quot;
+<a id="__codelineno-34-26" name="__codelineno-34-26" href="#__codelineno-34-26"></a>  protocol=&quot;tcp&quot;
+<a id="__codelineno-34-27" name="__codelineno-34-27" href="#__codelineno-34-27"></a>
+<a id="__codelineno-34-28" name="__codelineno-34-28" href="#__codelineno-34-28"></a>  Template=&quot;RawJson&quot;
+<a id="__codelineno-34-29" name="__codelineno-34-29" href="#__codelineno-34-29"></a>
+<a id="__codelineno-34-30" name="__codelineno-34-30" href="#__codelineno-34-30"></a>  queue.type=&quot;LinkedList&quot;
+<a id="__codelineno-34-31" name="__codelineno-34-31" href="#__codelineno-34-31"></a>  queue.filename=&quot;wazuh_forward&quot;
+<a id="__codelineno-34-32" name="__codelineno-34-32" href="#__codelineno-34-32"></a>  queue.maxdiskspace=&quot;10g&quot;
+<a id="__codelineno-34-33" name="__codelineno-34-33" href="#__codelineno-34-33"></a>  queue.saveonshutdown=&quot;on&quot;
+<a id="__codelineno-34-34" name="__codelineno-34-34" href="#__codelineno-34-34"></a>  queue.size=&quot;100000&quot;
+<a id="__codelineno-34-35" name="__codelineno-34-35" href="#__codelineno-34-35"></a>
+<a id="__codelineno-34-36" name="__codelineno-34-36" href="#__codelineno-34-36"></a>  action.resumeRetryCount=&quot;-1&quot;
+<a id="__codelineno-34-37" name="__codelineno-34-37" href="#__codelineno-34-37"></a>  action.resumeInterval=&quot;10&quot;
+<a id="__codelineno-34-38" name="__codelineno-34-38" href="#__codelineno-34-38"></a>)
+</code></pre></div>
+Then restart the rsyslog service</p>
+<p>Repeat the same process in worker1 vm and worker2 vm</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.top", "navigation.tracking", "navigation.indexes", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

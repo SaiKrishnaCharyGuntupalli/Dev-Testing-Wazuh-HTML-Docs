@@ -1,0 +1,3212 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Production implementation guide for multi-tenant Wazuh MSSP on single-node Docker">
+      
+      
+      
+      
+        <link rel="prev" href="../../LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/">
+      
+      
+        <link rel="next" href="../../Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring - Wazuh MSSP Multi-Tenant Implementation Guide</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../../stylesheets/responsive-nav.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#nginx-logstash-wazuh-integration-for-non-agent-log-monitoring" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-header__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Wazuh MSSP Multi-Tenant Implementation Guide
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-nav__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    Wazuh MSSP Multi-Tenant Implementation Guide
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../01-Getting_started/Getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment & Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment & Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../02-index-template-filebeat/index_template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index Template & Filebeat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../04-agent-configuration/agent_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & Access
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Security & Access
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../06-rbac/rbac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RBAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../07-dls/dls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Document Level Security (DLS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../08-sso-entra/sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSO - Microsoft Entra ID
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster and Index Verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../10-reference/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC's
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    POC's
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/GitHub_Webhook_to_Logstash/GitHub_Webhook_to_Logstash_POC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub_Webhook_to_Logstash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Rules-as-Code%20Implementation%20Guide/Wazuh%20Rules-as-Code%20Implementation%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Rules-as-Code Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Windows Agent Deployment & Security Detection logs Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetFlowlogs_to_Logstash_and_Wazuh_Indexer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/XDR%20Implementation%20Process/XDR%20Implementation%20Process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XDR Implementation Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Second%20use%20case%20of%20XDR/Second%20use%20case%20of%20XDR/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Second use case of XDR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Pipelines_and_Challenges/Pipelines_and_Challenges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipelines_and_Challenges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jira API → Logstash → Wazuh Integration for Non-Agent Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LOGSTASH PIPELINE WORKERS & BATCHSIZE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#end-to-end-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        End-to-End Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-nginx-installation-and-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1 — Nginx Installation and Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 1 — Nginx Installation and Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-nginx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is Nginx?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-is-nginx-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why is Nginx Used?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-was-nginx-used-in-this-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Was Nginx Used in This Implementation?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installation-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-2-nginx-log-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2 — Nginx Log Generation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 2 — Nginx Log Generation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#log-files-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log Files Used
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-generate-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Generate Logs?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-log-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Log Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-logstash-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 — Logstash Deployment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3 — Logstash Deployment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-logstash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is Logstash?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-is-logstash-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why is Logstash Used?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-was-logstash-used-in-this-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Was Logstash Used in This Implementation?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-logstash-file-input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4 — Logstash File Input
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 4 — Logstash File Input">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-file-input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why File Input?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-5-metadata-enrichment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5 — Metadata Enrichment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 5 — Metadata Enrichment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-metadata-enrichment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is Metadata Enrichment?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logstash-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logstash Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enriched-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enriched Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-6-non-agent-identification-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6 — Non-Agent Identification Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6 — Non-Agent Identification Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objective
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-7-debug-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 7 — Debug Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 7 — Debug Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-debug-output-was-configured" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Debug Output Was Configured
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-8-logstash-output-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 8 — Logstash Output Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 8 — Logstash Output Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-output-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Output Plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcp-output-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TCP Output Plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-9-custom-metadata-visibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 9 — Custom Metadata Visibility
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 9 — Custom Metadata Visibility">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requirement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requirement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-was-this-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Was This Used?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-10-wazuh-syslog-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 10 — Wazuh Syslog Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 10 — Wazuh Syslog Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#syslog-listener-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syslog Listener Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-explanation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-11-wazuh-alert-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 11 — Wazuh Alert Processing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#final-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Final Result
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nginx-in-real-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nginx in Real Production
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GitHub_Logstash_Wazuh_NonAgent_Implementation/GitHub_Logstash_Wazuh_NonAgent_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Logstash Wazuh NonAgent Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/MySQL_Log_Monitoring_Using_Wazuh_Agent/MySQL_Log_Monitoring_Using_Wazuh_Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MySQL_Log_Monitoring_Using_Wazuh_Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Agent_Log_Buffering_and_Resynchronization/Wazuh_Agent_Log_Buffering_and_Resynchronization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Agent_Log_Buffering_and_Resynchronization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Process%20to%20Monitor%20Filebeat%20Health/Implementation_Process_to_Monitor_Filebeat_Health/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor Filebeat Health
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20AWS%20CloudTrail%20%E2%86%92%20S3%20%E2%86%92%20SQS%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh/Implementation_Guide_AWS_CloudTrail_S3_SQS_Logstash_Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide AWS CloudTrail → S3 → SQS → Logstash → Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Prometheus/Prometheus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prometheus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SOC%20Logstash%20Multi-Pipeline%20Architecture%20Implementation%20Guide/SOC_Logstash_Multi_Pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Multi-Pipeline Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SOC%20Logstash%20Pipeline-to-Pipeline%20%28P2P%29%20Architecture%20Implementation%20Guide/SOC_Logstash_P2P/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Multi_Tenant_MSSP_Implementation/Wazuh_Multi_Tenant_MSSP_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Multi_Tenant_MSSP_Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/Wazuh%20Multi%20Node%20Runbook/Wazuh%20Multi%20Node%20Runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Multi Node Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Availability Log Ingestion Pipeline Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zero Downtime Group Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operating System Based Group Creation in Wazuh GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#end-to-end-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        End-to-End Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-nginx-installation-and-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1 — Nginx Installation and Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 1 — Nginx Installation and Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-nginx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is Nginx?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-is-nginx-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why is Nginx Used?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-was-nginx-used-in-this-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Was Nginx Used in This Implementation?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installation-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-2-nginx-log-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2 — Nginx Log Generation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 2 — Nginx Log Generation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#log-files-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log Files Used
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-generate-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Generate Logs?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-log-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Log Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-logstash-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 — Logstash Deployment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3 — Logstash Deployment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-logstash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is Logstash?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-is-logstash-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why is Logstash Used?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-was-logstash-used-in-this-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Was Logstash Used in This Implementation?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-logstash-file-input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4 — Logstash File Input
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 4 — Logstash File Input">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-file-input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why File Input?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-5-metadata-enrichment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5 — Metadata Enrichment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 5 — Metadata Enrichment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-metadata-enrichment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is Metadata Enrichment?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logstash-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logstash Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enriched-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enriched Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-6-non-agent-identification-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6 — Non-Agent Identification Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6 — Non-Agent Identification Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objective
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-7-debug-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 7 — Debug Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 7 — Debug Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-debug-output-was-configured" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Debug Output Was Configured
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-8-logstash-output-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 8 — Logstash Output Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 8 — Logstash Output Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-output-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Output Plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcp-output-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TCP Output Plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-9-custom-metadata-visibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 9 — Custom Metadata Visibility
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 9 — Custom Metadata Visibility">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requirement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requirement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-was-this-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Was This Used?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-10-wazuh-syslog-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 10 — Wazuh Syslog Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 10 — Wazuh Syslog Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#syslog-listener-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syslog Listener Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-explanation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-11-wazuh-alert-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 11 — Wazuh Alert Processing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#final-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Final Result
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nginx-in-real-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nginx in Real Production
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="nginx-logstash-wazuh-integration-for-non-agent-log-monitoring">Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring</h1>
+<h2 id="overview">Overview</h2>
+<p>This implementation demonstrates how logs generated by a non-agent source can be collected, enriched, forwarded, and analyzed within Wazuh without installing a Wazuh agent on the source system.</p>
+<p>The objective is to validate a non-agent log collection architecture where Nginx acts as the log source, Logstash performs event collection and metadata enrichment, and Wazuh provides detection, alert generation, and dashboard visibility.</p>
+<h3 id="end-to-end-flow">End-to-End Flow</h3>
+<p><img alt="Architecture Overview" src="../../../../assets/images/POC%27s/Yaseen/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/End-to-End%20Flow.png" /></p>
+<hr />
+<h2 id="architecture-overview">Architecture Overview</h2>
+<p><img alt="Architecture Overview" src="../../../../assets/images/POC%27s/Yaseen/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/ARCHITECTURE%20OVERVIEW.png" /></p>
+<hr />
+<h2 id="phase-1-nginx-installation-and-configuration">Phase 1 — Nginx Installation and Configuration</h2>
+<h3 id="what-is-nginx">What is Nginx?</h3>
+<p>Nginx is a high-performance web server, reverse proxy server, and load balancer. It is widely used to host websites, process HTTP requests, and manage incoming network traffic efficiently. Nginx automatically records client requests and server responses into log files, making it a useful source of operational and security-related information.</p>
+<h3 id="why-is-nginx-used">Why is Nginx Used?</h3>
+<p>Nginx provides detailed access logging that records: client IP address, requested URL, HTTP method, response code, timestamp, and user agent information. These logs can be used for security monitoring, threat detection, and access tracking.</p>
+<h3 id="why-was-nginx-used-in-this-implementation">Why Was Nginx Used in This Implementation?</h3>
+<p>Nginx was selected as a non-agent log source to simulate a real-world application generating web access events. The objective was to validate whether logs could be collected and monitored in Wazuh without deploying a Wazuh agent on the source system.</p>
+<h3 id="installation-commands">Installation Commands</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>nginx<span class="w"> </span>-y
+</code></pre></div>
+<h3 id="verify-installation">Verify Installation</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>nginx
+</code></pre></div>
+<p>Expected Output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>active (running)
+</code></pre></div></p>
+<hr />
+<h2 id="phase-2-nginx-log-generation">Phase 2 — Nginx Log Generation</h2>
+<h3 id="log-files-used">Log Files Used</h3>
+<p>Nginx generates two primary log files:</p>
+<p><strong>Access Log:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/var/log/nginx/access.log
+</code></pre></div>
+Stores: Successful Requests, Failed Requests, HTTP Methods, URLs Accessed, Response Codes.</p>
+<p><strong>Error Log:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/var/log/nginx/error.log
+</code></pre></div>
+Stores: Application Errors, Server Failures, Runtime Issues.</p>
+<h3 id="why-generate-logs">Why Generate Logs?</h3>
+<p>Logs are required to validate the complete ingestion pipeline. To generate test events, multiple requests were intentionally sent to non-existent pages.</p>
+<p>Commands:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>http://localhost/admin
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>curl<span class="w"> </span>http://localhost/login
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>curl<span class="w"> </span>http://localhost/secret
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>curl<span class="w"> </span>http://localhost/dashboard
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>curl<span class="w"> </span>http://localhost/test123
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>curl<span class="w"> </span>http://localhost/test456
+</code></pre></div>
+<p>These requests generated HTTP 404 responses:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>GET /test123 HTTP/1.1 404
+</code></pre></div></p>
+<h3 id="verify-log-generation">Verify Log Generation</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>tail<span class="w"> </span>-f<span class="w"> </span>/var/log/nginx/access.log
+</code></pre></div>
+<p>Example Output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>127.0.0.1 - - [08/Jun/2026] &quot;GET /test123 HTTP/1.1&quot; 404
+</code></pre></div></p>
+<hr />
+<h2 id="phase-3-logstash-deployment">Phase 3 — Logstash Deployment</h2>
+<h3 id="what-is-logstash">What is Logstash?</h3>
+<p>Logstash is a data collection and processing engine within the Elastic ecosystem. It receives data from multiple sources, performs transformation and enrichment, and forwards the processed events to downstream platforms.</p>
+<h3 id="why-is-logstash-used">Why is Logstash Used?</h3>
+<p>Logstash provides: Data Collection, Event Processing, Event Enrichment, Protocol Conversion, and Centralized Log Routing.</p>
+<h3 id="why-was-logstash-used-in-this-implementation">Why Was Logstash Used in This Implementation?</h3>
+<p>Logstash acts as the intermediary layer between Nginx and Wazuh. It performs: Log Collection, Metadata Enrichment, Event Normalization, and Syslog Forwarding.</p>
+<hr />
+<h2 id="phase-4-logstash-file-input">Phase 4 — Logstash File Input</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">input</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="n">file</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="n">path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;/var/log/nginx/access.log&quot;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="n">start_position</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;beginning&quot;</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="why-file-input">Why File Input?</h3>
+<p>Nginx stores events in a local log file. The Logstash File Input Plugin continuously monitors the file and reads newly appended log entries.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>No agent installation is required.
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>No API integration is required.
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>No network port exposure is required.
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>Flow:
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>Access.log
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>↓
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>File Input Plugin
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>↓
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>Logstash
+</code></pre></div></p>
+<hr />
+<h2 id="phase-5-metadata-enrichment">Phase 5 — Metadata Enrichment</h2>
+<h3 id="what-is-metadata-enrichment">What is Metadata Enrichment?</h3>
+<p>Metadata enrichment is the process of adding additional contextual information to an event before forwarding it to the destination platform.</p>
+<p>Enrichment improves: Searchability, Filtering, Multi-Tenant Separation, Dashboard Creation, and Correlation Activities.</p>
+<h3 id="logstash-configuration">Logstash Configuration</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">filter</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="n">mutate</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="n">add_field</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">      </span><span class="s2">&quot;source_platform&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;nginx&quot;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">      </span><span class="s2">&quot;event_category&quot;</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;web_access&quot;</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">      </span><span class="s2">&quot;environment&quot;</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;poc&quot;</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">      </span><span class="s2">&quot;tenant&quot;</span><span class="w">          </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;nginx_poc&quot;</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="enriched-fields">Enriched Fields</h3>
+<table>
+<thead>
+<tr>
+<th><strong>Field</strong></th>
+<th><strong>Purpose</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>source_platform</code></td>
+<td>Identifies Nginx as source</td>
+</tr>
+<tr>
+<td><code>event_category</code></td>
+<td>Identifies web access activity</td>
+</tr>
+<tr>
+<td><code>environment</code></td>
+<td>Identifies deployment environment</td>
+</tr>
+<tr>
+<td><code>tenant</code></td>
+<td>Tenant separation and classification</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="phase-6-non-agent-identification-testing">Phase 6 — Non-Agent Identification Testing</h2>
+<h3 id="objective">Objective</h3>
+<p>One requirement of multi-tenant environments is the ability to uniquely identify non-agent sources. A custom identifier was introduced to evaluate whether non-agent events could be assigned unique identifiers similar to Wazuh agent identifiers.</p>
+<h3 id="configuration">Configuration</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">mutate</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="n">add_field</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="s2">&quot;[agent][id]&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;3001&quot;</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="observation">Observation</h3>
+<p>Within Logstash debug output, the custom identifier was successfully added:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3001&quot;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>However, after processing within Wazuh, the dashboard continued displaying:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;000&quot;</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>This indicates that Wazuh internally assigns the manager identifier (<code>000</code>) to non-agent syslog events.</p>
+<hr />
+<h2 id="phase-7-debug-validation">Phase 7 — Debug Validation</h2>
+<h3 id="why-debug-output-was-configured">Why Debug Output Was Configured</h3>
+<p>Before forwarding events to Wazuh, validation was required to ensure logs were being collected, metadata was being added, and event structure was correct.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">output</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="n">file</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="n">path</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;/tmp/nginx-events.log&quot;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="n">codec</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">rubydebug</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="p">}</span>
+</code></pre></div>
+<p>Verification:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>tail<span class="w"> </span>-f<span class="w"> </span>/tmp/nginx-events.log
+</code></pre></div>
+<p>The output confirmed successful enrichment and custom field creation.</p>
+<hr />
+<h2 id="phase-8-logstash-output-configuration">Phase 8 — Logstash Output Configuration</h2>
+<h3 id="purpose">Purpose</h3>
+<p>After collecting and enriching Nginx logs, the events must be forwarded to Wazuh for security analysis and alert generation. Two output plugins were configured: File Output Plugin and TCP Output Plugin.</p>
+<h3 id="file-output-plugin">File Output Plugin</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">output</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="n">file</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">    </span><span class="n">path</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;/tmp/nginx-events.log&quot;</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">    </span><span class="n">codec</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">rubydebug</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="p">}</span>
+</code></pre></div>
+<p>The File Output Plugin was configured for debugging and validation purposes. Before sending logs to Wazuh, it was important to verify that Nginx logs were being collected correctly, metadata enrichment was successful, custom fields were being added, event formatting was correct, and the final event structure matched the expected format.</p>
+<p>Verification:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>tail<span class="w"> </span>-f<span class="w"> </span>/tmp/nginx-events.log
+</code></pre></div>
+<p>Observed Output:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">{</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nt">&quot;source_platform&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nginx&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span><span class="nt">&quot;event_category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;web_access&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span><span class="nt">&quot;tenant&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nginx_poc&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span><span class="nt">&quot;custom_agent_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3001&quot;</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="p">}</span>
+</code></pre></div>
+<p>This confirmed that Logstash enrichment was functioning correctly before forwarding events to Wazuh.</p>
+<h3 id="tcp-output-plugin">TCP Output Plugin</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">tcp</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span><span class="n">host</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;100.80.13.125&quot;</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span><span class="n">port</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">1514</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">  </span><span class="n">codec</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">    </span><span class="nb">format</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;&lt;134&gt;%{message}&quot;</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="p">}</span>
+</code></pre></div>
+<p>The TCP Output Plugin was responsible for forwarding enriched events from Logstash to the Wazuh Manager. TCP was selected because: reliable delivery mechanism, connection-oriented communication, reduced packet loss risk, and suitability for security event transmission.</p>
+<p><strong>Host Configuration:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">host</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;100.80.13.125&quot;</span>
+</code></pre></div>
+<p>Connected through Tailscale because both the Logstash instance and the Wazuh Manager are on different networks. Tailscale creates a secure peer-to-peer VPN tunnel between them, allowing Logstash to forward Syslog events directly to the Wazuh Manager's private IP over TCP without exposing it to the public internet.</p>
+<p><strong>Port Configuration:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">port</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">1514</span>
+</code></pre></div>
+<p>Port 1514 is the default Wazuh Syslog ingestion port configured for receiving remote events.</p>
+<p><strong>Message Formatting:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nb">format</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;&lt;134&gt;%{message}&quot;</span>
+</code></pre></div>
+<p>The Syslog Priority Header was added to ensure the message follows Syslog formatting standards. This allows Wazuh to correctly identify and process incoming events.</p>
+<hr />
+<h2 id="phase-9-custom-metadata-visibility">Phase 9 — Custom Metadata Visibility</h2>
+<h3 id="requirement">Requirement</h3>
+<p>A key requirement was to identify non-agent events separately from agent-based events. Since Wazuh automatically assigns <code>agent.id = 000</code> for non-agent events, an alternative identification mechanism was required.</p>
+<h3 id="configuration_1">Configuration</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">mutate</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span><span class="n">replace</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">    </span><span class="s2">&quot;message&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;tenant=nginx_poc non_agent_id=3001 %{message}&quot;</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="why-was-this-used">Why Was This Used?</h3>
+<p>The objective was to embed tenant and non-agent information directly into the event payload. This ensured the information remained visible after Wazuh processing.</p>
+<h3 id="example">Example</h3>
+<p><strong>Original Log:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>127.0.0.1 - - [08/Jun/2026] &quot;GET /test123 HTTP/1.1&quot; 404
+</code></pre></div>
+<strong>Modified Log:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>tenant=nginx_poc non_agent_id=3001 127.0.0.1 - - [08/Jun/2026] &quot;GET /test123 HTTP/1.1&quot; 404
+</code></pre></div></p>
+<h3 id="result">Result</h3>
+<p>The values became visible within: <code>full_log</code>, Discover View, Search Queries, and Event Investigation Screens.</p>
+<p>This provides a practical method for identifying non-agent events even when Wazuh assigns <code>agent.id = 000</code>.</p>
+<hr />
+<h2 id="phase-10-wazuh-syslog-configuration">Phase 10 — Wazuh Syslog Configuration</h2>
+<h3 id="purpose_1">Purpose</h3>
+<p>The Wazuh Manager must be configured to receive logs from external non-agent sources. Without a Syslog listener, Logstash cannot forward events into Wazuh.</p>
+<p>Configuration file: <code>/var/ossec/etc/ossec.conf</code></p>
+<h3 id="syslog-listener-configuration">Syslog Listener Configuration</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="nt">&lt;remote&gt;</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">  </span><span class="nt">&lt;connection&gt;</span>syslog<span class="nt">&lt;/connection&gt;</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">  </span><span class="nt">&lt;port&gt;</span>1514<span class="nt">&lt;/port&gt;</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">  </span><span class="nt">&lt;protocol&gt;</span>tcp<span class="nt">&lt;/protocol&gt;</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">  </span><span class="nt">&lt;allowed-ips&gt;</span>100.80.13.125<span class="nt">&lt;/allowed-ips&gt;</span>
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="nt">&lt;/remote&gt;</span>
+</code></pre></div>
+<h3 id="configuration-explanation">Configuration Explanation</h3>
+<table>
+<thead>
+<tr>
+<th><strong>Element</strong></th>
+<th><strong>Value</strong></th>
+<th><strong>Purpose</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>connection</code></td>
+<td><code>syslog</code></td>
+<td>Enables Syslog-based log ingestion</td>
+</tr>
+<tr>
+<td><code>port</code></td>
+<td><code>1514</code></td>
+<td>Defines the listening port for receiving external logs</td>
+</tr>
+<tr>
+<td><code>protocol</code></td>
+<td><code>tcp</code></td>
+<td>Configures TCP communication between Logstash and Wazuh</td>
+</tr>
+<tr>
+<td><code>allowed-ips</code></td>
+<td><code>100.80.13.125</code></td>
+<td>Restricts event ingestion to authorized systems only — improves security and prevents unauthorized log injection</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="phase-11-wazuh-alert-processing">Phase 11 — Wazuh Alert Processing</h2>
+<p>After receiving the event:</p>
+<ol>
+<li>Wazuh Syslog Listener receives the message.</li>
+<li>Decoder extracts relevant fields.</li>
+<li>Rules Engine evaluates the event.</li>
+<li>Matching rules generate alerts.</li>
+<li>Alerts are indexed into OpenSearch.</li>
+<li>Events become searchable within the Wazuh Dashboard.</li>
+</ol>
+<p>Example Alert:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>Rule ID:     31101
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>Description: Web server 400 error code
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>Generated From: GET /test123 HTTP/1.1 404
+</code></pre></div></p>
+<p><img alt="Wazuh Alert Processing" src="../../../../assets/images/POC%27s/Yaseen/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/Phase%2011%20%E2%80%94%20Wazuh%20Alert%20Processing.png" /></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Wazuh does not preserve custom metadata fields added by Logstash, but metadata can be embedded into the log message and successfully carried into Wazuh alerts.</p>
+</div>
+<hr />
+<h2 id="final-result">Final Result</h2>
+<p>The implementation successfully demonstrated end-to-end collection and monitoring of non-agent logs.</p>
+<p><strong>Achievements:</strong></p>
+<ol>
+<li>Nginx Log Collection</li>
+<li>Logstash File Monitoring</li>
+<li>Metadata Enrichment</li>
+<li>Tenant Tagging</li>
+<li>Syslog Forwarding</li>
+<li>Wazuh Event Ingestion</li>
+<li>Decoder Processing</li>
+<li>Rule Matching</li>
+<li>Alert Generation</li>
+<li>Dashboard Visibility</li>
+</ol>
+<p>The testing also confirmed that custom metadata can be preserved and searched within the event payload, providing an effective mechanism for identifying and categorizing non-agent log sources in multi-tenant environments.</p>
+<hr />
+<h2 id="nginx-in-real-production">Nginx in Real Production</h2>
+<p>In a real production environment:</p>
+<p>Users visit:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>[https://www.company.com/login](https://www.company.com/login)
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>[https://www.company.com/dashboard](https://www.company.com/dashboard)
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>[https://www.company.com/admin](https://www.company.com/admin)
+</code></pre></div>
+Every request creates an entry in <code>access.log</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>10.1.1.10 GET /login
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>10.1.1.11 GET /dashboard
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>10.1.1.12 GET /admin
+</code></pre></div>
+Nginx generates these logs automatically, making it a continuous passive source of security-relevant events for SOC monitoring pipelines.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.top", "navigation.tracking", "navigation.indexes", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
