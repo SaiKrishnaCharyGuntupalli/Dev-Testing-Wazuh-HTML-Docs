@@ -1,0 +1,82 @@
+site_name: Wazuh MSSP Multi-Tenant Implementation Guide
+site_description: Production implementation guide for multi-tenant Wazuh MSSP on single-node Docker
+
+theme:
+  name: material
+  palette:
+    scheme: default
+    primary: indigo
+    accent: indigo
+  features:
+    - navigation.top
+    - navigation.tracking
+    - navigation.indexes
+    - toc.follow
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    logo: material/security
+    repo: fontawesome/brands/git-alt
+  font:
+    text: Inter
+    code: JetBrains Mono
+extra_css:
+  - stylesheets/extra.css
+  - stylesheets/responsive-nav.css
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+
+nav:
+  - Home: index.md
+  - Getting Started: 01-Getting_started/Getting_started.md
+  - Deployment & Configuration:
+      - Index Template & Filebeat: 02-index-template-filebeat/index_template.md
+      - Agent Deployment: 03-agent-deployment/agent_deplyment.md
+      - Agent Configuration: 04-agent-configuration/agent_config.md
+  - Security & Access:
+      - RBAC: 06-rbac/rbac.md
+      - Document Level Security (DLS): 07-dls/dls.md
+      - SSO - Microsoft Entra ID: 08-sso-entra/sso.md
+  - Reference:
+      - Cluster and Index Verification: 09-Cluster and Index Verification/Cluster and Index Verification.md
+      - Reference: 10-reference/reference.md
+  - "POC's":
+      - "GitHub_Webhook_to_Logstash": "POC's/Junaid/GitHub_Webhook_to_Logstash/GitHub_Webhook_to_Logstash_POC.md"
+      - "Wazuh Rules-as-Code Implementation Guide": "POC's/Junaid/Wazuh Rules-as-Code Implementation Guide/Wazuh Rules-as-Code Implementation Guide.md"
+      - "POC- Single Agent Multi-Group in Wazuh": "POC's/Junaid/POC- Single Agent Multi-Group in Wazuh/POC- Single Agent Multi-Group in Wazuh.md"
+      - "Wazuh Windows Agent Deployment & Security Detection logs Generation": "POC's/Junaid/Wazuh Windows Agent Deployment & Security Detection logs Generation/Wazuh Windows Agent Deployment & Security Detection logs Generation.md"
+      - "NetFlowlogs_to_Logstash_and_Wazuh_Indexer": "POC's/Junaid/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/NetFlowlogs_to_Logstash_and_Wazuh_Indexer.md"
+      - "XDR Implementation Process": "POC's/Sai Krishna/XDR Implementation Process/XDR Implementation Process.md"
+      - "Second use case of XDR": "POC's/Sai Krishna/Second use case of XDR/Second use case of XDR.md"
+      - "PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT": "POC's/Sai Krishna/PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT/PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT.md"
+      - "Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh": "POC's/Sai Krishna/Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh/Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh.md"
+      - "Pipelines_and_Challenges": "POC's/Sai Krishna/Pipelines_and_Challenges/Pipelines_and_Challenges.md"
+      - "Jira API → Logstash → Wazuh Integration for Non-Agent Monitoring": "POC's/Yaseen/Jira API → Logstash → Wazuh Integration for Non-Agent Monitoring/Jira API → Logstash → Wazuh Integration for Non-Agent Monitoring.md"
+      - "LOGSTASH PIPELINE WORKERS & BATCHSIZE": "POC's/Yaseen/LOGSTASH PIPELINE WORKERS & BATCHSIZE/LOGSTASH PIPELINE WORKERS & BATCHSIZE.md"
+      - "Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring": "POC's/Yaseen/Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring/Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring.md"
+      - "Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent": "POC's/Yaseen/Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent/Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent.md"
+      - "GitHub Logstash Wazuh NonAgent Implementation": "POC's/Yaseen/GitHub_Logstash_Wazuh_NonAgent_Implementation/GitHub_Logstash_Wazuh_NonAgent_Implementation.md"
+      - "MySQL_Log_Monitoring_Using_Wazuh_Agent": "POC's/Junaid/MySQL_Log_Monitoring_Using_Wazuh_Agent/MySQL_Log_Monitoring_Using_Wazuh_Agent.md"
+      - "Wazuh_Agent_Log_Buffering_and_Resynchronization": "POC's/Junaid/Wazuh_Agent_Log_Buffering_and_Resynchronization/Wazuh_Agent_Log_Buffering_and_Resynchronization.md"
+      - "Implementation Process to Monitor Filebeat Health": "POC's/Sai Krishna/Implementation Process to Monitor Filebeat Health/Implementation_Process_to_Monitor_Filebeat_Health.md"
+      - "Implementation Guide AWS CloudTrail → S3 → SQS → Logstash → Wazuh": "POC's/Sai Krishna/Implementation Guide AWS CloudTrail → S3 → SQS → Logstash → Wazuh/Implementation_Guide_AWS_CloudTrail_S3_SQS_Logstash_Wazuh.md"
+      - "Prometheus": "POC's/Sai Krishna/Prometheus/Prometheus.md"
+      - "SOC Logstash Multi-Pipeline Architecture Implementation Guide": "POC's/Yaseen/SOC Logstash Multi-Pipeline Architecture Implementation Guide/SOC_Logstash_Multi_Pipeline.md"
+      - "SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide": "POC's/Yaseen/SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide/SOC_Logstash_P2P.md"
+      - "Wazuh_Multi_Tenant_MSSP_Implementation": "POC's/Junaid/Wazuh_Multi_Tenant_MSSP_Implementation/Wazuh_Multi_Tenant_MSSP_Implementation.md"
+      - Wazuh Multi Node Runbook: POC's/Vineeth/Wazuh Multi Node Runbook/Wazuh Multi Node Runbook.md
+      - High Availability Log Ingestion Pipeline Deployment Guide: POC's/Vineeth/High Availability Log Ingestion Pipeline Deployment Guide/High Availability Log Ingestion Pipeline Deployment Guide.md
+      - Zero Downtime Group Configuration: POC's/Junaid/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA.md
+      - Single Agent Multi Group in Wazuh: POC's/Junaid/POC- Single Agent Multi-Group in Wazuh/POC- Single Agent Multi-Group in Wazuh.md
+      - Operating System Based Group Creation in Wazuh GitHub: POC's/Junaid/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub.md
+  
