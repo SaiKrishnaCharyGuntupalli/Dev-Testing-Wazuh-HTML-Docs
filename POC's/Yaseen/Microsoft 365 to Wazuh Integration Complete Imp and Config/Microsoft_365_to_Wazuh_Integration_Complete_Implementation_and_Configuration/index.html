@@ -1,0 +1,5387 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Production implementation guide for multi-tenant Wazuh MSSP on single-node Docker">
+      
+      
+      
+      
+        <link rel="prev" href="../../../Junaid/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/">
+      
+      
+        <link rel="next" href="../../../Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Microsoft 365 to Wazuh Integration Complete Imp and Config - Wazuh MSSP Multi-Tenant Implementation Guide</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../../stylesheets/responsive-nav.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#microsoft-365-audit-log-integration-with-wazuh-siem-complete-implementation-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-header__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Wazuh MSSP Multi-Tenant Implementation Guide
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Microsoft 365 to Wazuh Integration Complete Imp and Config
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-nav__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    Wazuh MSSP Multi-Tenant Implementation Guide
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../01-Getting_started/Getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment & Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment & Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../02-index-template-filebeat/index_template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index Template & Filebeat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../03-agent-deployment/agent_deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../04-agent-configuration/agent_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & Access
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Security & Access
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../06-rbac/rbac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RBAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../07-dls/dls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Document Level Security (DLS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../08-sso-entra/sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSO - Microsoft Entra ID
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../09-cluster-index-verification/cluster-index-verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster and Index Verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../10-reference/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC's
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    POC's
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/GitHub_Webhook_to_Logstash/GitHub_Webhook_to_Logstash_POC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub_Webhook_to_Logstash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Rules-as-Code%20Implementation%20Guide/Wazuh%20Rules-as-Code%20Implementation%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Rules-as-Code Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Windows Agent Deployment & Security Detection logs Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetFlowlogs_to_Logstash_and_Wazuh_Indexer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/XDR%20Implementation%20Process/XDR%20Implementation%20Process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XDR Implementation Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Second%20use%20case%20of%20XDR/Second%20use%20case%20of%20XDR/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Second use case of XDR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Pipelines_and_Challenges/Pipelines_and_Challenges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipelines_and_Challenges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jira API → Logstash → Wazuh Integration for Non-Agent Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LOGSTASH PIPELINE WORKERS & BATCHSIZE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GitHub_Logstash_Wazuh_NonAgent_Implementation/GitHub_Logstash_Wazuh_NonAgent_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Logstash Wazuh NonAgent Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/MySQL_Log_Monitoring_Using_Wazuh_Agent/MySQL_Log_Monitoring_Using_Wazuh_Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MySQL_Log_Monitoring_Using_Wazuh_Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Agent_Log_Buffering_and_Resynchronization/Wazuh_Agent_Log_Buffering_and_Resynchronization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Agent_Log_Buffering_and_Resynchronization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Process%20to%20Monitor%20Filebeat%20Health/Implementation_Process_to_Monitor_Filebeat_Health/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor Filebeat Health
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20AWS%20CloudTrail%20%E2%86%92%20S3%20%E2%86%92%20SQS%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh/Implementation_Guide_AWS_CloudTrail_S3_SQS_Logstash_Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide AWS CloudTrail → S3 → SQS → Logstash → Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Prometheus/Prometheus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prometheus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SOC%20Logstash%20Multi-Pipeline%20Architecture%20Implementation%20Guide/SOC_Logstash_Multi_Pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Multi-Pipeline Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SOC%20Logstash%20Pipeline-to-Pipeline%20%28P2P%29%20Architecture%20Implementation%20Guide/SOC_Logstash_P2P/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Multi_Tenant_MSSP_Implementation/Wazuh_Multi_Tenant_MSSP_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Multi_Tenant_MSSP_Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/Wazuh%20Multi%20Node%20Runbook/Wazuh%20Multi%20Node%20Runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Multi Node Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Availability Log Ingestion Pipeline Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zero Downtime Group Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operating System Based Group Creation in Wazuh GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Microsoft 365 to Wazuh Integration Complete Imp and Config
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Microsoft 365 to Wazuh Integration Complete Imp and Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-1-introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 1 – Introduction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 1 – Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-project-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Project Objective
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Scope
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-technologies-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Technologies Used
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-end-to-end-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 End-to-End Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-2-microsoft-365-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 2 – Microsoft 365 Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 2 – Microsoft 365 Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-microsoft-365" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Microsoft 365
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-microsoft-entra-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Microsoft Entra ID
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-microsoft-purview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Microsoft Purview
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-microsoft-graph-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Microsoft Graph API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-office-365-management-activity-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Office 365 Management Activity API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-difference-between-microsoft-graph-api-and-office-365-management-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 Difference Between Microsoft Graph API and Office 365 Management API
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-3-prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 3 – Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-4-microsoft-365-portal-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 4 – Microsoft 365 Portal Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-5-azure-portal-microsoft-entra-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 5 – Azure Portal &amp; Microsoft Entra ID
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-6-azure-app-registration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 6 – Azure App Registration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 6 – Azure App Registration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#navigation-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Navigation path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fill" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fill
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-7-tenant-id-client-id-client-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 7 – Tenant ID, Client ID &amp; Client Secret
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 7 – Tenant ID, Client ID &amp; Client Secret">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tenant-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tenant ID
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client ID
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client Secret
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why required?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-8-api-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 8 – API Permissions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 8 – API Permissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#microsoft-graph-api-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Microsoft Graph API Permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#office-365-management-activity-api-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Office 365 Management Activity API Permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-9-admin-consent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 9 – Admin Consent
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 9 – Admin Consent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#procedure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Procedure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resolution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-10-microsoft-purview-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 10 – Microsoft Purview Audit
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 10 – Microsoft Purview Audit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-is-it-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why is it required?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#procedure_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Procedure:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-faced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue Faced
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolution_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resolution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#propagation-delay" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Propagation Delay
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-11-wazuh-office365-module-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 11 – Wazuh Office365 Module Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 11 – Wazuh Office365 Module Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#111-purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.1 Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#112-what-is-ossecconf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.2 What is ossec.conf?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#113-why-modify-ossecconf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.3 Why Modify ossec.conf?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#114-office365-module-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.4 Office365 Module Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#115-explanation-of-every-tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.5 Explanation of Every Tag
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-12-restarting-wazuh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 12 – Restarting Wazuh
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 12 – Restarting Wazuh">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verification_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-13-oauth-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 13 – OAuth Authentication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 13 – OAuth Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-is-oauth-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why is OAuth Required?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generate-access-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generate Access Token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Response
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-is-access-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is Access Token?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-14-rest-api-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 14 – REST API Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 14 – REST API Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-15-office365-module-internal-working" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 15 – Office365 Module Internal Working
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 15 – Office365 Module Internal Working">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#internal-processing-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Internal Processing Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-16-decoders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 16 – Decoders
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 16 – Decoders">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decoder-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decoder Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#built-in-json-decoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in JSON Decoder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-raw-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example Raw Log
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decoder-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decoder Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-automatically-selected" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Automatically Selected?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-17-wazuh-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 17 – Wazuh Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 17 – Wazuh Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#built-in-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in Rules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#office365-rules-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Office365 Rules File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#important-office365-rule-ids" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Important Office365 Rule IDs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#built-in-rule-processing-chain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in Rule Processing Chain
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-did-we-use-rule-91532" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Did We Use Rule 91532?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-engine-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule Engine Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-we-identified-the-parent-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How We Identified the Parent Rule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-18-alerts-dashboard-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 18 – Alerts &amp; Dashboard Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 18 – Alerts &amp; Dashboard Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#181-purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18.1 Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#182-alert-generation-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18.2 Alert Generation Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#183-what-does-each-alert-contain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18.3 What Does Each Alert Contain?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#184-dashboard-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18.4 Dashboard Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#185-verification-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18.5 Verification Result
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-19-custom-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 19 – Custom Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 19 – Custom Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gap-we-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap We Found
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-rule-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Rule Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-rule-we-added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Rule We Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-elements-explained" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule Elements Explained
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-add-the-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to Add the Rule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-custom-rules-you-can-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other Custom Rules You Can Add
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-20-wazuh-logtest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 20 – wazuh-logtest
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 20 – wazuh-logtest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Purpose">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to Run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-this-exact-json-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Exact JSON Structure?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output-we-can-get-exact-result-see-in-wazuh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output We can get exact result see in wazuh
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Wazuh SOC Onboarding and Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-1-introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 1 – Introduction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 1 – Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-project-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Project Objective
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Scope
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-technologies-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Technologies Used
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-end-to-end-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 End-to-End Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-2-microsoft-365-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 2 – Microsoft 365 Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 2 – Microsoft 365 Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-microsoft-365" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Microsoft 365
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-microsoft-entra-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Microsoft Entra ID
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-microsoft-purview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Microsoft Purview
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-microsoft-graph-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Microsoft Graph API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-office-365-management-activity-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Office 365 Management Activity API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-difference-between-microsoft-graph-api-and-office-365-management-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 Difference Between Microsoft Graph API and Office 365 Management API
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-3-prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 3 – Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-4-microsoft-365-portal-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 4 – Microsoft 365 Portal Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-5-azure-portal-microsoft-entra-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 5 – Azure Portal &amp; Microsoft Entra ID
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-6-azure-app-registration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 6 – Azure App Registration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 6 – Azure App Registration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#navigation-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Navigation path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fill" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fill
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-7-tenant-id-client-id-client-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 7 – Tenant ID, Client ID &amp; Client Secret
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 7 – Tenant ID, Client ID &amp; Client Secret">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tenant-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tenant ID
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client ID
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client Secret
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why required?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-8-api-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 8 – API Permissions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 8 – API Permissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#microsoft-graph-api-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Microsoft Graph API Permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#office-365-management-activity-api-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Office 365 Management Activity API Permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-9-admin-consent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 9 – Admin Consent
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 9 – Admin Consent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#procedure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Procedure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resolution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-10-microsoft-purview-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 10 – Microsoft Purview Audit
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 10 – Microsoft Purview Audit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-is-it-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why is it required?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#procedure_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Procedure:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-faced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue Faced
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolution_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resolution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#propagation-delay" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Propagation Delay
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-11-wazuh-office365-module-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 11 – Wazuh Office365 Module Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 11 – Wazuh Office365 Module Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#111-purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.1 Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#112-what-is-ossecconf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.2 What is ossec.conf?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#113-why-modify-ossecconf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.3 Why Modify ossec.conf?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#114-office365-module-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.4 Office365 Module Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#115-explanation-of-every-tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.5 Explanation of Every Tag
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-12-restarting-wazuh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 12 – Restarting Wazuh
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 12 – Restarting Wazuh">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verification_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-13-oauth-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 13 – OAuth Authentication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 13 – OAuth Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-is-oauth-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why is OAuth Required?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generate-access-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generate Access Token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Response
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-is-access-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is Access Token?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-14-rest-api-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 14 – REST API Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 14 – REST API Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-15-office365-module-internal-working" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 15 – Office365 Module Internal Working
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 15 – Office365 Module Internal Working">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#internal-processing-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Internal Processing Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-16-decoders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 16 – Decoders
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 16 – Decoders">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decoder-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decoder Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#built-in-json-decoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in JSON Decoder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-raw-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example Raw Log
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decoder-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decoder Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-automatically-selected" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Automatically Selected?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-17-wazuh-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 17 – Wazuh Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 17 – Wazuh Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#built-in-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in Rules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#office365-rules-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Office365 Rules File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#important-office365-rule-ids" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Important Office365 Rule IDs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#built-in-rule-processing-chain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in Rule Processing Chain
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-did-we-use-rule-91532" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Did We Use Rule 91532?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-engine-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule Engine Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-we-identified-the-parent-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How We Identified the Parent Rule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-18-alerts-dashboard-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 18 – Alerts &amp; Dashboard Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 18 – Alerts &amp; Dashboard Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#181-purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18.1 Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#182-alert-generation-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18.2 Alert Generation Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#183-what-does-each-alert-contain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18.3 What Does Each Alert Contain?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#184-dashboard-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18.4 Dashboard Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#185-verification-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18.5 Verification Result
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-step_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-19-custom-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 19 – Custom Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 19 – Custom Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gap-we-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap We Found
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-rule-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Rule Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-rule-we-added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Rule We Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-elements-explained" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule Elements Explained
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-add-the-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to Add the Rule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-custom-rules-you-can-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other Custom Rules You Can Add
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-20-wazuh-logtest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 20 – wazuh-logtest
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chapter 20 – wazuh-logtest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Purpose">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to Run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-this-exact-json-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Exact JSON Structure?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output-we-can-get-exact-result-see-in-wazuh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output We can get exact result see in wazuh
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="microsoft-365-audit-log-integration-with-wazuh-siem-complete-implementation-guide">Microsoft 365 Audit Log Integration with Wazuh SIEM Complete Implementation Guide</h1>
+<h2 id="chapter-1-introduction">Chapter 1 – Introduction</h2>
+<h3 id="11-project-objective">1.1 Project Objective</h3>
+<p>The objective of this project is to integrate Microsoft 365 Audit Logs with the Wazuh Security Information and Event Management (SIEM) platform. This integration enables centralized monitoring of Microsoft 365 activities such as Outlook, Teams, SharePoint, OneDrive, and Azure Active Directory. Once integrated, every audit activity performed within the Microsoft 365 organization is collected by Wazuh, analyzed using built-in detection rules, and displayed in the Wazuh Dashboard. This allows security analysts to monitor user activities, investigate incidents, and build organization-specific security detections.</p>
+<h3 id="12-scope">1.2 Scope</h3>
+<ol>
+<li>Microsoft 365 Tenant Configuration</li>
+<li>Microsoft Entra ID Configuration</li>
+<li>Azure App Registration</li>
+<li>OAuth Authentication</li>
+<li>Microsoft Graph API Permissions</li>
+<li>Office 365 Management Activity API Permissions</li>
+<li>Microsoft Purview Audit Configuration</li>
+<li>Wazuh Office365 Module Configuration</li>
+<li>Dashboard Verification</li>
+<li>Built-in Rule Processing</li>
+<li>Custom Rule Creation</li>
+<li>Troubleshooting</li>
+<li>Validation</li>
+</ol>
+<h3 id="13-technologies-used">1.3 Technologies Used</h3>
+<p><img alt="Technologies Used" src="../../../../assets/images/POC%27s/Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Technologies%20Used.png" /></p>
+<h2 id="14-end-to-end-architecture">1.4 End-to-End Architecture</h2>
+<p><img alt="End-to-End Architecture" src="../../../../assets/images/POC%27s/Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/End-to-End%20Architecture%20.png" /></p>
+<p><strong>Next Step</strong>
+The next step is to understand the Microsoft services used in this integration.</p>
+<hr />
+<h2 id="chapter-2-microsoft-365-overview">Chapter 2 – Microsoft 365 Overview</h2>
+<p>Before configuring the integration, it is important to understand the Microsoft services involved.</p>
+<h3 id="21-microsoft-365">2.1 Microsoft 365</h3>
+<p><strong>Definition:</strong> Microsoft 365 is Microsoft's cloud-based productivity platform that provides applications and services such as Outlook, Teams, SharePoint, OneDrive, Exchange Online, and Microsoft Entra ID.</p>
+<p><strong>Why is it required?</strong>
+Microsoft 365 generates audit logs whenever users perform activities such as:</p>
+<ol>
+<li>Sending emails</li>
+<li>Receiving emails</li>
+<li>Joining Teams meetings</li>
+<li>Uploading files</li>
+<li>Downloading files</li>
+<li>Sharing files</li>
+<li>Logging into Azure AD</li>
+</ol>
+<p>these audit logs are the primary data source for Wazuh monitoring.</p>
+<h3 id="22-microsoft-entra-id">2.2 Microsoft Entra ID</h3>
+<p><strong>Definition:</strong> Microsoft Entra ID (formerly Azure Active Directory) is Microsoft's Identity and Access Management (IAM) service.</p>
+<p><strong>Why is it required?</strong>
+It authenticates users and applications.
+In this project, Wazuh authenticates using an Azure Application Registration created inside Microsoft Entra ID.</p>
+<h3 id="23-microsoft-purview">2.3 Microsoft Purview</h3>
+<p><strong>Definition:</strong> Microsoft Purview is Microsoft's Compliance and Governance platform.</p>
+<p><strong>Why is it required?</strong>
+Purview stores all Microsoft 365 audit events.</p>
+<p>Examples include:</p>
+<ol>
+<li>Outlook activities</li>
+<li>Teams meetings</li>
+<li>SharePoint uploads</li>
+<li>OneDrive sharing</li>
+<li>Azure AD logins</li>
+</ol>
+<p>Without Purview Audit, Microsoft 365 audit logs cannot be retrieved.</p>
+<h3 id="24-microsoft-graph-api">2.4 Microsoft Graph API</h3>
+<p><strong>Definition:</strong> Microsoft Graph API is Microsoft's unified REST API used to access Microsoft cloud resources such as users, groups, calendars, devices, and directory information.</p>
+<p><strong>Why did we configure it?</strong>
+The Azure App Registration requires Microsoft Graph permissions for organization and directory access.</p>
+<p><strong>Permissions added:</strong></p>
+<ol>
+<li>AuditLog.Read.All</li>
+<li>Directory.Read.All</li>
+<li>Organization.Read.All</li>
+</ol>
+<p><strong>Important Note:</strong> Although Microsoft Graph permissions were configured, Wazuh does not retrieve audit logs using Microsoft Graph in this implementation.</p>
+<h3 id="25-office-365-management-activity-api">2.5 Office 365 Management Activity API</h3>
+<p><strong>Definition:</strong> The Office 365 Management Activity API is a REST API that provides Microsoft 365 audit logs.</p>
+<p><strong>Why is it required?</strong>
+Wazuh uses this API to retrieve audit logs from:</p>
+<ol>
+<li>Outlook</li>
+<li>Teams</li>
+<li>SharePoint</li>
+<li>OneDrive</li>
+<li>Azure AD</li>
+</ol>
+<p>Without this API, Wazuh cannot collect Microsoft 365 audit events.</p>
+<h3 id="26-difference-between-microsoft-graph-api-and-office-365-management-api">2.6 Difference Between Microsoft Graph API and Office 365 Management API</h3>
+<table>
+<thead>
+<tr>
+<th>Microsoft Graph API</th>
+<th>Office 365 Management API</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Accesses Microsoft resources</td>
+<td>Retrieves audit logs</td>
+</tr>
+<tr>
+<td>User information</td>
+<td>Security events</td>
+</tr>
+<tr>
+<td>Groups</td>
+<td>Compliance logs</td>
+</tr>
+<tr>
+<td>Calendars</td>
+<td>Activity logs</td>
+</tr>
+<tr>
+<td>Devices</td>
+<td>Audit subscriptions</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="chapter-3-prerequisites">Chapter 3 – Prerequisites</h2>
+<p>Beforewe starting the implementation,we have to ensure the following requirements are available.</p>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Microsoft 365 Organization Account</td>
+<td>Access Microsoft 365 services</td>
+</tr>
+<tr>
+<td>Azure Subscription</td>
+<td>Required for Azure resources</td>
+</tr>
+<tr>
+<td>Microsoft Entra ID</td>
+<td>Authentication</td>
+</tr>
+<tr>
+<td>Microsoft 365 Administrator</td>
+<td>Grant API permissions</td>
+</tr>
+<tr>
+<td>Wazuh Manager</td>
+<td>Receive audit logs</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>Wazuh deployment</td>
+</tr>
+<tr>
+<td>Microsoft Purview</td>
+<td>Audit logs</td>
+</tr>
+<tr>
+<td>Internet Connectivity</td>
+<td>API communication</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Next Step</strong>
+The next step is to log in to the Microsoft 365 Portal.</p>
+<hr />
+<h2 id="chapter-4-microsoft-365-portal-setup">Chapter 4 – Microsoft 365 Portal Setup</h2>
+<p><strong>Purpose:</strong> This portal provides access to all Microsoft 365 applications.</p>
+<blockquote>
+<p><strong>Step 1</strong>
+Open
+<a href="https://www.office.com?utm_source=chatgpt.com">https://www.office.com</a></p>
+<p><strong>Step 2</strong>
+Click
+Sign In</p>
+<p><strong>Step 3</strong>
+Login using
+yaseen@vidyayug.com</p>
+<p><strong>Step 4</strong>
+After successful login you will see
+1. Outlook
+2. Teams
+3. OneDrive
+4. SharePoint
+5. Word
+6. Excel
+7. PowerPoint</p>
+</blockquote>
+<p>This portal provides access to all Microsoft 365 applications.</p>
+<p><strong>Why is this required?</strong>
+The organization account is used throughout the implementation for authentication, Microsoft Purview access, and generating Microsoft 365 audit logs.</p>
+<p><strong>Next Step:</strong>
+Open Azure Portal to configure Microsoft Entra ID.</p>
+<hr />
+<h2 id="chapter-5-azure-portal-microsoft-entra-id">Chapter 5 – Azure Portal &amp; Microsoft Entra ID</h2>
+<p><strong>Purpose:</strong> Azure Portal is used to create an application that Wazuh will use for authentication.</p>
+<blockquote>
+<p><strong>Step 1</strong>
+Open
+<a href="https://portal.azure.com">https://portal.azure.com</a></p>
+<p><strong>Step 2</strong>
+Login using
+yaseen@vidyayug.com</p>
+<p><strong>Step 3</strong>
+Search
+Microsoft Entra ID
+Open it.</p>
+<p><strong>Why?</strong>
+Microsoft Entra ID manages users, applications, authentication, and permissions.</p>
+</blockquote>
+<p>The Wazuh application will be created here.</p>
+<p><strong>Next Step</strong>
+Create an Azure Application Registration.</p>
+<hr />
+<h2 id="chapter-6-azure-app-registration">Chapter 6 – Azure App Registration</h2>
+<p><strong>Definition:</strong> An App Registration creates an identity for an external application. In this project, Wazuh acts as the external application.</p>
+<p><strong>Why is it required?</strong>
+Without App Registration:</p>
+<ol>
+<li>Wazuh cannot authenticate.</li>
+<li>Microsoft will reject API requests.</li>
+</ol>
+<h3 id="navigation-path">Navigation path</h3>
+<blockquote>
+<p>Microsoft Entra ID
+↓
+Applications
+↓
+App Registrations
+↓
+New Registration</p>
+</blockquote>
+<h3 id="fill">Fill</h3>
+<p>Application Name</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>M365-Wazuh-Integration
+</code></pre></div>
+<p>Supported Account Type</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Accounts in this organizational directory only
+</code></pre></div>
+<p>Redirect URI</p>
+<p>Leave Empty</p>
+<p>Click</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Register
+</code></pre></div>
+<h3 id="output">Output</h3>
+<p>Application created successfully.</p>
+<h3 id="next-step">Next Step</h3>
+<p>Copy the Tenant ID and Client ID.</p>
+<hr />
+<h2 id="chapter-7-tenant-id-client-id-client-secret">Chapter 7 – Tenant ID, Client ID &amp; Client Secret</h2>
+<h3 id="tenant-id">Tenant ID</h3>
+<p><strong>Definition:</strong> Unique identifier of the Microsoft organization.</p>
+<p><strong>Why required?</strong> Wazuh needs to know which Microsoft tenant to connect to.</p>
+<h3 id="client-id">Client ID</h3>
+<p><strong>Definition:</strong> Unique identifier of the Azure Application.</p>
+<p><strong>Why required?</strong> Microsoft identifies which application is requesting access.</p>
+<p><strong>Copy</strong></p>
+<blockquote>
+<p>Application (Client) ID</p>
+<p>Directory (Tenant) ID</p>
+<p>Store both safely.</p>
+</blockquote>
+<h3 id="client-secret">Client Secret</h3>
+<p><strong>Definition:</strong> Acts like the password of the Azure Application.</p>
+<p><strong>Navigation</strong></p>
+<blockquote>
+<p>Certificates &amp; Secrets
+↓
+New Client Secret</p>
+<p>Description
+Microsoft365-Wazuh</p>
+<p>Expiry
+24 Months</p>
+<p>Click
+Add</p>
+<p>Immediately copy
+Secret Value</p>
+</blockquote>
+<p>Important: Microsoft displays the Secret Value only once.</p>
+<h3 id="why-required">Why required?</h3>
+<p>During OAuth authentication, Microsoft validates:</p>
+<ol>
+<li>Tenant ID</li>
+<li>Client ID</li>
+<li>Client Secret</li>
+</ol>
+<p>Only then is an Access Token generated.</p>
+<h3 id="next-step_1">Next Step</h3>
+<p>Configure the required API permissions.</p>
+<hr />
+<h2 id="chapter-8-api-permissions">Chapter 8 – API Permissions</h2>
+<p><strong>Purpose:</strong> API permissions define what resources the Azure Application is allowed to access. Authentication alone is not sufficient. The application must also be authorized to read Microsoft 365 audit data.</p>
+<blockquote>
+<h3 id="microsoft-graph-api-permissions">Microsoft Graph API Permissions</h3>
+<p>Navigate to:</p>
+<p>API Permissions
+↓
+Add Permission
+↓
+Microsoft Graph
+↓
+Application Permissions</p>
+<p>Add:
+1. AuditLog.Read.All
+2. Directory.Read.All
+3. Organization.Read.All</p>
+<p>Click Add Permissions.</p>
+</blockquote>
+<p>Why?
+These permissions allow the application to read organizational and directory information required by the Azure application.</p>
+<p>Note: These permissions were configured as part of the App Registration, but the audit log collection in this project is performed through the Office 365 Management Activity API.</p>
+<h3 id="office-365-management-activity-api-permissions">Office 365 Management Activity API Permissions</h3>
+<p>Again navigate to:</p>
+<blockquote>
+<p>API Permissions
+↓
+Add Permission
+↓
+Office 365 Management APIs
+↓
+Application Permissions</p>
+<p>Add:
+1. ActivityFeed.Read
+2. ActivityFeed.ReadDlp
+3. ServiceHealth.Read</p>
+<p>Click
+Add Permissions.</p>
+</blockquote>
+<p>Why?
+These permissions allow Wazuh to retrieve Microsoft 365 audit logs through the Office 365 Management Activity API.</p>
+<p><strong>Next Step</strong>
+Request an administrator to grant tenant-wide consent for the configured permissions.</p>
+<hr />
+<h2 id="chapter-9-admin-consent">Chapter 9 – Admin Consent</h2>
+<p><strong>Definition:</strong> Admin Consent authorizes the Azure Application to use the configured API permissions across the Microsoft 365 organization.</p>
+<p><strong>Why is it required?</strong>
+Application permissions affect the entire tenant and therefore require approval from a Microsoft 365 Administrator.</p>
+<h3 id="procedure">Procedure</h3>
+<p>Go to:</p>
+<p>API Permissions</p>
+<p>Click:</p>
+<p>Grant Admin Consent</p>
+<p><strong>Issue Faced</strong>
+Initially, the permissions were Not Granted, so Wazuh could authenticate but could not access Microsoft 365 audit subscriptions. This resulted in permission-related errors.</p>
+<h3 id="resolution">Resolution</h3>
+<p>my senior granted Admin Consent. After approval, the permission status changed to: Granted for Vidyayug</p>
+<h3 id="next-step_2">Next Step</h3>
+<p>Verify that Microsoft Purview Audit is accessible.</p>
+<hr />
+<h2 id="chapter-10-microsoft-purview-audit">Chapter 10 – Microsoft Purview Audit</h2>
+<p><strong>Definition:</strong> Microsoft Purview is Microsoft's compliance platform. Its Audit service stores organization-wide Microsoft 365 audit events.</p>
+<h3 id="why-is-it-required">Why is it required?</h3>
+<p>Wazuh collects Microsoft 365 activities that are recorded in Microsoft Purview Audit.</p>
+<h3 id="procedure_1">Procedure:</h3>
+<blockquote>
+<p>Open:
+<a href="https://purview.microsoft.com">https://purview.microsoft.com</a></p>
+<p>Navigate to:
+Solutions
+↓
+Audit</p>
+</blockquote>
+<h3 id="issue-faced">Issue Faced</h3>
+<p>Initially, the Audit page was not accessible because your account did not have the required permissions.</p>
+<h3 id="resolution_1">Resolution</h3>
+<p>So I contacted our senior,. He verified that Purview Audit was already enabled for the tenant and granted your account access. You also confirmed that granting your account access would not impact other organization users.</p>
+<h3 id="propagation-delay">Propagation Delay</h3>
+<p>Microsoft documents that permission changes may take 1–24 hours to propagate. After waiting, you verified that the Audit page became accessible.</p>
+<h3 id="verification">Verification</h3>
+<p>Generate a few Microsoft 365 activities, such as:</p>
+<ol>
+<li>Join a Microsoft Teams meeting.</li>
+<li>Send or receive an Outlook email.</li>
+<li>Upload a file to SharePoint.</li>
+<li>Upload or modify a file in OneDrive.</li>
+</ol>
+<p>These activities should appear in the Purview Audit Search page after processing.</p>
+<h3 id="next-step_3">Next Step</h3>
+<p>The next phase is to configure the Wazuh Office365 module so it can authenticate with Azure, retrieve Microsoft 365 audit logs through the Office 365 Management Activity API, and begin forwarding those events into the Wazuh analysis engine.</p>
+<hr />
+<h2 id="chapter-11-wazuh-office365-module-configuration">Chapter 11 – Wazuh Office365 Module Configuration</h2>
+<h3 id="111-purpose">11.1 Purpose</h3>
+<p>After configuring Microsoft 365, Azure, API permissions, and Microsoft Purview, the next step is to configure Wazuh so that it can authenticate with Microsoft 365 and retrieve audit logs automatically. The Office365 module is a built-in Wazuh module responsible for communicating with the Office 365 Management Activity API. <strong>Without this configuration, Wazuh will not collect any Microsoft 365 audit logs.</strong></p>
+<h3 id="112-what-is-ossecconf">11.2 What is ossec.conf?</h3>
+<p><strong>Definition:</strong> ossec.conf is the primary configuration file of the Wazuh Manager.</p>
+<p>It controls all Wazuh modules, including:</p>
+<ol>
+<li>Log collection</li>
+<li>Active response</li>
+<li>Vulnerability detection</li>
+<li>File Integrity Monitoring</li>
+<li>Office365 Integration</li>
+<li>Syscheck</li>
+<li>Rootcheck</li>
+<li>Remote Agents</li>
+</ol>
+<p>Location:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/var/ossec/etc/ossec.conf
+</code></pre></div>
+<h3 id="113-why-modify-ossecconf">11.3 Why Modify ossec.conf?</h3>
+<p>By default, Wazuh does not know:</p>
+<ol>
+<li>Which Microsoft 365 tenant to connect to.</li>
+<li>Which Azure application to use.</li>
+<li>Which API credentials to use.</li>
+<li>Which audit subscriptions should be collected.</li>
+</ol>
+<p>Therefore, these details must be configured manually.</p>
+<h3 id="114-office365-module-configuration">11.4 Office365 Module Configuration</h3>
+<p>Open:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>docker exec -it single-node-wazuh.manager-1 bash
+</code></pre></div>
+<p>Open configuration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>vi /var/ossec/etc/ossec.conf
+</code></pre></div>
+<p>Add:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">&lt;office365&gt;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nt">&lt;enabled&gt;</span>yes<span class="nt">&lt;/enabled&gt;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nt">&lt;interval&gt;</span>5m<span class="nt">&lt;/interval&gt;</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="nt">&lt;curl_max_size&gt;</span>1M<span class="nt">&lt;/curl_max_size&gt;</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="nt">&lt;api_auth&gt;</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="nt">&lt;tenant_id&gt;</span>YOUR_TENANT_ID<span class="nt">&lt;/tenant_id&gt;</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="nt">&lt;client_id&gt;</span>YOUR_CLIENT_ID<span class="nt">&lt;/client_id&gt;</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="nt">&lt;client_secret&gt;</span>YOUR_CLIENT_SECRET<span class="nt">&lt;/client_secret&gt;</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="nt">&lt;/api_auth&gt;</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="nt">&lt;subscriptions&gt;</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="nt">&lt;subscription&gt;</span>Audit.General<span class="nt">&lt;/subscription&gt;</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="nt">&lt;subscription&gt;</span>Audit.Exchange<span class="nt">&lt;/subscription&gt;</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="nt">&lt;subscription&gt;</span>Audit.SharePoint<span class="nt">&lt;/subscription&gt;</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="nt">&lt;subscription&gt;</span>Audit.AzureActiveDirectory<span class="nt">&lt;/subscription&gt;</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="nt">&lt;/subscriptions&gt;</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="nt">&lt;/office365&gt;</span>
+</code></pre></div>
+<h3 id="115-explanation-of-every-tag">11.5 Explanation of Every Tag</h3>
+<p><strong><code>&lt;enabled&gt;yes&lt;/enabled&gt;</code></strong></p>
+<p>Enables the Office365 module.</p>
+<p>Without this tag the module never starts.</p>
+<p><strong><code>&lt;interval&gt;5m&lt;/interval&gt;</code></strong></p>
+<p>Checks Microsoft every five minutes for new audit logs.</p>
+<p><strong><code>&lt;curl_max_size&gt;1M&lt;/curl_max_size&gt;</code></strong></p>
+<p>Maximum response size Wazuh accepts from Microsoft.</p>
+<p><strong><code>&lt;tenant_id&gt;</code></strong></p>
+<p>Identifies the Microsoft organization.</p>
+<p><strong><code>&lt;client_id&gt;</code></strong></p>
+<p>Identifies the Azure App Registration.</p>
+<p><strong><code>&lt;client_secret&gt;</code></strong></p>
+<p>Password of the Azure Application.
+Used during OAuth authentication.</p>
+<p><strong><code>&lt;subscriptions&gt;</code></strong></p>
+<p>Defines which Microsoft365 audit categories Wazuh should collect.</p>
+<p><strong>Audit.General</strong>
+General Microsoft365 activities</p>
+<p>Examples</p>
+<ul>
+<li>Teams</li>
+<li>OneDrive</li>
+<li>SharePoint</li>
+</ul>
+<p><strong>Audit.Exchange</strong>
+Exchange Online</p>
+<p>Examples</p>
+<ul>
+<li>Email</li>
+<li>Mailbox</li>
+<li>Outlook</li>
+</ul>
+<p><strong>Audit.SharePoint</strong>
+SharePoint operations</p>
+<p>Examples</p>
+<ul>
+<li>Upload</li>
+<li>Download</li>
+<li>Sharing</li>
+</ul>
+<p><strong>Audit.AzureActiveDirectory</strong>
+Azure AD</p>
+<p>Examples</p>
+<ul>
+<li>Login</li>
+<li>Authentication</li>
+<li>User management</li>
+</ul>
+<p><strong>Output</strong>
+After saving the configuration, Wazuh now knows how to authenticate with Microsoft 365 and which audit logs to retrieve.</p>
+<p><strong>Next Step</strong>
+Restart the Wazuh Manager to load the Office365 module.</p>
+<hr />
+<h2 id="chapter-12-restarting-wazuh">Chapter 12 – Restarting Wazuh</h2>
+<p>Restart Wazuh:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>/var/ossec/bin/wazuh-control restart
+</code></pre></div>
+<h3 id="purpose">Purpose</h3>
+<p>Reloads:</p>
+<ol>
+<li>Office365 module</li>
+<li>Rules</li>
+<li>Decoders</li>
+<li>Configuration</li>
+</ol>
+<h3 id="verification_1">Verification</h3>
+<p>Check:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>grep -i office365 /var/ossec/logs/ossec.log
+</code></pre></div>
+<p>Expected output:
+Office365 Module Started</p>
+<h3 id="next-step_4">Next Step</h3>
+<p>Verify Microsoft authentication using OAuth.</p>
+<hr />
+<h2 id="chapter-13-oauth-authentication">Chapter 13 – OAuth Authentication</h2>
+<h3 id="definition">Definition</h3>
+<p>OAuth 2.0 is Microsoft's authentication mechanism.</p>
+<p>Instead of sending the Client Secret every time, Azure generates a temporary Access Token.</p>
+<h3 id="authentication-flow">Authentication Flow</h3>
+<blockquote>
+<p>Wazuh
+↓
+Azure Entra ID
+↓
+Tenant ID
+↓
+Client ID
+↓
+Client Secret
+↓
+OAuth Access Token
+↓
+Office365 Management API
+↓
+Audit Logs
+↓
+Wazuh</p>
+</blockquote>
+<h3 id="why-is-oauth-required">Why is OAuth Required?</h3>
+<p>Microsoft never allows direct access to APIs using only a password.</p>
+<p>Instead:</p>
+<blockquote>
+<p>Client Secret
+↓
+Azure
+↓
+Access Token
+↓
+API Access</p>
+</blockquote>
+<h3 id="generate-access-token">Generate Access Token</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="s2">&quot;https://login.microsoftonline.com/&lt;TENANT_ID&gt;/oauth2/v2.0/token&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>-d<span class="w"> </span><span class="s2">&quot;client_id=&lt;CLIENT_ID&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>-d<span class="w"> </span><span class="s2">&quot;client_secret=&lt;CLIENT_SECRET&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>-d<span class="w"> </span><span class="s2">&quot;scope=https://manage.office.com/.default&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>-d<span class="w"> </span><span class="s2">&quot;grant_type=client_credentials&quot;</span>
+</code></pre></div>
+<h3 id="expected-response">Expected Response</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nt">&quot;access_token&quot;</span><span class="p">:</span><span class="s2">&quot;eyJ...&quot;</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="what-is-access-token">What is Access Token?</h3>
+<p>Temporary credential generated by Azure.</p>
+<p>Valid for approximately one hour.</p>
+<h3 id="next-step_5">Next Step</h3>
+<p>Verify Microsoft365 subscriptions.</p>
+<hr />
+<h2 id="chapter-14-rest-api-testing">Chapter 14 – REST API Testing</h2>
+<h3 id="purpose_1">Purpose</h3>
+<p>Before relying on Wazuh, verify that Microsoft APIs are accessible.</p>
+<h3 id="step-1">Step 1</h3>
+<p>Generate token.</p>
+<h3 id="step-2">Step 2</h3>
+<p>List subscriptions.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="s2">&quot;https://manage.office.com/api/v1.0/&lt;TENANT_ID&gt;/activity/feed/subscriptions/list&quot;</span>
+</code></pre></div>
+<p>Expected:</p>
+<p>Audit.General</p>
+<p>Audit.Exchange</p>
+<p>Audit.SharePoint</p>
+<p>Audit.AzureActiveDirectory</p>
+<h3 id="why">Why?</h3>
+<p>Confirms:</p>
+<ul>
+<li>Authentication successful.</li>
+<li>Permissions correct.</li>
+<li>API accessible.</li>
+</ul>
+<h3 id="next-step_6">Next Step</h3>
+<p>Allow Wazuh to retrieve audit logs.</p>
+<hr />
+<h2 id="chapter-15-office365-module-internal-working">Chapter 15 – Office365 Module Internal Working</h2>
+<h3 id="internal-processing-flow">Internal Processing Flow</h3>
+<blockquote>
+<p>Microsoft365
+↓
+Purview Audit
+↓
+Office365 Management API
+↓
+Office365 Module
+↓
+Analysisd
+↓
+JSON Decoder
+↓
+Rules
+↓
+Alerts
+↓
+Dashboard</p>
+</blockquote>
+<h3 id="explanation">Explanation</h3>
+<p>The Office365 module periodically calls Microsoft APIs.</p>
+<p>Microsoft returns audit logs in JSON format.</p>
+<p>These logs are forwarded to Wazuh Analysisd for processing.</p>
+<h3 id="next-step_7">Next Step</h3>
+<p>Understand how Wazuh decodes Microsoft365 JSON logs.</p>
+<hr />
+<h2 id="chapter-16-decoders">Chapter 16 – Decoders</h2>
+<h3 id="definition_1">Definition</h3>
+<p>A decoder converts raw logs into structured fields.</p>
+<p>Without decoding, Wazuh cannot understand log contents.</p>
+<h3 id="decoder-location">Decoder Location</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>/var/ossec/ruleset/decoders/
+</code></pre></div>
+<h3 id="built-in-json-decoder">Built-in JSON Decoder</h3>
+<p>Wazuh already contains a JSON decoder.</p>
+<p>No manual configuration is required.</p>
+<h3 id="example-raw-log">Example Raw Log</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nt">&quot;Operation&quot;</span><span class="p">:</span><span class="s2">&quot;MeetingParticipantDetail&quot;</span><span class="p">,</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="nt">&quot;Workload&quot;</span><span class="p">:</span><span class="s2">&quot;MicrosoftTeams&quot;</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="decoder-output">Decoder Output</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>office365.Operation
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>MeetingParticipantDetail
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>office365.Workload
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>MicrosoftTeams
+</code></pre></div>
+<h3 id="why-automatically-selected">Why Automatically Selected?</h3>
+<p>The Office365 module sends JSON logs.
+Wazuh automatically detects JSON format and uses the built-in JSON decoder.</p>
+<p>No custom decoder was created during this implementation.</p>
+<h3 id="next-step_8">Next Step</h3>
+<p>Process decoded logs using Wazuh Rules.</p>
+<hr />
+<h2 id="chapter-17-wazuh-rules">Chapter 17 – Wazuh Rules</h2>
+<h3 id="definition_2">Definition</h3>
+<p>Rules are the decision-making engine of Wazuh. After a log is decoded, Wazuh compares it against its built-in and custom rules. If a rule matches the event, Wazuh generates an alert and displays it in the Wazuh Dashboard.</p>
+<h3 id="built-in-rules">Built-in Rules</h3>
+<p>Wazuh includes approximately 8456 built-in rules covering multiple log sources, including:</p>
+<ol>
+<li>Linux</li>
+<li>Windows</li>
+<li>Office365</li>
+<li>AWS</li>
+<li>Azure</li>
+<li>Firewalls</li>
+<li>Suricata</li>
+<li>Syslog</li>
+<li>Docker</li>
+</ol>
+<p>These rules are maintained by Wazuh and are available immediately after installation.</p>
+<p>Location</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>/var/ossec/ruleset/rules/
+</code></pre></div>
+<h3 id="office365-rules-file">Office365 Rules File</h3>
+<p>The Microsoft 365 built-in rules are stored in:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>/var/ossec/ruleset/rules/0755-office365_rules.xml
+</code></pre></div>
+<p>We inspected this file to understand how Microsoft 365 events are processed before creating our custom rule.</p>
+<h3 id="important-office365-rule-ids">Important Office365 Rule IDs</h3>
+<p><img alt="Important Office365 Rule IDs" src="../../../../assets/images/POC%27s/Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Important%20Office365%20Rule%20IDs.png" /></p>
+<h3 id="built-in-rule-processing-chain">Built-in Rule Processing Chain</h3>
+<p>When an Office365 event arrives, Wazuh processes it in the following order:</p>
+<p>91531
+(Root Office365 Rule)
+↓
+91532
+(Generic Office365 Rule)
+↓
+91536 / 91537 / 91555 / 91578
+(Built-in Office365 Detection Rules)
+↓
+100500
+(Custom Rule Created by Us)</p>
+<h3 id="why-did-we-use-rule-91532">Why Did We Use Rule 91532?</h3>
+<p>Before creating a custom rule, we examined the Office365 rules file and observed that most Office365 detection rules inherit from Rule 91532.</p>
+<p>Since our required operation (SharingInvitationCreated) did not already exist as a built-in rule, we used 91532 as the parent rule. This ensures that our custom rule executes only after Wazuh has already verified that the event is a valid Office365 event.</p>
+<h3 id="rule-engine-flow">Rule Engine Flow</h3>
+<blockquote>
+<p>Raw Microsoft365 Log
+↓
+Office365 Module
+↓
+JSON Decoder
+↓
+8456 Built-in Rules
+↓
+Matching Rule Found
+↓
+Alert Generated
+↓
+Displayed in Wazuh Dashboard</p>
+</blockquote>
+<h3 id="how-we-identified-the-parent-rule">How We Identified the Parent Rule</h3>
+<p><strong>Step 1 – Locate the Office365 Rules File</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>find<span class="w"> </span>/var/ossec/ruleset/rules/<span class="w"> </span>-iname<span class="w"> </span><span class="s2">&quot;*office365*&quot;</span>
+</code></pre></div>
+<p><strong>Step 2 – Inspect the Parent Rule</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>grep<span class="w"> </span>-B5<span class="w"> </span>-A8<span class="w"> </span><span class="s1">&#39;id=&quot;91531&quot;&#39;</span><span class="w"> </span>/var/ossec/ruleset/rules/0755-office365_rules.xml
+</code></pre></div>
+<p><strong>Step 3 – Inspect the Generic Office365 Rule</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>grep<span class="w"> </span>-B5<span class="w"> </span>-A8<span class="w"> </span><span class="s1">&#39;id=&quot;91532&quot;&#39;</span><span class="w"> </span>/var/ossec/ruleset/rules/0755-office365_rules.xml
+</code></pre></div>
+<p><strong>Step 4 – Verify Whether the Required Detection Already Exists</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>grep<span class="w"> </span>-rl<span class="w"> </span><span class="s2">&quot;SharingInvitationCreated&quot;</span><span class="w"> </span>/var/ossec/ruleset/rules/
+</code></pre></div>
+<p>Result:</p>
+<p>No output.
+This confirmed that Wazuh did not provide a built-in rule for SharingInvitationCreated, so a custom rule was required.</p>
+<h3 id="observation">Observation</h3>
+<p>We did not choose Rule 91532 randomly. We first analyzed Wazuh's built-in Office365 rules, understood the parent-child rule hierarchy, and confirmed that no existing rule handled our target operation. Only then did we create Custom Rule 100500, using 91532 as its parent to extend Wazuh's default detection logic.</p>
+<hr />
+<h2 id="chapter-18-alerts-dashboard-verification">Chapter 18 – Alerts &amp; Dashboard Verification</h2>
+<h3 id="181-purpose">18.1 Purpose</h3>
+<p>After Wazuh successfully collects Microsoft 365 audit logs and processes them through the decoder and rule engine, security alerts are generated and displayed in the Wazuh Dashboard. This chapter explains how alerts are created, what information they contain, and how to verify that the integration is working correctly.</p>
+<h3 id="182-alert-generation-flow">18.2 Alert Generation Flow</h3>
+<blockquote>
+<p>Microsoft 365 Activity
+│
+▼
+Office365 Module
+│
+▼
+Raw JSON Log
+│
+▼
+JSON Decoder
+│
+▼
+8456 Built-in Rules
+│
+▼
+Matching Rule
+│
+▼
+Alert Generated
+│
+▼
+Stored by Wazuh
+│
+▼
+Indexed
+│
+▼
+Visible in Wazuh Dashboard</p>
+</blockquote>
+<h3 id="183-what-does-each-alert-contain">18.3 What Does Each Alert Contain?</h3>
+<p>Every alert generated by Wazuh contains useful security information that helps analysts understand what happened.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rule.id</td>
+<td>Rule that generated the alert</td>
+<td>100500</td>
+</tr>
+<tr>
+<td>rule.level</td>
+<td>Alert severity</td>
+<td>10</td>
+</tr>
+<tr>
+<td>rule.description</td>
+<td>Description of the alert</td>
+<td>Office365: External file sharing invitation created - possible data loss risk</td>
+</tr>
+<tr>
+<td>data.integration</td>
+<td>Log source</td>
+<td>office365</td>
+</tr>
+<tr>
+<td>data.office365.UserId</td>
+<td>User who performed the activity</td>
+<td>yaseen@vidyayug.com</td>
+</tr>
+<tr>
+<td>data.office365.Operation</td>
+<td>Microsoft 365 operation performed</td>
+<td>SharingInvitationCreated</td>
+</tr>
+<tr>
+<td>data.office365.TargetUserOrGroupName</td>
+<td>Target user or external recipient</td>
+<td>khanyaseenkhan2001@gmail.com</td>
+</tr>
+<tr>
+<td>data.office365.Workload</td>
+<td>Microsoft 365 service</td>
+<td>SharePoint / OneDrive</td>
+</tr>
+<tr>
+<td>GeoLocation.country_name</td>
+<td>Country associated with the activity (if available)</td>
+<td>United States</td>
+</tr>
+<tr>
+<td>timestamp</td>
+<td>Time when the event occurred</td>
+<td>Jun 30, 2026 @ 17:13:55</td>
+</tr>
+<tr>
+<td>rule.groups</td>
+<td>Categories assigned to the alert</td>
+<td>office365_custom, data_loss, SharePoint</td>
+</tr>
+</tbody>
+</table>
+<h3 id="184-dashboard-verification">18.4 Dashboard Verification</h3>
+<p>Open the Wazuh Dashboard.</p>
+<p>Navigate to:</p>
+<p>Security Events
+↓
+Discover</p>
+<p>Use the following search queries to verify different Microsoft 365 activities.</p>
+<p><strong>Search all Office365 events</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>data.integration:office365
+</code></pre></div>
+<p><strong>Search by specific operation</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>data.office365.Operation:&quot;SharingInvitationCreated&quot;
+</code></pre></div>
+<p><strong>Search using the custom rule</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>rule.id:100500
+</code></pre></div>
+<p><strong>Search by user</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>data.office365.UserId:&quot;yaseen@vidyayug.com&quot;
+</code></pre></div>
+<p><strong>Search by Microsoft 365 service</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>data.office365.Workload:&quot;SharePoint&quot;
+</code></pre></div>
+<p>or</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>data.office365.Workload:&quot;MicrosoftTeams&quot;
+</code></pre></div>
+<p>or</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>data.office365.Workload:&quot;Exchange&quot;
+</code></pre></div>
+<h3 id="185-verification-result">18.5 Verification Result</h3>
+<p>If the integration is successful, the Wazuh Dashboard will display:</p>
+<blockquote>
+<p>Microsoft 365 user activities.</p>
+<ol>
+<li>The operation performed (for example, SharingInvitationCreated, MeetingParticipantDetail, MailItemsAccessed).</li>
+<li>The user who performed the activity.</li>
+<li>The workload (SharePoint, Teams, Exchange, OneDrive, Azure AD).</li>
+<li>The rule that matched the event.</li>
+<li>The alert severity level.</li>
+<li>The event timestamp.</li>
+</ol>
+<p>This confirms that the Office365 integration is functioning correctly and that Wazuh is successfully monitoring organization-wide Microsoft 365 audit activities.</p>
+</blockquote>
+<h3 id="next-step_9">Next Step</h3>
+<p>After verifying that alerts are generated successfully, the next step is to create organization-specific custom rules to detect security scenarios that are not covered by Wazuh's default Office365 rules.</p>
+<hr />
+<h2 id="chapter-19-custom-rules">Chapter 19 – Custom Rules</h2>
+<p>Why Custom Rules?
+Built-in rules automatically classify what happened — but they don't know what is risky for your specific organization.</p>
+<p>Without custom rule:</p>
+<p>File shared externally → rule 91532 fires → level 3 (low, generic)</p>
+<p>SOC analyst may MISS it in thousands of events</p>
+<p>With custom rule:</p>
+<p>File shared externally → rule 100500 fires → level 10 (HIGH SEVERITY)</p>
+<p>Immediately visible as DATA LOSS RISK</p>
+<h4 id="gap-we-found">Gap We Found</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>grep<span class="w"> </span>-rl<span class="w"> </span><span class="s2">&quot;SharingInvitationCreated&quot;</span><span class="w"> </span>/var/ossec/ruleset/rules/
+</code></pre></div>
+<p>Returned EMPTY — Wazuh has NO built-in rule for external file sharing</p>
+<p>This means a critical data loss event only shows as generic level 3 alert</p>
+<p>Custom rule needed to close this gap</p>
+<h4 id="custom-rule-location">Custom Rule Location</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>/var/ossec/etc/rules/local_rules.xml
+</code></pre></div>
+<p>Note: Never edit built-in rules in /var/ossec/ruleset/rules/ — always add custom rules in local_rules.xml only.</p>
+<h4 id="custom-rule-we-added">Custom Rule We Added</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;office365_custom,&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="nt">&lt;rule</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;100500&quot;</span><span class="w"> </span><span class="na">level=</span><span class="s">&quot;10&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="nt">&lt;if_sid&gt;</span>91532<span class="nt">&lt;/if_sid&gt;</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="nt">&lt;field</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;office365.Operation&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;osregex&quot;</span><span class="nt">&gt;</span>^SharingInvitationCreated$<span class="nt">&lt;/field&gt;</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="nt">&lt;description&gt;</span>Office<span class="w"> </span>365:<span class="w"> </span>External<span class="w"> </span>file<span class="w"> </span>sharing<span class="w"> </span>invitation<span class="w"> </span>created<span class="w"> </span>-<span class="w"> </span>possible<span class="w"> </span>data<span class="w"> </span>loss<span class="w"> </span>risk.<span class="nt">&lt;/description&gt;</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="nt">&lt;group&gt;</span>office365,data_loss,SharePoint,custom,<span class="nt">&lt;/group&gt;</span>
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="nt">&lt;/rule&gt;</span>
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="nt">&lt;/group&gt;</span>
+</code></pre></div>
+<h4 id="rule-elements-explained">Rule Elements Explained</h4>
+<p><img alt="Rule Elements Explained" src="../../../../assets/images/POC%27s/Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Rule%20Elements%20Explained.png" /></p>
+<h4 id="how-to-add-the-rule">How to Add the Rule</h4>
+<p><strong>Step 1 — Enter Wazuh container</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>single-node-wazuh.manager-1<span class="w"> </span>bash
+</code></pre></div>
+<p><strong>Step 2 — Add rule to local_rules.xml</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>cat<span class="w"> </span>&gt;&gt;<span class="w"> </span>/var/ossec/etc/rules/local_rules.xml<span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="s">&lt;group name=&quot;office365_custom,&quot;&gt;</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="s">&lt;rule id=&quot;100500&quot; level=&quot;10&quot;&gt;</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="s">&lt;if_sid&gt;91532&lt;/if_sid&gt;</span>
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="s">&lt;field name=&quot;office365.Operation&quot; type=&quot;osregex&quot;&gt;^SharingInvitationCreated$&lt;/field&gt;</span>
+<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="s">&lt;description&gt;Office 365: External file sharing invitation created - possible data loss risk.&lt;/description&gt;</span>
+<a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="s">&lt;group&gt;office365,data_loss,SharePoint,custom,&lt;/group&gt;</span>
+<a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a><span class="s">&lt;/rule&gt;</span>
+<a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a><span class="s">&lt;/group&gt;</span>
+<a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a><span class="s">EOF</span>
+</code></pre></div>
+<p><strong>Step 3 — Test syntax (no output = no errors)</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>/var/ossec/bin/wazuh-analysisd<span class="w"> </span>-t
+</code></pre></div>
+<p><strong>Step 4 — Restart Wazuh</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>/var/ossec/bin/wazuh-control<span class="w"> </span>restart
+</code></pre></div>
+<h4 id="other-custom-rules-you-can-add">Other Custom Rules You Can Add</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="cm">&lt;!-- Brute Force Login --&gt;</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;office365_custom,&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="nt">&lt;rule</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;100501&quot;</span><span class="w"> </span><span class="na">level=</span><span class="s">&quot;12&quot;</span><span class="w"> </span><span class="na">frequency=</span><span class="s">&quot;5&quot;</span><span class="w"> </span><span class="na">timeframe=</span><span class="s">&quot;120&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="nt">&lt;if_matched_sid&gt;</span>91531<span class="nt">&lt;/if_matched_sid&gt;</span>
+<a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="nt">&lt;field</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;office365.Operation&quot;</span><span class="nt">&gt;</span>UserLoginFailed<span class="nt">&lt;/field&gt;</span>
+<a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a><span class="nt">&lt;description&gt;</span>M365:<span class="w"> </span>Multiple<span class="w"> </span>failed<span class="w"> </span>logins<span class="w"> </span>-<span class="w"> </span>possible<span class="w"> </span>brute<span class="w"> </span>force<span class="w"> </span>attack<span class="nt">&lt;/description&gt;</span>
+<a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a><span class="nt">&lt;group&gt;</span>office365,brute_force,authentication,<span class="nt">&lt;/group&gt;</span>
+<a id="__codelineno-35-8" name="__codelineno-35-8" href="#__codelineno-35-8"></a><span class="nt">&lt;/rule&gt;</span>
+<a id="__codelineno-35-9" name="__codelineno-35-9" href="#__codelineno-35-9"></a><span class="nt">&lt;/group&gt;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="cm">&lt;!-- Anonymous Public Link Created --&gt;</span>
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;office365_custom,&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="nt">&lt;rule</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;100503&quot;</span><span class="w"> </span><span class="na">level=</span><span class="s">&quot;12&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="nt">&lt;if_sid&gt;</span>91531<span class="nt">&lt;/if_sid&gt;</span>
+<a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="nt">&lt;field</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;office365.Operation&quot;</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;osregex&quot;</span><span class="nt">&gt;</span>^AnonymousLinkCreated$<span class="nt">&lt;/field&gt;</span>
+<a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="nt">&lt;description&gt;</span>M365:<span class="w"> </span>Public<span class="w"> </span>anonymous<span class="w"> </span>link<span class="w"> </span>created<span class="w"> </span>-<span class="w"> </span>file<span class="w"> </span>accessible<span class="w"> </span>to<span class="w"> </span>anyone<span class="w"> </span>on<span class="w"> </span>internet<span class="nt">&lt;/description&gt;</span>
+<a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="nt">&lt;group&gt;</span>office365,data_loss,critical,<span class="nt">&lt;/group&gt;</span>
+<a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a><span class="nt">&lt;/rule&gt;</span>
+<a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a><span class="nt">&lt;/group&gt;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="cm">&lt;!-- Admin Role Assigned --&gt;</span>
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;office365_custom,&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="nt">&lt;rule</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;100504&quot;</span><span class="w"> </span><span class="na">level=</span><span class="s">&quot;12&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="nt">&lt;if_sid&gt;</span>91531<span class="nt">&lt;/if_sid&gt;</span>
+<a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a><span class="nt">&lt;field</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;office365.Operation&quot;</span><span class="nt">&gt;</span>Add<span class="w"> </span>member<span class="w"> </span>to<span class="w"> </span>role.<span class="nt">&lt;/field&gt;</span>
+<a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a><span class="nt">&lt;description&gt;</span>M365:<span class="w"> </span>Admin<span class="w"> </span>role<span class="w"> </span>assigned<span class="w"> </span>to<span class="w"> </span>user<span class="w"> </span>-<span class="w"> </span>verify<span class="w"> </span>authorization<span class="nt">&lt;/description&gt;</span>
+<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="nt">&lt;group&gt;</span>office365,privilege_escalation,<span class="nt">&lt;/group&gt;</span>
+<a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a><span class="nt">&lt;/rule&gt;</span>
+<a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a><span class="nt">&lt;/group&gt;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="cm">&lt;!-- Mass File Download --&gt;</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;office365_custom,&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="nt">&lt;rule</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;100505&quot;</span><span class="w"> </span><span class="na">level=</span><span class="s">&quot;14&quot;</span><span class="w"> </span><span class="na">frequency=</span><span class="s">&quot;20&quot;</span><span class="w"> </span><span class="na">timeframe=</span><span class="s">&quot;300&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="nt">&lt;if_matched_sid&gt;</span>91531<span class="nt">&lt;/if_matched_sid&gt;</span>
+<a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="nt">&lt;field</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;office365.Operation&quot;</span><span class="nt">&gt;</span>FileDownloaded<span class="nt">&lt;/field&gt;</span>
+<a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="nt">&lt;description&gt;</span>M365:<span class="w"> </span>Mass<span class="w"> </span>file<span class="w"> </span>download<span class="w"> </span>detected<span class="w"> </span>-<span class="w"> </span>possible<span class="w"> </span>data<span class="w"> </span>exfiltration<span class="nt">&lt;/description&gt;</span>
+<a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a><span class="nt">&lt;group&gt;</span>office365,data_exfiltration,critical,<span class="nt">&lt;/group&gt;</span>
+<a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a><span class="nt">&lt;/rule&gt;</span>
+<a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a><span class="nt">&lt;/group&gt;</span>
+</code></pre></div>
+<hr />
+<h2 id="chapter-20-wazuh-logtest">Chapter 20 – wazuh-logtest</h2>
+<h3 id="purpose_2">Purpose</h3>
+<p>Tests custom rules without waiting for real events — validates that your rule syntax, parent chain, and field matching are all correct before deploying.</p>
+<h4 id="how-to-run">How to Run</h4>
+<p><strong>Step 1 — Launch logtest</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>/var/ossec/bin/wazuh-logtest
+</code></pre></div>
+<p><strong>Step 2 — Paste sample JSON (after tool loads)</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="p">{</span><span class="nt">&quot;integration&quot;</span><span class="p">:</span><span class="s2">&quot;office365&quot;</span><span class="p">,</span><span class="nt">&quot;office365&quot;</span><span class="p">:{</span><span class="nt">&quot;Operation&quot;</span><span class="p">:</span><span class="s2">&quot;SharingInvitationCreated&quot;</span><span class="p">,</span><span class="nt">&quot;RecordType&quot;</span><span class="p">:</span><span class="mi">14</span><span class="p">,</span><span class="nt">&quot;Workload&quot;</span><span class="p">:</span><span class="s2">&quot;SharePoint&quot;</span><span class="p">}}</span>
+</code></pre></div>
+<p><strong>Step 3 — Wait for output (DO NOT press Ctrl+C)</strong></p>
+<p><strong>Step 4 — Exit when done</strong></p>
+<p>Ctrl+C</p>
+<h4 id="why-this-exact-json-structure">Why This Exact JSON Structure?</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>&quot;integration&quot;:&quot;office365&quot; → triggers root rule 91531
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>&quot;office365.RecordType&quot;:14 → triggers parent rule 91532
+<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>&quot;office365.Operation&quot;:&quot;SharingInvitationCreated&quot; → triggers your rule 100500
+</code></pre></div>
+<p>All three fields must be present — missing any one breaks the parent chain and Phase 3 never runs.</p>
+<h4 id="expected-output-we-can-get-exact-result-see-in-wazuh">Expected Output We can get exact result see in wazuh</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>**Phase 1: Completed pre-decoding.
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>full event: &#39;{&quot;integration&quot;:&quot;office365&quot;,...}&#39;
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>
+<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a>**Phase 2: Completed decoding.
+<a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a>name: &#39;json&#39;
+<a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a>integration: &#39;office365&#39;
+<a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a>office365.Operation: &#39;SharingInvitationCreated&#39;
+<a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a>office365.RecordType: &#39;14&#39;
+<a id="__codelineno-42-9" name="__codelineno-42-9" href="#__codelineno-42-9"></a>office365.Workload: &#39;SharePoint&#39;
+<a id="__codelineno-42-10" name="__codelineno-42-10" href="#__codelineno-42-10"></a>
+<a id="__codelineno-42-11" name="__codelineno-42-11" href="#__codelineno-42-11"></a>**Phase 3: Completed filtering (rules).
+<a id="__codelineno-42-12" name="__codelineno-42-12" href="#__codelineno-42-12"></a>id: &#39;100500&#39;
+<a id="__codelineno-42-13" name="__codelineno-42-13" href="#__codelineno-42-13"></a>level: &#39;10&#39;
+<a id="__codelineno-42-14" name="__codelineno-42-14" href="#__codelineno-42-14"></a>description: &#39;Office 365: External file sharing invitation created - possible data loss risk.&#39;
+<a id="__codelineno-42-15" name="__codelineno-42-15" href="#__codelineno-42-15"></a>groups: &#39;[office365_custom, office365, data_loss, SharePoint, custom]&#39;
+<a id="__codelineno-42-16" name="__codelineno-42-16" href="#__codelineno-42-16"></a>firedtimes: &#39;1&#39;
+<a id="__codelineno-42-17" name="__codelineno-42-17" href="#__codelineno-42-17"></a>
+<a id="__codelineno-42-18" name="__codelineno-42-18" href="#__codelineno-42-18"></a>**Alert to be generated.
+</code></pre></div>
+<p>Phase Meanings</p>
+<p><img alt="Phase Meanings" src="../../../../assets/images/POC%27s/Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Phase%20Meanings.png" /></p>
+<p><img alt="Image5" src="../../../../assets/images/POC%27s/Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/image5.png" /></p>
+<h3 id="result">Result</h3>
+<p>The successful appearance of Microsoft 365 audit events in the Wazuh Dashboard confirms that:</p>
+<ol>
+<li>The Office365 module was configured correctly.</li>
+<li>OAuth authentication was successful.</li>
+<li>The Office365 Management Activity API is accessible.</li>
+<li>Microsoft 365 audit logs are being collected successfully.</li>
+<li>Wazuh is decoding the incoming events correctly.</li>
+<li>The built-in Office365 rules are generating alerts.</li>
+<li>Custom rules are functioning as expected when their conditions are met.</li>
+</ol>
+<h3 id="conclusion">Conclusion</h3>
+<p>The Microsoft 365 to Wazuh integration has been successfully implemented and validated. Wazuh is now capable of continuously monitoring organization-wide Microsoft 365 activities—including Exchange Online, SharePoint Online, OneDrive, Microsoft Teams, and Azure Active Directory—and generating security alerts based on both built-in and organization-specific custom rules.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.top", "navigation.tracking", "navigation.indexes", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

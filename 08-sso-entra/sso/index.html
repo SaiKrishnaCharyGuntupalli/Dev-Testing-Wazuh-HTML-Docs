@@ -14,7 +14,7 @@
         <link rel="prev" href="../../07-dls/dls/">
       
       
-        <link rel="next" href="../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/">
+        <link rel="next" href="../../09-cluster-index-verification/cluster-index-verification/">
       
       
         
@@ -347,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+      <a href="../../03-agent-deployment/agent_deployment/" class="md-nav__link">
         
   
   
@@ -829,7 +829,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+      <a href="../../09-cluster-index-verification/cluster-index-verification/" class="md-nav__link">
         
   
   
@@ -893,6 +893,10 @@
   
     
     
+      
+        
+      
+        
       
         
       
@@ -1774,6 +1778,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC%27s/Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Microsoft_365_to_Wazuh_Integration_Complete_Implementation_and_Configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Microsoft 365 to Wazuh Integration Complete Imp and Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC%27s/Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Wazuh SOC Onboarding and Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1996,6 +2056,11 @@
 
 
 <h1 id="sso-microsoft-entra-id-saml">SSO — Microsoft Entra ID (SAML)</h1>
+<!-- **Author:** Abhinav   -->
+<p><strong>Version:</strong> 1.0  </p>
+<!-- **Created Date:** 2026-07-28  
+**Updated Date:** 2026-07-28 -->
+
 <h2 id="overview">Overview</h2>
 <p>This process can be completed in three simple steps to configure SSO and role-based access for Wazuh in Microsoft Entra ID. Follow the steps below in sequence to set up the application, define roles, and assign access to users.</p>
 <ul>
@@ -2029,7 +2094,7 @@
 <tr>
 <td><strong>Wazuh dashboard URL</strong></td>
 <td>Public or internal HTTPS URL used to access the Wazuh dashboard.</td>
-<td>https://10.10.100.100/</td>
+<td>https://WAZUH_DASHBOARD_URL/</td>
 </tr>
 <tr>
 <td><strong>Identifier / Entity ID</strong></td>
@@ -2039,12 +2104,12 @@
 <tr>
 <td><strong>Reply URL / ACS URL</strong></td>
 <td>Assertion Consumer Service URL for Wazuh SAML login.</td>
-<td>https://10.10.100.100/_opendistro/_security/saml/acs</td>
+<td>https://WAZUH_DASHBOARD_URL/_opendistro/_security/saml/acs</td>
 </tr>
 <tr>
 <td><strong>Sign-on URL</strong></td>
 <td>Main Wazuh dashboard URL.</td>
-<td>https://10.10.100.100/</td>
+<td>https://WAZUH_DASHBOARD_URL/</td>
 </tr>
 <tr>
 <td><strong>App role display name</strong></td>
@@ -2074,7 +2139,7 @@
 <tr>
 <td><strong>Users or groups</strong></td>
 <td>Users or groups that should be assigned to the Wazuh enterprise application.</td>
-<td>Internal: CISO, Users as needed. External: Shekark@vidyayug.com (admin), vineethreddy@vidyayug.com (Analyst), Tharun@vidyayug.com (Analyst)</td>
+<td>Internal: Security administrators and authorized users. External: admin@example.com (admin), analyst1@example.com (Analyst), analyst2@example.com(Analyst)</td>
 </tr>
 <tr>
 <td><strong>SAML claim name</strong></td>
@@ -2192,19 +2257,19 @@
 <tr>
 <td><strong>Tenant ID</strong></td>
 <td>Microsoft Entra ID → Overview → Tenant ID</td>
-<td><code>4d327ebb-24ba-46d0-a50a-0e777e00e023</code></td>
+<td><code>&lt;tenant-id&gt;</code></td>
 </tr>
 <tr>
 <td><strong>Client ID (Application ID)</strong></td>
 <td>App registrations → our app → Overview → Application (client) ID</td>
-<td><code>73c4bf32-97b3-4268-a944-44b9986f0b3b</code></td>
+<td><code>&lt;client-id&gt;</code></td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="6-wazuh-indexer-configuration">6. Wazuh Indexer Configuration</h2>
 <p><strong>Step — Run this command inside your VM:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>single-node-wazuh.indexer-1<span class="w"> </span>bash
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>&lt;WAZUH_INDEXER_CONTAINER&gt;<span class="w"> </span>bash
 </code></pre></div>
 <p>Back up the indexer security configuration before you make changes.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">JAVA_HOME</span><span class="o">=</span>/usr/share/wazuh-indexer/jdk<span class="w"> </span>/usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh<span class="w"> </span><span class="se">\</span>
@@ -2216,6 +2281,7 @@
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span>-cacert<span class="w"> </span>/usr/share/wazuh-indexer/config/certs/root-ca.pem
 </code></pre></div>
 <p>Generate the <code>exchange_key</code>:</p>
+<p>Generate a unique exchange key and store it securely. Do not reuse the same value across environments and do not commit it to source control.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">32</span>
 </code></pre></div>
 <p>Edit the indexer SAML configuration:</p>
@@ -2322,7 +2388,7 @@
 <hr />
 <h2 id="8-wazuh-dashboard-configuration">8. Wazuh Dashboard Configuration</h2>
 <p><strong>Step — Run this command inside your VM:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>single-node-wazuh.dashboard-1<span class="w"> </span>bash
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>&lt;WAZUH_DASHBOARD_CONTAINER&gt;<span class="w"> </span>bash
 </code></pre></div>
 <p>Verify <code>run_as</code> is enabled:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>cat<span class="w"> </span>/usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
@@ -2405,9 +2471,9 @@
 <a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="nt">server.xsrf.allowlist</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;/_opendistro/_security/saml/acs&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;/_opendistro/_security/saml/logout&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;/_opendistro/_security/saml/acs/idpinitiated&quot;</span><span class="p p-Indicator">]</span>
 </code></pre></div>
 <p>Restart the dashboard:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-dashboard
-</code></pre></div>
+<p>Restart the Wazuh Dashboard container using the deployment method used in your environment (Docker, Docker Compose, Kubernetes, or systemd-based installation).</p>
 <p>Test the configuration by opening the Wazuh dashboard and logging in with your Microsoft account.</p>
+<p>If authentication fails, review the Wazuh Dashboard logs, OpenSearch security logs, and Microsoft Entra ID sign-in logs to identify claim-mapping or SAML assertion issues.</p>
 
 
 

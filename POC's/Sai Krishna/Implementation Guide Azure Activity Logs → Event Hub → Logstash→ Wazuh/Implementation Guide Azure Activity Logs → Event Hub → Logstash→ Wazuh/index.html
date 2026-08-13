@@ -347,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+      <a href="../../../../03-agent-deployment/agent_deployment/" class="md-nav__link">
         
   
   
@@ -609,7 +609,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+      <a href="../../../../09-cluster-index-verification/cluster-index-verification/" class="md-nav__link">
         
   
   
@@ -675,6 +675,10 @@
   
     
     
+      
+        
+      
+        
       
         
       
@@ -1061,6 +1065,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#full-implementation-guide-azure-activity-logs-event-hub-wazuh" class="md-nav__link">
@@ -2014,6 +2029,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Microsoft_365_to_Wazuh_Integration_Complete_Implementation_and_Configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Microsoft 365 to Wazuh Integration Complete Imp and Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Wazuh SOC Onboarding and Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2046,6 +2117,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#full-implementation-guide-azure-activity-logs-event-hub-wazuh" class="md-nav__link">
@@ -2476,11 +2558,28 @@
 
 
 <h1 id="implementation-guide-azure-activity-logs-event-hub-logstash-wazuh">Implementation Guide: Azure Activity Logs → Event Hub → Logstash → Wazuh</h1>
+<!-- **Author:** Sai Krishna   -->
+<p><strong>Version:</strong> 1.0  </p>
+<!-- **Created Date:** 2026-07-24  
+**Updated Date:** 2026-07-24 -->
+
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Before starting, ensure:</p>
+<ul>
+<li>Azure Subscription</li>
+<li>Contributor or Owner permissions</li>
+<li>Event Hub permissions</li>
+<li>Storage Account permissions</li>
+<li>Linux server with Logstash installed</li>
+<li>Wazuh Manager deployed</li>
+<li>Network connectivity between Logstash and Wazuh</li>
+<li>Required firewall ports opened</li>
+</ul>
 <h2 id="full-implementation-guide-azure-activity-logs-event-hub-wazuh">Full Implementation Guide: Azure Activity Logs → Event Hub → Wazuh</h2>
 <h3 id="is-it-possible-is-it-recommended">Is It Possible? Is It Recommended?</h3>
-<p>YES — It is 100% POSSIBLE
-YES — It is RECOMMENDED for Wazuh-based SOCs
-It needs a pipeline: Event Hub → Logstash → Wazuh</p>
+<p>This architecture is supported and commonly used for integrating Azure Activity Logs with Wazuh through Logstash.</p>
+<p>Suitability depends on ingestion volume, operational requirements, and infrastructure design.</p>
+<p>It needs a pipeline: Event Hub → Logstash → Wazuh</p>
 <p>Wazuh does NOT natively consume Event Hub — so we use Logstash as the bridge.</p>
 <h4 id="full-architecture-what-we-are-building">Full Architecture (What We Are Building)</h4>
 <p><img alt="Is it possible? Is it recommended?" src="../../../../assets/images/POC%27s/Sai%20krishna/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Is%20It%20Possible%20Is%20It%20Recommended.png" /></p>
@@ -2501,12 +2600,14 @@ It needs a pipeline: Event Hub → Logstash → Wazuh</p>
 <p>→ Shared Access Policies → + Add</p>
 <p><img alt="Step 3 — Create Shared Access Policy" src="../../../../assets/images/POC%27s/Sai%20krishna/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Step%203%20%E2%80%94%20Create%20Shared%20Access%20Policy%20%28for%20Logstash%20to%20authenticate%29.png" /></p>
 <p>→ Create</p>
-<p>COPY THESE (you'll need them later):
-- Connection string–primary key
-- Event Hub name: azure-activity-logs</p>
+<p>Copy the following values securely:</p>
+<ul>
+<li>Event Hub Connection String</li>
+<li>Event Hub Name</li>
+</ul>
 <h4 id="step-4-create-consumer-group">Step 4 — Create Consumer Group</h4>
 <p>Go to Event Hub → Consumer Groups → + Add</p>
-<p>Name: wazuh-consumer</p>
+<p>Name: <consumer-group-name></p>
 <p>(This ensures Logstash has its own read pointer
 and doesn't conflict with other consumers)</p>
 <h3 id="phase-2-connect-azure-activity-logs-event-hub">PHASE 2: Connect Azure Activity Logs → Event Hub</h3>
@@ -2552,7 +2653,7 @@ and doesn't conflict with other consumers)</p>
 </table>
 <h4 id="does-azure-write-immediately-or-is-there-delay">Does Azure Write Immediately or Is There Delay?</h4>
 <p><img alt="Does Azure write immediately or is there delay?" src="../../../../assets/images/POC%27s/Sai%20krishna/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Does%20Azure%20Write%20Immediately%20or%20Is%20There%20Delay.png" /></p>
-<p>So after you do an action in Azure (like create/delete a resource), wait 3-5 minutes before expecting to see it in Event Hub.</p>
+<p>So after you do an action in Azure (like create/delete a resource), Azure Activity Logs typically appear within a few minutes, but actual latency varies depending on Azure service, region, and workload.</p>
 <h4 id="where-are-logs-stored-inside-event-hub">Where Are Logs Stored Inside Event Hub?</h4>
 <p>Event Hub internally works like this:</p>
 <p><img alt="Where Are Logs Stored Inside Event Hub" src="../../../../assets/images/POC%27s/Sai%20krishna/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Where%20Are%20Logs%20Stored%20Inside%20Event%20Hub.png" /></p>
@@ -2569,7 +2670,7 @@ and doesn't conflict with other consumers)</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>azure-webjobs-eventhub/ 
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  └── soc-eventhub-ns/ 
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        └── azure-activity-logs/ 
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>              └── wazuh-consumer/ 
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>              └── &lt;consumer-group-name&gt;/ 
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>                    └── checkpoint  ← offset saved here 
 </code></pre></div>
 <h4 id="step-6-install-logstash-on-your-server">Step 6 — Install Logstash (on your server)</h4>
@@ -2577,11 +2678,16 @@ and doesn't conflict with other consumers)</p>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo apt-get update
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>sudo apt-get install logstash -y
 </code></pre></div>
-<p>If logstash is already installed, then skip the step 6. In my case I already installed previously. So, I just modifying the existing logstash config file and installing the supported plugin.</p>
+<p>If Logstash is already installed in your environment, you can skip Step 6. In this implementation, Logstash had been installed previously; therefore, only the existing Logstash configuration file was updated, and the required supported plugin was installed.</p>
 <h3 id="phase-3-updated-logstash-config-azure-added">PHASE 3: Updated Logstash Config (Azure Added)</h3>
-<p>Here is your fully updated config — I only added the Azure Event Hub input block and updated the azure filter section. All your existing logic is 100% untouched:</p>
-<p>Now let me build the full updated config and data flow diagram for you.</p>
-<p>Now here is your fully updated logstash.conf — I only added the Event Hub input block and updated the Azure filter section. Every single line of your existing logic is preserved exactly.</p>
+<p>The Logstash configuration has been updated to include Azure Event Hub integration while preserving all existing processing logic and configurations.</p>
+<p>The following changes have been implemented:</p>
+<ul>
+<li>Added the Azure Event Hub input configuration.</li>
+<li>Updated the Azure-specific filter section to support Event Hub log processing.</li>
+<li>Retained all existing Logstash logic, rules, filters, and outputs without modification.</li>
+</ul>
+<p>In addition, the complete updated Logstash configuration and the corresponding data flow diagram have been prepared to reflect the new Azure Event Hub integration.</p>
 <p><img alt="Updated Logstash config" src="../../../../assets/images/POC%27s/Sai%20krishna/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/updated%20logstash%20config.png" /></p>
 <p>logstash.config:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a># ============================================
@@ -2603,7 +2709,7 @@ and doesn't conflict with other consumers)</p>
 <a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>    ]
 <a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>    threads              =&gt; 4
 <a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>    decorate_events      =&gt; true
-<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    consumer_group       =&gt; &quot;wazuh-consumer&quot;
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    consumer_group       =&gt; &quot;&lt;consumer-group-name&gt;&quot;
 <a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>    storage_connection   =&gt; &quot;DefaultEndpointsProtocol=https;AccountName=YOUR_STORAGE_ACCOUNT;AccountKey=&lt;YOUR_STORAGE_ACCOUNT_KEY&gt;;EndpointSuffix=core.windows.net&quot;
 <a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>    # ↑ This enables checkpointing — Logstash remembers where it stopped reading
 <a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>    # Without this, every restart reads from latest only (you lose logs during downtime)
@@ -2826,7 +2932,7 @@ and doesn't conflict with other consumers)</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>azure-webjobs-eventhub/ 
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>  └── nseventhub.servicebus.windows.net/ 
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>        └── activity-logs-event-hub/ 
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>              └── wazuh-consumer/ 
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>              └── &lt;consumer-group-name&gt;/ 
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>                    ├── 0        ← offset for partition 0 
 <a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>                    └── 1        ← offset for partition 1 
 </code></pre></div>
@@ -2834,7 +2940,7 @@ and doesn't conflict with other consumers)</p>
 <h3 id="phase-4-wazuh-rules-paste-into-manager">Phase 4: Wazuh Rules (paste into manager)</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sudo nano /var/ossec/etc/rules/azure_activity_rules.xml
 </code></pre></div>
-<p>Local_file.xml:</p>
+<p>azure_activity_rules.xml:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>&lt;group name=&quot;azure,activity_log,&quot;&gt;
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>  &lt;!-- Base: any AzureActivityLog line received --&gt;
@@ -2881,7 +2987,7 @@ and doesn't conflict with other consumers)</p>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a># Verify port 9065 is open:
 <a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>sudo ss -tlnp | grep 9065
 </code></pre></div>
-<p>You can also add above custom rule from the wazuh UI. I did in that way only, but after saving the rule must reload wazuh, then only changes will apply.</p>
+<p>The custom rule can also be added through the Wazuh UI. After saving the rule, ensure that the Wazuh service is reloaded for the changes to take effect.</p>
 <h3 id="phase-5-verify-the-full-flow-end-to-end">Phase 5: Verify the Full Flow End-to-End</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a># ── Step 1: Trigger an Azure event ──────────────────────────
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a># Go to Azure Portal → create or delete any small resource
@@ -2907,9 +3013,9 @@ and doesn't conflict with other consumers)</p>
 <a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>sudo docker exec -it single-node-wazuh.manager-1 tail -f /var/ossec/logs/alerts/alerts.json
 </code></pre></div>
 <h4 id="challenge">Challenge:</h4>
-<p>I followed and implemented same as above, but when I observe logstash related logs in terminal. The azure activity logs are reaching logstash, but not passing to wazuh and there is no alerts generated in alerts.json file in wazuh manager for activity logs even I wrote custom rule.</p>
+<p>After implementing the configuration as described above, log analysis confirmed that Azure Activity Logs were successfully reaching Logstash. However, the logs were not being forwarded to Wazuh Manager for processing. As a result, no corresponding alerts were generated in the alerts.json file, despite the presence of custom detection rules designed to trigger alerts for these activity log events.</p>
 <h3 id="solution">Solution:</h3>
-<p>The challenge was logstash filter logic, current logic is not filtering properly due to this wazuh can't understand properly and can't apply rules on it. Then I changed the logstash config file logic something like below.</p>
+<p>The challenge was with the Logstash filter logic, as the existing configuration was not processing and filtering the incoming logs correctly. As a result, Wazuh was unable to properly parse the events and apply the corresponding detection rules. To address this issue, the Logstash configuration was reviewed and the filter logic was modified as shown below, enabling accurate log processing and rule matching within Wazuh.</p>
 <p>logstash.config:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a># ============================================
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a># INPUT: Receive logs FROM Filebeat
@@ -2924,7 +3030,7 @@ and doesn't conflict with other consumers)</p>
 <a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>    ]
 <a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    threads =&gt; 4
 <a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>    decorate_events =&gt; true
-<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>    consumer_group =&gt; &quot;wazuh-consumer&quot;
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>    consumer_group =&gt; &quot;&lt;consumer-group-name&gt;&quot;
 <a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>    storage_connection =&gt; &quot;DefaultEndpointsProtocol=https;AccountName=&lt;YOUR_STORAGE_ACCOUNT_NAME&gt;;AccountKey=&lt;YOUR_STORAGE_ACCOUNT_KEY&gt;;EndpointSuffix=core.windows.net&quot;
 <a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>  }
 <a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>}
@@ -3070,9 +3176,11 @@ and doesn't conflict with other consumers)</p>
 <a id="__codelineno-14-157" name="__codelineno-14-157" href="#__codelineno-14-157"></a>}
 </code></pre></div>
 <h4 id="challenge_1">Challenge:</h4>
-<p>After changing the logstash filter logic, now alerts are generating for the azure activity logs based on written custom rule in wazuh manager. But when I observe the generated alerts in alerts.json file in wazuh manager, all generated alerts are based on only one rule i.e rule id is 100200 this will look like another challenge. The challenge is, for different type of azure activity logs, only one rule is triggering even I wrote multiple child rules for different type of activity logs. You can see generated alerts in alerts.json file from the below image.</p>
+<p>After modifying the Logstash filter logic, alerts are now being successfully generated for Azure Activity Logs based on the custom rules configured in the Wazuh Manager. However, upon reviewing the generated alerts in the alerts.json file, it was observed that all alerts are being triggered by a single rule (Rule ID: 100200).</p>
+<p>This behavior introduces an additional challenge. Although multiple child rules have been created to detect and classify different types of Azure Activity Log events, only the parent rule (100200) is being matched and generating alerts. As a result, the expected child-rule-specific alert classification is not occurring, making it difficult to distinguish between different Azure Activity Log event types based on rule identification.</p>
+<p>The generated alerts captured in the alerts.json file demonstrate that all detected events are currently associated with Rule ID 100200.</p>
 <h3 id="solution_1">Solution:</h3>
-<p>The current custom rule is not properly triggering the different type of activity logs due the the match is not properly defined, so I updated the current custom rule with the below one.</p>
+<p>The existing custom rule was not consistently triggering alerts for various activity log types because the matching conditions were not adequately defined. To address this issue, the custom rule was reviewed and updated with the revised rule configuration shown below, ensuring improved detection and alert generation across different activity log events.</p>
 <h3 id="custom-rule">Custom rule</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;custom,activity,azure_activity,&quot;</span><span class="nt">&gt;</span>
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
@@ -3172,7 +3280,7 @@ and doesn't conflict with other consumers)</p>
 <a id="__codelineno-15-96" name="__codelineno-15-96" href="#__codelineno-15-96"></a><span class="nt">&lt;/group&gt;</span>
 </code></pre></div>
 <p>Save the changes and restart or reload the wazuh to apply the changes.</p>
-<p>Now I again generate the logs by creating and deleting the vm in azure cloud and observed those logs in logstash and wazuh terminal. Now alerts are triggering differently for different type of azure activity logs with different rule id and level. If you observe alerts.json file in wazuh manager, you will see generated alerts with different rule id and level and it is something like same as below image.</p>
+<p>For validation purposes, VM creation and deletion activities were performed again in the Azure cloud environment, and the corresponding logs were observed in both Logstash and Wazuh. The generated alerts were successfully triggered and categorized based on the specific Azure Activity Log event type, with each alert being assigned a unique rule ID and severity level. By reviewing the alerts.json file on the Wazuh Manager, you can verify that the alerts are being generated with different rule IDs and levels, similar to those shown in the image below.</p>
 <h2 id="adding-metadata-to-the-azure-activity-logs">Adding metadata to the Azure Activity logs</h2>
 <p>Update the existing logstash config file with the following metadata:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># ==========================================</span>
@@ -3187,9 +3295,9 @@ and doesn't conflict with other consumers)</p>
 <a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>
 <a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="w">      </span><span class="s2">&quot;source_platform&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;azure&quot;</span>
 <a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="w">      </span><span class="s2">&quot;event_category&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;cloud_security&quot;</span>
-<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="w">      </span><span class="s2">&quot;environment&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;poc&quot;</span>
-<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="w">      </span><span class="s2">&quot;tenant&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;azure_poc&quot;</span>
-<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="w">      </span><span class="s2">&quot;non_agent_id&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;7001&quot;</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="w">      </span><span class="s2">&quot;environment&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;&lt;environment&gt;&quot;</span>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="w">      </span><span class="s2">&quot;tenant&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;&lt;tenant_name&gt;&quot;</span>
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="w">      </span><span class="s2">&quot;non_agent_id&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;&lt;non_agent_identifier&gt;&quot;</span>
 <a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="w">      </span><span class="s2">&quot;device_type&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;azure_activity_log&quot;</span>
 <a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="w">      </span><span class="s2">&quot;cloud_provider&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;azure&quot;</span>
 <a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a>

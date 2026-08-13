@@ -347,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+      <a href="../../../../03-agent-deployment/agent_deployment/" class="md-nav__link">
         
   
   
@@ -609,7 +609,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+      <a href="../../../../09-cluster-index-verification/cluster-index-verification/" class="md-nav__link">
         
   
   
@@ -675,6 +675,10 @@
   
     
     
+      
+        
+      
+        
       
         
       
@@ -1089,6 +1093,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#1-pipeline-1-wazuh-agent-manager-indexer-dashboard" class="md-nav__link">
@@ -2889,6 +2904,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pipeline-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pipeline Comparison
+      
+    </span>
+  </a>
   
 </li>
       
@@ -3405,6 +3431,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Microsoft_365_to_Wazuh_Integration_Complete_Implementation_and_Configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Microsoft 365 to Wazuh Integration Complete Imp and Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Wazuh SOC Onboarding and Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3437,6 +3519,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#1-pipeline-1-wazuh-agent-manager-indexer-dashboard" class="md-nav__link">
@@ -5240,6 +5333,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#pipeline-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pipeline Comparison
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -5258,10 +5362,25 @@
 
 
 <h1 id="pipelines-and-challenges">PIPELINES AND CHALLENGES</h1>
+<!-- **Author:** Sai Krishna   -->
+<p><strong>Version:</strong> 1.0  </p>
+<!-- **Created Date:** 2026-07-24  
+**Updated Date:** 2026-07-24 -->
+
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>Ubuntu/Debian Linux VM</li>
+<li>Docker-based Wazuh deployment</li>
+<li>Root or sudo access</li>
+<li>Network connectivity between all pipeline components</li>
+<li>Required firewall ports opened</li>
+<li>Filebeat 7.x (or specified version)</li>
+<li>Logstash 8.x (or specified version)</li>
+</ul>
 <h2 id="1-pipeline-1-wazuh-agent-manager-indexer-dashboard">1. PIPELINE 1 (WAZUH AGENT → MANAGER → INDEXER → DASHBOARD)</h2>
 <h3 id="11-how-to-install-wazuh-agent-in-linux-vm">1.1 How to Install Wazuh Agent in Linux VM</h3>
 <h5 id="meaning">Meaning:</h5>
-<p>To install the Wazuh agent on a Linux VM, Windows machine, or Mac, follow the approach below (from the Wazuh UI) to install and connect it with the Wazuh manager properly without any challenges.</p>
+<p>To install the Wazuh Agent on a Linux VM, Windows machine, or Mac, follow the approach below (from the Wazuh UI) to install and connect it with the Wazuh Manager properly without any challenges.</p>
 <p><img alt="Image 1" src="../../../../assets/images/POC%27s/Sai%20krishna/Pipelines%20and%20Challenges/image1.png" /></p>
 <hr />
 <h3 id="12-where-should-you-run-the-install-commands">1.2 Where Should You Run the Install Commands?</h3>
@@ -5281,7 +5400,7 @@
 <p>After installation, the agent is placed here:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/var/ossec/
 </code></pre></div>
-<p>This is the <strong>main directory of the Wazuh agent</strong>.</p>
+<p>This is the <strong>main directory of the Wazuh Agent</strong>.</p>
 <h5 id="explanation_1">Explanation:</h5>
 <p>Important subfolders:</p>
 <ul>
@@ -5322,7 +5441,7 @@
 <h5 id="meaning_4">Meaning:</h5>
 <p>If you want to add metadata at the agent level, then you have to modify the agent config file at the target machine.</p>
 <h5 id="query_2">Query:</h5>
-<p>In <code>ossec.config</code>:</p>
+<p>In <code>ossec.conf</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">&lt;ossec_config&gt;</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">&lt;labels&gt;</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="nt">&lt;label</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;tenant&quot;</span><span class="nt">&gt;</span>tenantC<span class="nt">&lt;/label&gt;</span>
@@ -5332,7 +5451,7 @@
 <a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="nt">&lt;/ossec_config&gt;</span>
 </code></pre></div>
 <h5 id="explanation_2">Explanation:</h5>
-<p>Add this as a separate block in the agent <code>ossec.config</code> file, which is shown in the image below.</p>
+<p>Add this block to the agent <code>ossec.conf</code> file under the <code>&lt;ossec_config&gt;</code> section., which is shown in the image below.</p>
 <p><img alt="Image 4" src="../../../../assets/images/POC%27s/Sai%20krishna/Pipelines%20and%20Challenges/image4.png" /></p>
 <h4 id="after-adding-metadata">After Adding Metadata</h4>
 <p>Restart the agent:</p>
@@ -5343,12 +5462,12 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-agent
 </code></pre></div>
 <h4 id="how-to-verify">How to Verify</h4>
-<p>From now onwards, you can see the added metadata for every alert that the Wazuh manager is generating. It will display the same as the image below:</p>
+<p>From now onwards, you can see the added metadata for every alert that the Wazuh Manager is generating. It will display the same as the image below:</p>
 <p><img alt="Image 5" src="../../../../assets/images/POC%27s/Sai%20krishna/Pipelines%20and%20Challenges/image5.png" /></p>
 <h4 id="simple-understanding">Simple Understanding</h4>
 <ul>
 <li><code>&lt;labels&gt;</code> = metadata (like tags)</li>
-<li>Used for filtering in the Wazuh dashboard</li>
+<li>Used for filtering in the Wazuh Dashboard</li>
 </ul>
 <hr />
 <h3 id="18-for-performance-test">1.8 For Performance Test</h3>
@@ -5400,9 +5519,10 @@
 <hr />
 <h3 id="19-for-performance-test-alternate-script-attempt">1.9 For Performance Test (Alternate Script Attempt)</h3>
 <h5 id="challenge"><strong>Challenge:</strong></h5>
-<p>When I was following the above process, the synthetic logs are not generating and not writing to the <code>auth.log</code> file, and not reaching the <code>archives.log</code> file in the manager VM.</p>
+<p>Issue Encountered: 
+the synthetic logs are not generating and not writing to the <code>auth.log</code> file, and not reaching the <code>archives.log</code> file in the manager VM.</p>
 <h5 id="solution"><strong>Solution:</strong></h5>
-<p>I changed the synthetic log generation script to the following one:</p>
+<p>Then changed the synthetic log generation script to the following one:</p>
 <p><strong>Script:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">for</span><span class="w"> </span>i<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">{</span><span class="m">1</span>..12000<span class="o">}</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Apr 20 12:00:01 XXXXXXXX sshd[1234]: Failed password for invalid user user</span><span class="nv">$i</span><span class="s2"> from XXX.XXX.X.100 port 22 ssh2&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>/var/log/auth.log
@@ -5410,9 +5530,10 @@
 <a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="k">done</span>
 </code></pre></div>
 <h4 id="challenge_1"><strong>Challenge:</strong></h4>
-<p>When I was using the above script, the synthetic logs are generating and writing to the <code>auth.log</code> file but not reaching the <code>archives.log</code> file in the manager VM.</p>
+<p>Issue Encountered:
+ the synthetic logs are generating and writing to the <code>auth.log</code> file but not reaching the <code>archives.log</code> file in the manager VM.</p>
 <h4 id="solution_1"><strong>Solution:</strong></h4>
-<p>Then I changed the synthetic log generation script again to:</p>
+<p>Then changed the synthetic log generation script again to:</p>
 <p><strong>Script:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">for</span><span class="w"> </span>i<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">{</span><span class="m">1</span>..12000<span class="o">}</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span>logger<span class="w"> </span><span class="s2">&quot;sshd: Failed password for invalid user user</span><span class="nv">$i</span><span class="s2"> from XXX.XXX.X.100 port 22 ssh2&quot;</span>
@@ -5677,7 +5798,7 @@
 <h5 id="meaning_14">Meaning:</h5>
 <p>This will tell you if Filebeat can reach <code>XXX.XXX.XX.13:9065</code>.</p>
 <h3 id="challenge_3"><strong>Challenge:</strong></h3>
-<p>When I test the connectivity to the Wazuh manager, I faced an error the same as in the image below:</p>
+<p>While test the connectivity to the Wazuh Manager, we may faced an error the same as in the image below:</p>
 <p><img alt="Image 7" src="../../../../assets/images/POC%27s/Sai%20krishna/Pipelines%20and%20Challenges/image7.png" /></p>
 <h4 id="the-real-problem">The Real Problem</h4>
 <p>Think of it like this:</p>
@@ -5750,7 +5871,7 @@
 </code></pre></div>
 <p>If you see all those <strong>OK</strong> messages — your Filebeat is successfully connected to Wazuh.</p>
 <h3 id="challenge_4"><strong>Challenge:</strong></h3>
-<p>When I followed the above solution, it actually displayed all OK's when I ran the test command. But I again faced a challenge while passing generated synthetic logs from Filebeat to the Wazuh manager, and those synthetic logs are not reaching the <code>archives.log</code> file in the Wazuh manager VM.</p>
+<p>While following the above solution, it actually displayed all OK's while ran the test command. But again faced a challenge while passing generated synthetic logs from Filebeat to the Wazuh Manager, and those synthetic logs are not reaching the <code>archives.log</code> file in the Wazuh Manager VM.</p>
 <h4 id="why-outputlogstash-on-port-1514-shows-ok-but-doesnt-work">Why output.logstash on Port 1514 Shows OK But Doesn't Work</h4>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>filebeat test output → OK
 </code></pre></div>
@@ -5800,7 +5921,7 @@
 <a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>filebeat
 </code></pre></div>
 <h3 id="challenge_5"><strong>Challenge:</strong></h3>
-<p>When I was trying to restart Filebeat, it is not starting and is giving the following error, the same as in the given image:</p>
+<p>When trying to restart Filebeat, it is not starting and is giving the following error, the same as in the given image:</p>
 <p><img alt="Image 8" src="../../../../assets/images/POC%27s/Sai%20krishna/Pipelines%20and%20Challenges/image8.png" /></p>
 <h3 id="solution_5"><strong>Solution:</strong></h3>
 <h4 id="the-real-reason">The Real Reason</h4>
@@ -6031,7 +6152,7 @@ Status: RECOMMENDED by Wazuh officially. Your agent ID:002 is already installed,
 <a id="__codelineno-67-4" name="__codelineno-67-4" href="#__codelineno-67-4"></a><span class="n">input</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-67-5" name="__codelineno-67-5" href="#__codelineno-67-5"></a><span class="w">  </span><span class="n">beats</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-67-6" name="__codelineno-67-6" href="#__codelineno-67-6"></a><span class="w">    </span><span class="n">port</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">5044</span><span class="w">          </span><span class="c1"># Logstash listens on this port for Filebeat</span>
-<a id="__codelineno-67-7" name="__codelineno-67-7" href="#__codelineno-67-7"></a><span class="w">    </span><span class="n">host</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;0.0.0.0&quot;</span><span class="w">     </span><span class="c1"># Accept from any IP</span>
+<a id="__codelineno-67-7" name="__codelineno-67-7" href="#__codelineno-67-7"></a><span class="w">    </span><span class="n">host</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;0.0.0.0&quot;</span><span class="w">     </span><span class="c1"># Listen on all interfaces. Restrict to specific interfaces in production where possible.</span>
 <a id="__codelineno-67-8" name="__codelineno-67-8" href="#__codelineno-67-8"></a><span class="w">  </span><span class="p">}</span>
 <a id="__codelineno-67-9" name="__codelineno-67-9" href="#__codelineno-67-9"></a><span class="p">}</span>
 <a id="__codelineno-67-10" name="__codelineno-67-10" href="#__codelineno-67-10"></a>
@@ -6103,9 +6224,9 @@ Status: RECOMMENDED by Wazuh officially. Your agent ID:002 is already installed,
 <div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-manager
 </code></pre></div>
 <h3 id="challenge_6"><strong>Challenge:</strong></h3>
-<p>After implementing the above process clearly, when I am trying to pass the logs from Logstash to the Wazuh manager, those logs are not reaching the Wazuh manager and there are no new alerts in the Wazuh UI.</p>
+<p>After implementing the above process clearly, trying to pass the logs from Logstash to the Wazuh Manager, those logs are not reaching the Wazuh Manager and there are no new alerts in the Wazuh UI.</p>
 <h3 id="solution_6"><strong>Solution:</strong></h3>
-<p>Then I modified the existing Logstash config file with some filters and allowed the ports at the VM level by taking the DevOps engineer's help.</p>
+<p>Then modified the existing Logstash config file with some filters and allowed the ports at the VM level by taking the DevOps engineer's help.</p>
 <p>Modified Logstash config file:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a><span class="c1"># ============================================</span>
 <a id="__codelineno-75-2" name="__codelineno-75-2" href="#__codelineno-75-2"></a><span class="c1"># INPUT: Receive logs FROM Filebeat</span>
@@ -6113,7 +6234,7 @@ Status: RECOMMENDED by Wazuh officially. Your agent ID:002 is already installed,
 <a id="__codelineno-75-4" name="__codelineno-75-4" href="#__codelineno-75-4"></a><span class="n">input</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-75-5" name="__codelineno-75-5" href="#__codelineno-75-5"></a><span class="w">  </span><span class="n">beats</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-75-6" name="__codelineno-75-6" href="#__codelineno-75-6"></a><span class="w">    </span><span class="n">port</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">5044</span><span class="w">          </span><span class="c1"># Logstash listens on this port for Filebeat</span>
-<a id="__codelineno-75-7" name="__codelineno-75-7" href="#__codelineno-75-7"></a><span class="w">    </span><span class="n">host</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;0.0.0.0&quot;</span><span class="w">     </span><span class="c1"># Accept from any IP</span>
+<a id="__codelineno-75-7" name="__codelineno-75-7" href="#__codelineno-75-7"></a><span class="w">    </span><span class="n">host</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;0.0.0.0&quot;</span><span class="w">     </span><span class="c1"># Listen on all interfaces. Restrict to specific interfaces in production where possible.</span>
 <a id="__codelineno-75-8" name="__codelineno-75-8" href="#__codelineno-75-8"></a><span class="w">  </span><span class="p">}</span>
 <a id="__codelineno-75-9" name="__codelineno-75-9" href="#__codelineno-75-9"></a><span class="p">}</span>
 <a id="__codelineno-75-10" name="__codelineno-75-10" href="#__codelineno-75-10"></a>
@@ -6167,10 +6288,10 @@ Status: RECOMMENDED by Wazuh officially. Your agent ID:002 is already installed,
 <a id="__codelineno-75-58" name="__codelineno-75-58" href="#__codelineno-75-58"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="challenge_7"><strong>Challenge:</strong></h3>
-<p>After following the above approach, the issue still remains the same, and when I debug, I get an error in my Logstash log file, the same as in the image below.</p>
+<p>After following the above approach, the issue still remains the same, and when we debug, we get an error in the Logstash log file, the same as in the image below.</p>
 <p><img alt="Image 9" src="../../../../assets/images/POC%27s/Sai%20krishna/Pipelines%20and%20Challenges/image9.png" /></p>
 <h3 id="solution_7"><strong>Solution:</strong></h3>
-<p>Then I connected with the DevOps engineer and he opened the new port 9065 to the Wazuh manager, then added the below config code snippet to the Wazuh manager config file and restarted.</p>
+<p>Then connected with the DevOps engineer and he opened the new port 9065 to the Wazuh Manager, then added the below config code snippet to the Wazuh Manager config file and restarted.</p>
 <p><strong>Manager <code>ossec.conf</code>:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a><span class="nt">&lt;ossec_config&gt;</span>
 <a id="__codelineno-76-2" name="__codelineno-76-2" href="#__codelineno-76-2"></a><span class="w">  </span><span class="nt">&lt;remote&gt;</span>
@@ -6181,7 +6302,7 @@ Status: RECOMMENDED by Wazuh officially. Your agent ID:002 is already installed,
 <a id="__codelineno-76-7" name="__codelineno-76-7" href="#__codelineno-76-7"></a><span class="w">  </span><span class="nt">&lt;/remote&gt;</span>
 <a id="__codelineno-76-8" name="__codelineno-76-8" href="#__codelineno-76-8"></a><span class="nt">&lt;/ossec_config&gt;</span>
 </code></pre></div>
-<p>Then I updated the Logstash config file output part with the code below.</p>
+<p>Then update the Logstash config file output part with the code below.</p>
 <p><strong><code>Wazuh.conf</code>:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a><span class="n">output</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-77-2" name="__codelineno-77-2" href="#__codelineno-77-2"></a><span class="w">  </span><span class="n">tcp</span><span class="w"> </span><span class="p">{</span>
@@ -6191,7 +6312,7 @@ Status: RECOMMENDED by Wazuh officially. Your agent ID:002 is already installed,
 <a id="__codelineno-77-6" name="__codelineno-77-6" href="#__codelineno-77-6"></a><span class="w">  </span><span class="p">}</span>
 <a id="__codelineno-77-7" name="__codelineno-77-7" href="#__codelineno-77-7"></a><span class="p">}</span>
 </code></pre></div>
-<p>And restarted Logstash. Now the logs are passing through Logstash to the Wazuh manager, and alerts are also displayed in the Wazuh UI.</p>
+<p>And restarted Logstash. Now the logs are passing through Logstash to the Wazuh Manager, and alerts are also displayed in the Wazuh UI.</p>
 <hr />
 <h3 id="37-for-performance-test">3.7 For Performance Test</h3>
 <h4 id="what-type-of-logs-should-you-generate_1">What Type of Logs Should You Generate?</h4>
@@ -6229,6 +6350,33 @@ Status: RECOMMENDED by Wazuh officially. Your agent ID:002 is already installed,
 <p>You can also see the generated alerts in the Wazuh UI, and it will display something like the image below.</p>
 <p><img alt="Image 10" src="../../../../assets/images/POC%27s/Sai%20krishna/Pipelines%20and%20Challenges/image10.png" /></p>
 <hr />
+<h2 id="pipeline-comparison">Pipeline Comparison</h2>
+<table>
+<thead>
+<tr>
+<th>Pipeline</th>
+<th>Components</th>
+<th>Recommended</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pipeline 1</td>
+<td>Agent → Manager → Indexer → Dashboard</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Pipeline 2</td>
+<td>Filebeat → Manager</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Pipeline 3</td>
+<td>Filebeat → Logstash → Manager</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
 
 
 

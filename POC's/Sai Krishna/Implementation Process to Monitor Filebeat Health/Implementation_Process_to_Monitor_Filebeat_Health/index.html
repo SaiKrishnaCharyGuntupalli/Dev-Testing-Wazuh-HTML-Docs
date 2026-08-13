@@ -347,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+      <a href="../../../../03-agent-deployment/agent_deployment/" class="md-nav__link">
         
   
   
@@ -609,7 +609,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+      <a href="../../../../09-cluster-index-verification/cluster-index-verification/" class="md-nav__link">
         
   
   
@@ -675,6 +675,10 @@
   
     
     
+      
+        
+      
+        
       
         
       
@@ -2149,6 +2153,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Microsoft_365_to_Wazuh_Integration_Complete_Implementation_and_Configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Microsoft 365 to Wazuh Integration Complete Imp and Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Wazuh SOC Onboarding and Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2746,10 +2806,15 @@
 
 
 <h1 id="implementation-process-to-monitor-filebeat-health">IMPLEMENTATION PROCESS TO MONITOR FILEBEAT HEALTH</h1>
+<!-- **Author:** Sai Krishna   -->
+<p><strong>Version:</strong> 1.0  </p>
+<!-- **Created Date:** 2026-07-24  
+**Updated Date:** 2026-07-24 -->
+
 <h2 id="1-existing-setup">1. EXISTING SETUP</h2>
 <h5 id="meaning">Meaning:</h5>
-<p>I already installed Filebeat on the XXX.XXX.XX.12 VM, installed Logstash on the XXX.XXX.XX.87 VM, and installed Wazuh on the XXX.XXX.XX.43 VM.</p>
-<p>I already have a pipeline to collect application logs by using Filebeat. My pipeline is: Filebeat → Logstash → Wazuh Manager.</p>
+<p>Already installed Filebeat on the source VM, Logstash on the processing VM, and Wazuh on the monitoring VM.</p>
+<p>Already haveing a pipeline to collect application logs by using Filebeat. Pipeline is: Filebeat → Logstash → Wazuh Manager.</p>
 <hr />
 <h2 id="2-what-changes-are-needed">2. WHAT CHANGES ARE NEEDED?</h2>
 <h5 id="meaning_1">Meaning:</h5>
@@ -2842,8 +2907,8 @@
 <a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a><span class="w">    </span><span class="n">password</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;YOUR-OPENSEARCH-PASSWORD&quot;</span>
 <a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="w">    </span><span class="n">index</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;filebeat-health-%{+YYYY.MM.dd}&quot;</span>
 <a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a><span class="w">    </span><span class="c1"># creates daily index like filebeat-health-2026.05.18</span>
-<a id="__codelineno-11-24" name="__codelineno-11-24" href="#__codelineno-11-24"></a><span class="w">    </span><span class="n">ssl_certificate_verification</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="kp">false</span>
-<a id="__codelineno-11-25" name="__codelineno-11-25" href="#__codelineno-11-25"></a><span class="w">    </span><span class="c1"># for lab/dev — set to true with proper certs in production</span>
+<a id="__codelineno-11-24" name="__codelineno-11-24" href="#__codelineno-11-24"></a><span class="w">    </span><span class="n">ssl_certificate_verification</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="kp">false</span><span class="w">  </span><span class="c1"># for lab/dev</span>
+<a id="__codelineno-11-25" name="__codelineno-11-25" href="#__codelineno-11-25"></a><span class="w">    </span><span class="c1"># set to true with proper certs in production</span>
 <a id="__codelineno-11-26" name="__codelineno-11-26" href="#__codelineno-11-26"></a><span class="w">  </span><span class="p">}</span>
 <a id="__codelineno-11-27" name="__codelineno-11-27" href="#__codelineno-11-27"></a><span class="p">}</span>
 </code></pre></div>
@@ -2893,7 +2958,7 @@
 <a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>sudo<span class="w"> </span>env<span class="w"> </span><span class="nv">OPENSEARCH_INITIAL_ADMIN_PASSWORD</span><span class="o">=</span>XXXXXXXXXXXX<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>opensearch<span class="w"> </span>-y
 </code></pre></div>
 <h5 id="challenge"><strong>Challenge:</strong></h5>
-<p>When I am trying to install OpenSearch, I faced an error: <code>Unable to locate package opensearch</code>.</p>
+<p>While installing OpenSearch, encountered the following error:: <code>Unable to locate package opensearch</code>.</p>
 <h5 id="solution"><strong>Solution:</strong></h5>
 <h6 id="run-these-commands-in-order">Run these commands in order</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Step 1 — refresh apt&#39;s package list from ALL repositories including the new OpenSearch one</span>
@@ -2920,7 +2985,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>opensearch<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>opensearch
 <a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
 <a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="c1"># Verify it is working (run from OpenSearch VM itself)</span>
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>admin:XXXXXXXXXXXX<span class="w"> </span>https://localhost:9200
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>admin:&lt;password&gt;<span class="w"> </span>https://localhost:9200
 <a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="c1"># You should see JSON with cluster_name and version</span>
 </code></pre></div>
 <p>Install OpenSearch Dashboards on the same VM:</p>
@@ -2936,6 +3001,7 @@
 <a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="nt">opensearch.username</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kibanaserver&quot;</span>
 <a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="nt">opensearch.password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;XXXXXXXXXXXX&quot;</span>
 <a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="nt">opensearch.ssl.verificationMode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">none</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="c1"># Change opensearch.ssl.verificationMode: full in production</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>opensearch-dashboards<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>opensearch-dashboards
 <a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="c1"># Access at http://YOUR-OPENSEARCH-VM-IP:5601</span>
@@ -2943,7 +3009,7 @@
 <p><strong>Note:</strong></p>
 <p>Your existing Filebeat → Logstash → Wazuh pipeline continues running exactly as before. The new Metricbeat → Logstash → OpenSearch pipeline runs in parallel without touching it.</p>
 <h5 id="challenge_1"><strong>Challenge:</strong></h5>
-<p>After doing the changes at the Logstash level, I am trying to restart Logstash, but it is taking a long time to restart and is not restarting. When I investigate, I find an error as follows:</p>
+<p>After applying the changes at the Logstash level, an attempt was made to restart the Logstash service. However, the service is taking an unusually long time to restart and is not coming up successfully. Upon further investigation, the following error was identified:</p>
 <p><strong>Logstash is stuck in <code>deactivating (stop-sigterm)</code> for 1 hour 36 minutes</strong></p>
 <p>Look at this line:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>Active: deactivating (stop-sigterm) since Tue 2026-05-19 06:50:28 UTC; 1h 36min ago
@@ -2990,10 +3056,12 @@
 <a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="c1"># Should show TWO lines — one for 5044 (wazuh pipeline) and one for 5045 (opensearch pipeline)</span>
 </code></pre></div>
 <h5 id="challenge_2"><strong>Challenge:</strong></h5>
-<p>After fixing the previous challenge, when I am trying to access OpenSearch Dashboards from the browser to display the data in the UI, I faced another challenge: when opening the OpenSearch dashboard in the browser using the <code>http://XXX.XXX.XX.87:5601</code> URL, it displays "OpenSearch Dashboards server is not ready yet" in the browser.</p>
+<p>After resolving the previous issue, an additional challenge was encountered while attempting to access OpenSearch Dashboards through the web browser to visualize data in the user interface. When navigating to the OpenSearch Dashboards URL (http://XXX.XXX.XX.87:5601), the browser displayed the message:</p>
+<p>"OpenSearch Dashboards server is not ready yet."</p>
+<p>As a result, the OpenSearch Dashboards interface was unavailable and the data could not be accessed through the UI.</p>
 <h6 id="exact-cause-of-the-problem">Exact cause of the problem</h6>
 <p>Look at this output you got:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>kibanaserver:XXXXXXXXXXXX<span class="w"> </span>https://localhost:9200
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>kibanaserver:&lt;password&gt;<span class="w"> </span>https://localhost:9200
 <a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>Unauthorized
 </code></pre></div>
 <p>The <code>kibanaserver</code> user is being <strong>rejected</strong> by OpenSearch. This is the root cause of everything.</p>
@@ -3033,20 +3101,22 @@
 <a id="__codelineno-32-12" name="__codelineno-32-12" href="#__codelineno-32-12"></a><span class="c1"># should ALSO still show — confirms existing pipeline untouched</span>
 <a id="__codelineno-32-13" name="__codelineno-32-13" href="#__codelineno-32-13"></a>
 <a id="__codelineno-32-14" name="__codelineno-32-14" href="#__codelineno-32-14"></a><span class="c1"># On OpenSearch VM: did data arrive?</span>
-<a id="__codelineno-32-15" name="__codelineno-32-15" href="#__codelineno-32-15"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>admin:XXXXXXXXXXXX<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-32-15" name="__codelineno-32-15" href="#__codelineno-32-15"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>admin:&lt;password&gt;<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-32-16" name="__codelineno-32-16" href="#__codelineno-32-16"></a><span class="w">  </span><span class="s2">&quot;https://localhost:9200/_cat/indices?v&quot;</span>
 <a id="__codelineno-32-17" name="__codelineno-32-17" href="#__codelineno-32-17"></a><span class="c1"># After 1-2 minutes you should see: filebeat-health-2026.05.18</span>
 <a id="__codelineno-32-18" name="__codelineno-32-18" href="#__codelineno-32-18"></a>
 <a id="__codelineno-32-19" name="__codelineno-32-19" href="#__codelineno-32-19"></a><span class="c1"># Count documents to confirm data is flowing</span>
-<a id="__codelineno-32-20" name="__codelineno-32-20" href="#__codelineno-32-20"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>admin:XXXXXXXXXXXX<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-32-20" name="__codelineno-32-20" href="#__codelineno-32-20"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>admin:&lt;password&gt;<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-32-21" name="__codelineno-32-21" href="#__codelineno-32-21"></a><span class="w">  </span><span class="s2">&quot;https://localhost:9200/filebeat-health-*/_count&quot;</span>
 <a id="__codelineno-32-22" name="__codelineno-32-22" href="#__codelineno-32-22"></a><span class="c1"># Should return { &quot;count&quot;: some_number_greater_than_0 }</span>
 </code></pre></div>
-<p>And check by accessing OpenSearch Dashboards from the browser using <code>admin</code> / <code>&lt;your admin password&gt;</code> as username and password, and it will be based on your setup and configured values. When we open OpenSearch Dashboards for the first time it will ask a few setup questions. So first we need to complete those steps before seeing the data in the UI. This setup will look like the following:</p>
+<p>Access OpenSearch Dashboards through a web browser using the administrator credentials configured in your environment. The username is typically admin, while the password should be the value defined during your installation and configuration process.</p>
+<p>When accessing OpenSearch Dashboards for the first time, an initial setup and configuration wizard may be displayed. Complete the required setup steps before proceeding to the dashboard interface and viewing data. An example of the initial setup screen is shown below.</p>
 <p><img alt="Image 2" src="../../../../assets/images/POC%27s/Sai%20krishna/Implementation%20Process%20to%20Monitor%20Filebeat%20Health/image2.png" /></p>
 <p>After completing the initial setup, you can now see the incoming metric data in the Discover section in OpenSearch Dashboards, and it will look something like the following image.</p>
 <p><img alt="Image 3" src="../../../../assets/images/POC%27s/Sai%20krishna/Implementation%20Process%20to%20Monitor%20Filebeat%20Health/image3.png" /></p>
-<p>Now data is reaching and being stored in OpenSearch, and we can verify data using the Discover section — that is fine, but for monitoring this is not the recommended way. To monitor agent health, we must create a dashboard to display all the agents on one screen, so that we can monitor multiple agents in one place — this is the recommended way.</p>
+<p>Data is now being successfully ingested into and stored within OpenSearch. While the data can be verified through the Discover section, this approach is not recommended for ongoing monitoring purposes.</p>
+<p>For effective agent health monitoring, it is recommended to create a dedicated dashboard that provides a centralized view of all agents on a single screen. This enables administrators to monitor the status and health of multiple agents efficiently from one location, improving visibility and operational management.</p>
 <hr />
 <h2 id="4-for-visualizations">4. FOR VISUALIZATIONS</h2>
 <h3 id="41-first-confirm-your-data-has-the-right-fields">4.1 First Confirm Your Data Has the Right Fields</h3>
@@ -3537,11 +3607,13 @@ Click Save</p>
 </code></pre></div>
 <p>Change 120 to 300 for 5 minutes. Change the same number in the color line below it too.</p>
 <h5 id="challenge_3"><strong>Challenge:</strong></h5>
-<p>When I run the above custom script in OpenSearch Dashboards in Vega Visualize, it actually gives errors while running the script. The errors are: <code>"width" and "height" params are ignored because "autosize" is enabled. Set "autosize": "none" to disable</code> and <code>url.%context% and url.%timefield% must not be used when url.body.query is set</code>.</p>
+<p>While runing the above custom script in OpenSearch Dashboards in Vega Visualize, it actually gives errors. The errors are: <code>"width" and "height" params are ignored because "autosize" is enabled. Set "autosize": "none" to disable</code> and <code>url.%context% and url.%timefield% must not be used when url.body.query is set</code>.</p>
 <p><strong>Error 1</strong> — width and height are ignored because OpenSearch Dashboards enables autosize automatically. The fix is to add <code>"autosize": "none"</code>.</p>
-<p><strong>Error 2</strong> — In OpenSearch Dashboards Vega, you cannot use <code>%context%</code> and <code>%timefield%</code> together with a custom <code>body.query</code>. You must choose one approach. Since we need a custom query to filter by <code>event.module</code> and <code>beat.type</code>, we remove <code>%context%</code> and <code>%timefield%</code> and write the time filter manually inside the query.</p>
+<p><strong>Error 2</strong> — In OpenSearch Dashboards Vega visualizations, %context% and %timefield% cannot be used together with a custom body.query. When a custom query is required (for example, to filter data by event.module and beat.type), the dashboard context parameters must be removed, and the time range filter should be explicitly defined within the query itself.</p>
 <h5 id="solution_3"><strong>Solution:</strong></h5>
-<p>I updated the code, and now the errors are resolved. But visually it was not good, so I again updated the code to look better, and the condition was also changed to 30 seconds instead of 120 seconds, and I updated the code to display 0 minutes when Filebeat is not running. After making all these modifications, the final code is as follows:</p>
+<p>The code has been updated and all previously reported errors have been resolved. Following the issue resolution, additional enhancements were implemented to improve the overall visual appearance of the interface.</p>
+<p>As part of these updates, the monitoring condition threshold was modified from 120 seconds to 30 seconds to better align with the current requirements. Furthermore, the logic was enhanced to display 0 minutes when the Filebeat service is not running, ensuring clearer and more accurate status representation.</p>
+<p>After incorporating these changes and improvements, the final version of the code is provided below.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="p">{</span>
 <a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="w">  </span><span class="nt">&quot;$schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://vega.github.io/schema/vega/v5.json&quot;</span><span class="p">,</span>
 <a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="w">  </span><span class="nt">&quot;autosize&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;none&quot;</span><span class="p">,</span>

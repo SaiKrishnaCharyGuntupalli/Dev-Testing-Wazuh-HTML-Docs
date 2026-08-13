@@ -347,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+      <a href="../../../../03-agent-deployment/agent_deployment/" class="md-nav__link">
         
   
   
@@ -609,7 +609,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+      <a href="../../../../09-cluster-index-verification/cluster-index-verification/" class="md-nav__link">
         
   
   
@@ -675,6 +675,10 @@
   
     
     
+      
+        
+      
+        
       
         
       
@@ -979,6 +983,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#first-understand-what-is-xdr-in-wazuh" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -994,6 +1009,17 @@
     <span class="md-ellipsis">
       
         Configuration Files You Must Edit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backup-existing-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backup Existing Configuration
       
     </span>
   </a>
@@ -1780,6 +1806,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Microsoft_365_to_Wazuh_Integration_Complete_Implementation_and_Configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Microsoft 365 to Wazuh Integration Complete Imp and Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Wazuh SOC Onboarding and Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1814,6 +1896,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#first-understand-what-is-xdr-in-wazuh" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1829,6 +1922,17 @@
     <span class="md-ellipsis">
       
         Configuration Files You Must Edit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backup-existing-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backup Existing Configuration
       
     </span>
   </a>
@@ -2008,8 +2112,22 @@
 
 
 <h1 id="xdr-implementation-process">XDR Implementation Process</h1>
+<!-- **Author:** Sai Krishna   -->
+<p><strong>Version:</strong> 1.0  </p>
+<!-- **Created Date:** 2026-07-24  
+**Updated Date:** 2026-07-24 -->
+
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>Wazuh Manager installed and running</li>
+<li>Wazuh Agent installed and connected</li>
+<li>Administrative privileges</li>
+<li>Backup of existing ossec.conf</li>
+<li>Network connectivity between agents and manager</li>
+<li>Supported Wazuh version identified</li>
+</ul>
 <h2 id="first-understand-what-is-xdr-in-wazuh">First Understand: What is XDR in Wazuh?</h2>
-<p>XDR = Correlating security data from:</p>
+<p>Extended Detection and Response (XDR) correlates security telemetry from:</p>
 <ul>
 <li>Endpoint (agent logs)</li>
 <li>System activity</li>
@@ -2030,43 +2148,49 @@
 <hr />
 <h2 id="configuration-files-you-must-edit">Configuration Files You Must Edit</h2>
 <hr />
+<h2 id="backup-existing-configuration">Backup Existing Configuration</h2>
+<p>Before modifying any Wazuh configuration file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>sudo<span class="w"> </span>cp<span class="w"> </span>/var/ossec/etc/ossec.conf<span class="w"> </span>/var/ossec/etc/ossec.conf.backup
+</code></pre></div>
 <h2 id="on-agent-vm">On Agent VM</h2>
 <p>File: <code>/var/ossec/etc/ossec.conf</code></p>
 <hr />
 <h3 id="enable-log-collection">Enable Log Collection</h3>
 <p>Inside <code>&lt;localfile&gt;</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">&lt;localfile&gt;</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&lt;log_format&gt;</span>syslog<span class="nt">&lt;/log_format&gt;</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&lt;location&gt;</span>/var/log/auth.log<span class="nt">&lt;/location&gt;</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nt">&lt;/localfile&gt;</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nt">&lt;localfile&gt;</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="nt">&lt;log_format&gt;</span>syslog<span class="nt">&lt;/log_format&gt;</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="nt">&lt;location&gt;</span>/var/log/syslog<span class="nt">&lt;/location&gt;</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nt">&lt;/localfile&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">&lt;localfile&gt;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&lt;log_format&gt;</span>syslog<span class="nt">&lt;/log_format&gt;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&lt;location&gt;</span>/var/log/auth.log<span class="nt">&lt;/location&gt;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nt">&lt;/localfile&gt;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nt">&lt;localfile&gt;</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nt">&lt;log_format&gt;</span>syslog<span class="nt">&lt;/log_format&gt;</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="nt">&lt;location&gt;</span>/var/log/syslog<span class="nt">&lt;/location&gt;</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nt">&lt;/localfile&gt;</span>
 </code></pre></div>
 <p><strong>Why?</strong> Collect authentication logs for brute force detection.</p>
 <hr />
 <h3 id="enable-file-integrity-monitoring-fim">Enable File Integrity Monitoring (FIM)</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">&lt;syscheck&gt;</span><span class="w"> </span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&lt;frequency&gt;</span>3600<span class="nt">&lt;/frequency&gt;</span><span class="w"> </span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&lt;directories</span><span class="w"> </span><span class="na">check_all=</span><span class="s">&quot;yes&quot;</span><span class="nt">&gt;</span>/etc,/usr/bin<span class="nt">&lt;/directories&gt;</span><span class="w"> </span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nt">&lt;/syscheck&gt;</span><span class="w"> </span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">&lt;syscheck&gt;</span><span class="w"> </span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&lt;frequency&gt;</span>3600<span class="nt">&lt;/frequency&gt;</span><span class="w"> </span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&lt;directories</span><span class="w"> </span><span class="na">check_all=</span><span class="s">&quot;yes&quot;</span><span class="nt">&gt;</span>/etc,/usr/bin<span class="nt">&lt;/directories&gt;</span><span class="w"> </span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nt">&lt;/syscheck&gt;</span><span class="w"> </span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="cm">&lt;!-- Adjust monitored directories based on system size and performance requirements --&gt;</span>
 </code></pre></div>
 <p><strong>Why?</strong> Detect file modifications caused by malware or persistence mechanisms.</p>
 <hr />
 <h3 id="enable-rootcheck">Enable Rootcheck</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">&lt;rootcheck&gt;</span><span class="w"> </span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&lt;disabled&gt;</span>no<span class="nt">&lt;/disabled&gt;</span><span class="w"> </span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">&lt;/rootcheck&gt;</span><span class="w"> </span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">&lt;rootcheck&gt;</span><span class="w"> </span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">&lt;disabled&gt;</span>no<span class="nt">&lt;/disabled&gt;</span><span class="w"> </span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nt">&lt;/rootcheck&gt;</span><span class="w"> </span>
 </code></pre></div>
 <p><strong>Why?</strong> Detect rootkits and suspicious binaries.</p>
 <hr />
 <h3 id="enable-sca">Enable SCA</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">&lt;sca&gt;</span><span class="w"> </span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">&lt;enabled&gt;</span>yes<span class="nt">&lt;/enabled&gt;</span><span class="w"> </span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">&lt;scan_on_start&gt;</span>yes<span class="nt">&lt;/scan_on_start&gt;</span><span class="w"> </span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="nt">&lt;/sca&gt;</span><span class="w"> </span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">&lt;sca&gt;</span><span class="w"> </span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&lt;enabled&gt;</span>yes<span class="nt">&lt;/enabled&gt;</span><span class="w"> </span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">&lt;scan_on_start&gt;</span>yes<span class="nt">&lt;/scan_on_start&gt;</span><span class="w"> </span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nt">&lt;/sca&gt;</span><span class="w"> </span>
 </code></pre></div>
 <p><strong>Why?</strong> Detect insecure configurations.</p>
 <hr />
@@ -2076,10 +2200,10 @@
 </div>
 <h3 id="apply-changes-on-agent">Apply Changes on Agent</h3>
 <p>Restart the Wazuh agent to apply changes:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-agent
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-agent
 </code></pre></div>
 <p>Verify the agent is running:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>wazuh-agent
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>wazuh-agent
 </code></pre></div>
 <p>Expected result: <code>active (running)</code></p>
 <hr />
@@ -2087,28 +2211,33 @@
 <p>File: <code>/var/ossec/etc/ossec.conf</code></p>
 <hr />
 <h3 id="enable-vulnerability-detection">Enable Vulnerability Detection</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">&lt;vulnerability-detector&gt;</span><span class="w"> </span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">&lt;enabled&gt;</span>yes<span class="nt">&lt;/enabled&gt;</span><span class="w"> </span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">&lt;interval&gt;</span>5m<span class="nt">&lt;/interval&gt;</span><span class="w"> </span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">&lt;provider</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;canonical&quot;</span><span class="nt">&gt;</span><span class="w"> </span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="nt">&lt;enabled&gt;</span>yes<span class="nt">&lt;/enabled&gt;</span><span class="w"> </span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nt">&lt;/provider&gt;</span><span class="w"> </span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="nt">&lt;/vulnerability-detector&gt;</span><span class="w"> </span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="cm">&lt;!-- Verify the vulnerability detection configuration syntax against your installed Wazuh version before applying changes. --&gt;</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nt">&lt;vulnerability-detector&gt;</span><span class="w"> </span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nt">&lt;enabled&gt;</span>yes<span class="nt">&lt;/enabled&gt;</span><span class="w"> </span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="nt">&lt;interval&gt;</span>5m<span class="nt">&lt;/interval&gt;</span><span class="w"> </span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="nt">&lt;provider</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;canonical&quot;</span><span class="nt">&gt;</span><span class="w"> </span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="nt">&lt;enabled&gt;</span>yes<span class="nt">&lt;/enabled&gt;</span><span class="w"> </span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="nt">&lt;/provider&gt;</span><span class="w"> </span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="nt">&lt;/vulnerability-detector&gt;</span><span class="w"> </span>
 </code></pre></div>
 <p><strong>Why?</strong> Detect installed packages with known CVEs.</p>
 <hr />
 <h3 id="custom-rules">Custom Rules</h3>
 <p>If you want to write a custom rule, add it to:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>/var/ossec/etc/rules/local_rules.xml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/var/ossec/etc/rules/local_rules.xml
 </code></pre></div>
 Example — block connections from blacklisted IPs:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;threat_intel&quot;</span><span class="nt">&gt;</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&lt;rule</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;100100&quot;</span><span class="w"> </span><span class="na">level=</span><span class="s">&quot;10&quot;</span><span class="nt">&gt;</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nt">&lt;if_sid&gt;</span>5710<span class="nt">&lt;/if_sid&gt;</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="nt">&lt;list</span><span class="w"> </span><span class="na">field=</span><span class="s">&quot;srcip&quot;</span><span class="w"> </span><span class="na">lookup=</span><span class="s">&quot;address_match_key&quot;</span><span class="nt">&gt;</span>etc/lists/bad-ip-list<span class="nt">&lt;/list&gt;</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="nt">&lt;description&gt;</span>Connection<span class="w"> </span>from<span class="w"> </span>blacklisted<span class="w"> </span>IP<span class="nt">&lt;/description&gt;</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nt">&lt;/rule&gt;</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="nt">&lt;/group&gt;</span>
+<p>Ensure the referenced list file exists:</p>
+<p><code>/var/ossec/etc/lists/bad-ip-list</code></p>
+<p>Add one IP address per line.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;threat_intel&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">&lt;rule</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;100100&quot;</span><span class="w"> </span><span class="na">level=</span><span class="s">&quot;10&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="nt">&lt;if_sid&gt;</span>5710<span class="nt">&lt;/if_sid&gt;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="nt">&lt;list</span><span class="w"> </span><span class="na">field=</span><span class="s">&quot;srcip&quot;</span><span class="w"> </span><span class="na">lookup=</span><span class="s">&quot;address_match_key&quot;</span><span class="nt">&gt;</span>etc/lists/bad-ip-list<span class="nt">&lt;/list&gt;</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="nt">&lt;description&gt;</span>Connection<span class="w"> </span>from<span class="w"> </span>blacklisted<span class="w"> </span>IP<span class="nt">&lt;/description&gt;</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="nt">&lt;/rule&gt;</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="nt">&lt;/group&gt;</span>
 </code></pre></div>
 <h3 id="adding-custom-rules-via-the-ui">Adding Custom Rules via the UI</h3>
 <p>Custom rules can also be added directly from the Wazuh Dashboard UI:</p>
@@ -2120,12 +2249,14 @@ Example — block connections from blacklisted IPs:</p>
 <hr />
 <h3 id="enable-active-response">Enable Active Response</h3>
 <p>In <code>/var/ossec/etc/ossec.conf</code> on the manager:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">&lt;active-response&gt;</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">&lt;command&gt;</span>firewall-drop<span class="nt">&lt;/command&gt;</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nt">&lt;location&gt;</span>local<span class="nt">&lt;/location&gt;</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nt">&lt;rules_id&gt;</span>5710<span class="nt">&lt;/rules_id&gt;</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nt">&lt;timeout&gt;</span>60<span class="nt">&lt;/timeout&gt;</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="nt">&lt;/active-response&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">&lt;active-response&gt;</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">&lt;command&gt;</span>firewall-drop<span class="nt">&lt;/command&gt;</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">&lt;location&gt;</span>local<span class="nt">&lt;/location&gt;</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nt">&lt;rules_id&gt;</span>5710<span class="nt">&lt;/rules_id&gt;</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nt">&lt;timeout&gt;</span>60<span class="nt">&lt;/timeout&gt;</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="nt">&lt;/active-response&gt;</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="cm">&lt;!-- Validate active response behavior in a test environment before enabling in production. --&gt;</span>
 </code></pre></div>
 <p><strong>Why?</strong> Automatically block a brute force attacker's IP address.</p>
 <div class="admonition note">
@@ -2139,10 +2270,10 @@ Example — block connections from blacklisted IPs:</p>
 </div>
 <h3 id="apply-changes-on-manager">Apply Changes on Manager</h3>
 <p>Restart the Wazuh manager to apply changes:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-manager
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-manager
 </code></pre></div>
 <p>Verify the manager is running:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>wazuh-manager
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>wazuh-manager
 </code></pre></div>
 <p>Expected result: <code>active (running)</code></p>
 <hr />
@@ -2152,11 +2283,10 @@ Example — block connections from blacklisted IPs:</p>
 <p class="admonition-title">If You See This Error</p>
 <p>If the Wazuh Dashboard becomes unreachable after editing <code>ossec.conf</code>, the most likely cause is a syntax error in the configuration file. Validate the XML before restarting:</p>
 </div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="w">    </span>/var/ossec/bin/wazuh-control<span class="w"> </span>check-config
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>/var/ossec/bin/wazuh-control<span class="w"> </span>check-config
 </code></pre></div>
-<div class="highlight"><pre><span></span><code>Fix any reported errors, then restart:
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="w">    </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-manager
+<p>Fix any reported errors, then restart:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-manager
 </code></pre></div>
 
 

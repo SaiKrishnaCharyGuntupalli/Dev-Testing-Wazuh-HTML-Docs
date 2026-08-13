@@ -11,7 +11,7 @@
       
       
       
-        <link rel="prev" href="../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/">
+        <link rel="prev" href="../../09-cluster-index-verification/cluster-index-verification/">
       
       
         <link rel="next" href="../../POC%27s/Junaid/GitHub_Webhook_to_Logstash/GitHub_Webhook_to_Logstash_POC/">
@@ -347,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+      <a href="../../03-agent-deployment/agent_deployment/" class="md-nav__link">
         
   
   
@@ -611,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+      <a href="../../09-cluster-index-verification/cluster-index-verification/" class="md-nav__link">
         
   
   
@@ -844,6 +844,10 @@
   
     
     
+      
+        
+      
+        
       
         
       
@@ -1725,6 +1729,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC%27s/Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Microsoft_365_to_Wazuh_Integration_Complete_Implementation_and_Configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Microsoft 365 to Wazuh Integration Complete Imp and Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC%27s/Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Wazuh SOC Onboarding and Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1898,11 +1958,17 @@
 
 
 <h1 id="wazuh-dashboard-security-role-permissions-master-reference">Wazuh Dashboard — Security Role Permissions Master Reference</h1>
+<!-- **Author:** Abhinav   -->
+<p><strong>Version:</strong> 1.0  </p>
+<!-- **Created Date:** 2026-07-28  
+**Updated Date:** 2026-07-28 -->
+
 <p><strong>Source:</strong> OpenSearch Security Plugin (used by Wazuh Indexer / Wazuh Dashboard)<br />
 <strong>Configuration Location:</strong> Indexer Management → Security → Edit Role → Cluster Permissions &amp; Index Permissions</p>
 <hr />
 <h2 id="section-1-cluster-permissions">SECTION 1 — CLUSTER PERMISSIONS</h2>
 <p>Applied in the <strong>Cluster Permissions</strong> field of a role. These control cluster-wide operations independent of any specific index.</p>
+<p>After assigning permissions, validate access using a non-administrative test account before deploying role changes to production users.</p>
 <h3 id="11-cluster-level-action-groups">1.1 Cluster-Level Action Groups</h3>
 <p>Shorthand names you can type directly to apply multiple permissions at once.</p>
 <table>
@@ -1915,7 +1981,7 @@
 <tbody>
 <tr>
 <td style="text-align: left;"><code>cluster_all</code></td>
-<td style="text-align: left;">Full access to all cluster-level operations; alias for <code>cluster:*</code> wildcard.</td>
+<td style="text-align: left;">Full access to all cluster-level operations; alias for <code>cluster:*</code> wildcard. Grant only to trusted cluster administrators.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>cluster_monitor</code></td>
@@ -1943,6 +2009,7 @@
 </tr>
 </tbody>
 </table>
+<p>Note: In multi-tenant environments, cluster monitoring permissions may expose infrastructure and cluster metadata. Evaluate whether tenant-facing roles require these permissions. </p>
 <h3 id="12-administrative-permissions-clusteradmin">1.2 Administrative Permissions (<code>cluster:admin/*</code>)</h3>
 <p>Control cluster configuration, snapshots, ingest pipelines, scripts, templates, and plugin-specific operations.</p>
 <table>
@@ -2250,7 +2317,7 @@
 <tbody>
 <tr>
 <td style="text-align: left;"><code>indices_all</code></td>
-<td style="text-align: left;">Full access to every index operation (alias for <code>indices:*</code> wildcard).</td>
+<td style="text-align: left;">Full access to every index operation (alias for <code>indices:*</code> wildcard). Assign only to trusted administrative roles.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>read</code></td>

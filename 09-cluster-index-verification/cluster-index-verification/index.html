@@ -347,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+      <a href="../../03-agent-deployment/agent_deployment/" class="md-nav__link">
         
   
   
@@ -693,6 +693,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#optional-operational-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional Operational Permissions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#3-granular-index-monitoring-permissions-indicesmonitor" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -755,6 +766,10 @@
   
     
     
+      
+        
+      
+        
       
         
       
@@ -1636,6 +1651,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC%27s/Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Microsoft_365_to_Wazuh_Integration_Complete_Implementation_and_Configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Microsoft 365 to Wazuh Integration Complete Imp and Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC%27s/Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Wazuh SOC Onboarding and Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1692,6 +1763,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#optional-operational-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional Operational Permissions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#3-granular-index-monitoring-permissions-indicesmonitor" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1720,6 +1802,11 @@
 
 
 <h1 id="cluster-and-index-verification-monitoring-permissions">Cluster and Index Verification &amp; Monitoring Permissions</h1>
+<!-- **Author:** Abhinav   -->
+<p><strong>Version:</strong> 1.0  </p>
+<!-- **Created Date:** 2026-07-28  
+**Updated Date:** 2026-07-28 -->
+
 <p>This document references the predefined action groups and specific granular permissions required to monitor and verify the health, status, and task states of the Wazuh Indexer / OpenSearch cluster without allowing any structural changes.</p>
 <h2 id="1-monitoring-action-groups-shorthand-names">1. Monitoring Action Groups (Shorthand Names)</h2>
 <p>Use these shorthand names in the respective configuration fields to apply multiple monitoring permissions at once.</p>
@@ -1777,7 +1864,7 @@
 </tr>
 <tr>
 <td style="text-align: left;"><code>cluster:monitor/nodes/info</code></td>
-<td style="text-align: left;">Returns node-level information (host, roles, attributes, plugins, version).</td>
+<td style="text-align: left;">Returns node-level information (hostnames, roles, attributes, plugins, and version information). Consider restricting this permission for tenant-facing roles.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>cluster:monitor/nodes/stats</code></td>
@@ -1803,12 +1890,14 @@
 <td style="text-align: left;"><code>cluster:monitor/tasks/list</code></td>
 <td style="text-align: left;">Lists all currently running tasks across every node in the cluster.</td>
 </tr>
-<tr>
-<td style="text-align: left;"><code>cluster:monitor/tasks/cancel</code></td>
-<td style="text-align: left;">Cancels a running task identified by its task ID.</td>
-</tr>
 </tbody>
 </table>
+<p>Note: Evaluate whether cluster:monitor/state is required for tenant-facing roles because it exposes detailed cluster metadata.</p>
+<h2 id="optional-operational-permissions">Optional Operational Permissions</h2>
+<p>The following permissions are not required for monitoring and allow operational intervention:</p>
+<ul>
+<li>cluster:monitor/tasks/cancel</li>
+</ul>
 <h2 id="3-granular-index-monitoring-permissions-indicesmonitor">3. Granular Index Monitoring Permissions (<code>indices:monitor/*</code>)</h2>
 <p>These permissions provide visibility into individual index operational health metrics and must be applied in the <strong>Index Permissions</strong> configuration block.</p>
 <table>

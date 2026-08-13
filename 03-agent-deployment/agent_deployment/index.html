@@ -763,7 +763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+      <a href="../../09-cluster-index-verification/cluster-index-verification/" class="md-nav__link">
         
   
   
@@ -827,6 +827,10 @@
   
     
     
+      
+        
+      
+        
       
         
       
@@ -1708,6 +1712,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC%27s/Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Microsoft_365_to_Wazuh_Integration_Complete_Implementation_and_Configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Microsoft 365 to Wazuh Integration Complete Imp and Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC%27s/Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Wazuh SOC Onboarding and Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1864,36 +1924,45 @@
 
 
 <h1 id="agent-deployment">Agent Deployment</h1>
+<!-- **Author:** Abhinav   -->
+<p><strong>Version:</strong> 1.0  </p>
+<!-- **Created Date:** 2026-07-28  
+**Updated Date:** 2026-07-28 -->
+
 <h2 id="overview">Overview</h2>
 <p>To set up Wazuh multi-tenant isolation you need at least two tenants (e.g. Tenant A and Tenant B), each with at least one endpoint. This section covers deploying agents to those endpoints.</p>
 <hr />
 <h2 id="prerequisites-verify-docker-status">Prerequisites — Verify Docker Status</h2>
-<p>Go to the VM where Wazuh Docker images are installed and check that all three Docker containers are running before proceeding.</p>
+<p>Go to the VM where Wazuh Docker images are installed and check that all three Docker containers are running before proceeding.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span>ps
+</code></pre></div></p>
 <hr />
 <h2 id="31-deploying-a-new-wazuh-agent-linux">3.1 Deploying a New Wazuh Agent (Linux)</h2>
 <h3 id="step-1-generate-the-deployment-command-from-the-wazuh-dashboard">Step 1 — Generate the deployment command from the Wazuh Dashboard</h3>
 <p>In the Wazuh Dashboard, navigate to the <strong>New Agent</strong> deployment form. Fill in the appropriate details. The dashboard will generate the install command for you.</p>
 <p><img alt="Wazuh dashboard login interface" src="../../assets/images/2.Agent%20Deployment%20%26%20Configuration/2.Login_page.png" /></p>
 <p><img alt="Wazuh main dashboard view" src="../../assets/images/2.Agent%20Deployment%20%26%20Configuration/2.dashboard.png" /></p>
+<p><img alt="Agent deployment process in progress" src="../../assets/images/2.Agent%20Deployment%20%26%20Configuration/2.deploying-agent.png" /></p>
 <h3 id="step-2-run-the-command-on-the-endpoint-vm">Step 2 — Run the command on the endpoint VM</h3>
 <p>SSH into the new endpoint VM and run the generated command. It will look like this:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>wget<span class="w"> </span>https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.14.4-1_amd64.deb<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span><span class="nv">WAZUH_MANAGER</span><span class="o">=</span><span class="s1">&#39;192.168.45.21&#39;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">     </span><span class="nv">WAZUH_AGENT_NAME</span><span class="o">=</span><span class="s1">&#39;Linux-&lt;TENANT-NAME&gt;01&#39;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">     </span>dpkg<span class="w"> </span>-i<span class="w"> </span>./wazuh-agent_4.14.4-1_amd64.deb
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>wget<span class="w"> </span>https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_&lt;VERSION&gt;_amd64.deb<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span><span class="nv">WAZUH_MANAGER</span><span class="o">=</span><span class="s1">&#39;&lt;WAZUH-MANAGER-IP&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">     </span><span class="nv">WAZUH_AGENT_NAME</span><span class="o">=</span><span class="s1">&#39;Linux-&lt;TENANT-NAME&gt;01&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">     </span>dpkg<span class="w"> </span>-i<span class="w"> </span>./wazuh-agent_&lt;VERSION&gt;_amd64.deb
 </code></pre></div>
-<p><img alt="Agent deployment process in progress" src="../../assets/images/2.Agent%20Deployment%20%26%20Configuration/2.deploying-agent.png" /></p>
+<!-- ![Agent deployment process in progress](../assets/images/2.Agent Deployment & Configuration/2.deploying-agent.png) -->
+
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Replace <code>&lt;TENANT-NAME&gt;</code> with the actual tenant identifier for this agent (e.g. <code>Linux-TenantA01</code>).</p>
 </div>
 <h3 id="step-3-enable-and-start-the-agent">Step 3 — Enable and start the agent</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>wazuh-agent
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>wazuh-agent
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>wazuh-agent
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>wazuh-agent
 </code></pre></div>
 <h3 id="step-4-verify-the-agent-is-running">Step 4 — Verify the agent is running</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>wazuh-agent
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>wazuh-agent
 </code></pre></div>
 <p><img alt="Agent status check showing running state" src="../../assets/images/2.Agent%20Deployment%20%26%20Configuration/2.status.png" /></p>
 <hr />
@@ -1902,7 +1971,7 @@
 <p><img alt="Wazuh agent verification in dashboard" src="../../assets/images/2.Agent%20Deployment%20%26%20Configuration/2.agent-verification.png" /></p>
 <hr />
 <h2 id="deploying-additional-agents-linux">Deploying Additional Agents (Linux)</h2>
-<p>Repeat all steps in section 3.1 for each additional endpoint. Each agent must be given a unique name and assigned to the correct tenant.</p>
+<p>Repeat all steps in section 3.1 for each additional endpoint. Each agent must be given a unique name, follow the approved tenant naming convention, and assigned to the correct tenant.</p>
 <hr />
 <div class="admonition success">
 <p class="admonition-title">Checkpoint</p>

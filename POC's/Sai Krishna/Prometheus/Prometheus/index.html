@@ -347,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+      <a href="../../../../03-agent-deployment/agent_deployment/" class="md-nav__link">
         
   
   
@@ -609,7 +609,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+      <a href="../../../../09-cluster-index-verification/cluster-index-verification/" class="md-nav__link">
         
   
   
@@ -675,6 +675,10 @@
   
     
     
+      
+        
+      
+        
       
         
       
@@ -1371,15 +1375,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-what-is-prometheus" class="md-nav__link">
+  <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. WHAT IS PROMETHEUS?
+        Prerequisites
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="1. WHAT IS PROMETHEUS?">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-is-prometheus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What Is Prometheus?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. What Is Prometheus?">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3170,12 +3185,12 @@
   <a href="#20-what-is-grafana" class="md-nav__link">
     <span class="md-ellipsis">
       
-        20. WHAT IS GRAFANA?
+        20. What Is Grafana?
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="20. WHAT IS GRAFANA?">
+    <nav class="md-nav" aria-label="20. What Is Grafana?">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3849,6 +3864,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Microsoft_365_to_Wazuh_Integration_Complete_Implementation_and_Configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Microsoft 365 to Wazuh Integration Complete Imp and Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Wazuh SOC Onboarding and Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3883,15 +3954,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-what-is-prometheus" class="md-nav__link">
+  <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. WHAT IS PROMETHEUS?
+        Prerequisites
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="1. WHAT IS PROMETHEUS?">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-is-prometheus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What Is Prometheus?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. What Is Prometheus?">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -5682,12 +5764,12 @@
   <a href="#20-what-is-grafana" class="md-nav__link">
     <span class="md-ellipsis">
       
-        20. WHAT IS GRAFANA?
+        20. What Is Grafana?
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="20. WHAT IS GRAFANA?">
+    <nav class="md-nav" aria-label="20. What Is Grafana?">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6146,7 +6228,20 @@
 
 
 <h1 id="prometheus">PROMETHEUS</h1>
-<h2 id="1-what-is-prometheus">1. WHAT IS PROMETHEUS?</h2>
+<!-- **Author:** Sai Krishna   -->
+<p><strong>Version:</strong> 1.0  </p>
+<!-- **Created Date:** 2026-07-24  
+**Updated Date:** 2026-07-24 -->
+
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>A Linux VM (Ubuntu/RHEL) with <code>sudo</code> access and outbound internet access</li>
+<li>Firewall/security-group rules allowing inbound traffic to ports 9090 (Prometheus),
+    9100 (Node Exporter), 9093 (Alertmanager), and 3000 (Grafana) from trusted sources only</li>
+<li>Network routing between the Prometheus VM and any monitored VM's Node Exporter port</li>
+<li>A Windows machine requires <code>windows_exporter</code> instead of Node Exporter</li>
+</ul>
+<h2 id="1-what-is-prometheus">1. What Is Prometheus?</h2>
 <p><strong>Prometheus</strong> is an <strong>open-source monitoring and alerting tool</strong> mainly used to track system performance like:</p>
 <ul>
 <li>CPU usage</li>
@@ -6265,9 +6360,9 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>http://&lt;Manager_VM_IP&gt;:9090
 </code></pre></div>
 <h5 id="challenge"><strong>Challenge:</strong></h5>
-<p>When I run the Step 1 command, I faced an issue related to the version.</p>
+<p>While executing the command in Step 1, a version-related issue was encountered.</p>
 <h5 id="solution"><strong>Solution:</strong></h5>
-<p>I found a stable version, then downloaded that stable version and followed the above process.</p>
+<p>A stable release was identified and downloaded, and the installation/configuration process was completed by following the steps outlined above.</p>
 <p><strong>Working link:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>wget<span class="w"> </span>https://github.com/prometheus/prometheus/releases/download/v2.47.2/prometheus-2.47.2.linux-amd64.tar.gz
 </code></pre></div>
@@ -6293,9 +6388,9 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>http://&lt;IP&gt;:9100/metrics
 </code></pre></div>
 <h5 id="challenge_1"><strong>Challenge:</strong></h5>
-<p>When I run the Step 1 command, I faced an issue related to the version.</p>
+<p>While executing the command in Step 1, a version-related issue was encountered.</p>
 <h5 id="solution_1"><strong>Solution:</strong></h5>
-<p>I found a stable version, then downloaded that stable version and followed the above process.</p>
+<p>A stable version was identified and downloaded, and the implementation process was completed by following the steps outlined above.</p>
 <p><strong>Working link:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>wget<span class="w"> </span>https://github.com/prometheus/node_exporter/releases/download/v1.7.0/node_exporter-1.7.0.linux-amd64.tar.gz
 </code></pre></div>
@@ -6318,9 +6413,9 @@
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>./prometheus<span class="w"> </span>--config.file<span class="o">=</span>prometheus.yml
 </code></pre></div>
 <h5 id="challenge_2"><strong>Challenge:</strong></h5>
-<p>In my case, when I tried to configure Node Exporter with Prometheus in the <code>prometheus.yml</code> file, I faced a firewall-related issue because my Prometheus and Node Exporter are in different subnets under the same private network.</p>
+<p>When configuring Node Exporter with Prometheus in the prometheus.yml file, connectivity issues may occur if the Prometheus server and Node Exporter instance are located in different network segments or subnets. In such cases, firewall rules and network access controls should be reviewed to ensure that Prometheus can successfully reach the Node Exporter endpoint.</p>
 <h5 id="solution_2"><strong>Solution:</strong></h5>
-<p>I took the help of a DevOps engineer, and he implemented routing between them to make them communicate with each other. After that it worked fine, and I could see the data in my browser.</p>
+<p>A DevOps engineer configured the necessary routing between the services to enable communication. Once the routing was established, the integration functioned correctly, and the data became accessible through the browser.</p>
 <hr />
 <h2 id="4-how-data-collection-works">4. HOW DATA COLLECTION WORKS</h2>
 <h5 id="step-by-step">Step-by-step:</h5>
@@ -6631,7 +6726,9 @@
 </tr>
 </tbody>
 </table>
-<p>Since your Prometheus started on <strong>Apr 2</strong> and today is <strong>Apr 7</strong>, you have <strong>~5 days of data</strong> stored right now.</p>
+<p>For example, if Prometheus has been running for 5 days and no custom retention flag was
+  set, you would have approximately 5 days of data stored (since 5 days &lt; the 15-day default
+  retention window).</p>
 <h3 id="145-what-happens-to-old-data-after-retention">14.5 What Happens to Old Data After Retention?</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>Block older than 15 days
 <a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>↓
@@ -7228,9 +7325,9 @@
 <p>Open: <code>http://&lt;prometheus-vm-ip&gt;:9093</code></p>
 <p>You'll see all active/resolved alerts here.</p>
 <h3 id="challenge_3"><strong>Challenge:</strong></h3>
-<p>I faced a challenge in the notification part — in the UI I could see the generated alerts, but I couldn't receive any email notification in my Gmail inbox.</p>
+<p>A challenge was encountered with the notification functionality. Although the generated alerts were successfully displayed in the user interface, email notifications were not being delivered to the configured Gmail inbox.</p>
 <h3 id="solution_3"><strong>Solution:</strong></h3>
-<p>Then I modified the <code>alertmanager.yml</code> file with the below new configuration:</p>
+<p>The alertmanager.yml file was updated with the following configuration:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-84-1" name="__codelineno-84-1" href="#__codelineno-84-1"></a><span class="nt">global</span><span class="p">:</span>
 <a id="__codelineno-84-2" name="__codelineno-84-2" href="#__codelineno-84-2"></a><span class="w">  </span><span class="nt">resolve_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5m</span>
 <a id="__codelineno-84-3" name="__codelineno-84-3" href="#__codelineno-84-3"></a><span class="w">  </span><span class="nt">smtp_require_tls</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
@@ -7252,12 +7349,12 @@
 <a id="__codelineno-84-19" name="__codelineno-84-19" href="#__codelineno-84-19"></a><span class="w">        </span><span class="nt">auth_password</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;your-app-password&#39;</span>
 <a id="__codelineno-84-20" name="__codelineno-84-20" href="#__codelineno-84-20"></a><span class="w">        </span><span class="nt">send_resolved</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
-<p>Then I followed the same running process, and I tested the implementation, and I successfully received the email notification when the instance was down:</p>
+<p>Following the implementation procedure, the solution was executed and validated. During testing, email notifications were successfully generated and received when the monitored instance became unavailable, confirming that the alerting mechanism was functioning as expected.</p>
 <p><img alt="Image 5" src="../../../../assets/images/POC%27s/Sai%20krishna/Prometheus/image5.png" /></p>
-<p>And I received another email notification after resolving that fired alert.</p>
+<p>After the alert was resolved, an additional email notification was received.</p>
 <p><img alt="Image 6" src="../../../../assets/images/POC%27s/Sai%20krishna/Prometheus/image6.png" /></p>
 <hr />
-<h2 id="20-what-is-grafana">20. WHAT IS GRAFANA?</h2>
+<h2 id="20-what-is-grafana">20. What Is Grafana?</h2>
 <p><strong>Grafana is an open-source visualization and monitoring tool (application).</strong></p>
 <p>In simple words: it <strong>converts raw data into meaningful dashboards (graphs, charts, alerts)</strong>.</p>
 <h3 id="201-so-is-it-a-tool-or-application">20.1 So Is It a Tool or Application?</h3>
@@ -7346,9 +7443,9 @@
 <li>password: <code>admin</code></li>
 </ul>
 <h3 id="challenge_4"><strong>Challenge:</strong></h3>
-<p>While following the above process, I faced an issue while downloading Grafana, and the issue was related to the version.</p>
+<p>During the implementation process, an issue was encountered while downloading Grafana due to a version compatibility mismatch.</p>
 <h3 id="solution_4"><strong>Solution:</strong></h3>
-<p>I used the below approach to install the correct working version of Grafana:</p>
+<p>The following approach was used to install a compatible and properly functioning version of Grafana.</p>
 <h4 id="correct-working-versions">Correct Working Versions</h4>
 <p>As of now:</p>
 <ul>

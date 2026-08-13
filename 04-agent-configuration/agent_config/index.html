@@ -11,7 +11,7 @@
       
       
       
-        <link rel="prev" href="../../03-agent-deployment/agent_deplyment/">
+        <link rel="prev" href="../../03-agent-deployment/agent_deployment/">
       
       
         <link rel="next" href="../../06-rbac/rbac/">
@@ -349,7 +349,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+      <a href="../../03-agent-deployment/agent_deployment/" class="md-nav__link">
         
   
   
@@ -1007,7 +1007,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+      <a href="../../09-cluster-index-verification/cluster-index-verification/" class="md-nav__link">
         
   
   
@@ -1071,6 +1071,10 @@
   
     
     
+      
+        
+      
+        
       
         
       
@@ -1952,6 +1956,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC%27s/Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Microsoft_365_to_Wazuh_Integration_Complete_Implementation_and_Configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Microsoft 365 to Wazuh Integration Complete Imp and Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC%27s/Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Wazuh SOC Onboarding and Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2352,8 +2412,13 @@
 
 
 <h1 id="agent-configuration-fim-tenant-label-mapping">Agent Configuration: FIM &amp; Tenant Label Mapping</h1>
+<!-- **Author:** Abhinav   -->
+<p><strong>Version:</strong> 1.0  </p>
+<!-- **Created Date:** 2026-07-28  
+**Updated Date:** 2026-07-28 -->
+
 <h2 id="overview">Overview</h2>
-<p>These changes are made to <code>/var/ossec/etc/ossec.conf</code> on each agent VM. There are 5 changes in total. Apply them in order.</p>
+<p>These changes are made to <code>/var/ossec/etc/ossec.conf</code> on each Linux agent VM. There are 5 changes in total. Apply them in order.</p>
 <div class="admonition warning">
 <p class="admonition-title">Always take a backup first</p>
 </div>
@@ -2365,8 +2430,10 @@
 <hr />
 <h2 id="change-1-add-docker-ignore-paths-to-rootcheck">Change 1 — Add Docker Ignore Paths to rootcheck</h2>
 <h3 id="what-to-find">What to find</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="w">    </span>...
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span>yes
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">&lt;rootcheck&gt;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>...
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&lt;skip_nfs&gt;</span>yes<span class="nt">&lt;/skip_nfs&gt;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nt">&lt;/rootcheck&gt;</span>
 </code></pre></div>
 <h3 id="what-to-add">What to add</h3>
 <p>Immediately after <code>&lt;skip_nfs&gt;yes&lt;/skip_nfs&gt;</code>, before <code>&lt;/rootcheck&gt;</code>:</p>
@@ -2374,9 +2441,9 @@
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span>/var/lib/docker/overlay2
 </code></pre></div>
 <h3 id="result-after-change">Result after change</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="w">    </span>yes
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span>/var/lib/containerd
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>/var/lib/docker/overlay2
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">&lt;skip_nfs&gt;</span>yes<span class="nt">&lt;/skip_nfs&gt;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nt">&lt;ignore&gt;</span>/var/lib/containerd<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nt">&lt;ignore&gt;</span>/var/lib/docker/overlay2<span class="nt">&lt;/ignore&gt;</span>
 </code></pre></div>
 <h3 id="why">Why</h3>
 <p>Rootcheck continuously scans the filesystem for suspicious files and rootkits. Docker stores container image layers in <code>/var/lib/containerd</code> and <code>/var/lib/docker/overlay2</code>. These directories contain thousands of files that change constantly during normal container operations. Without ignoring them, rootcheck generates excessive false positive alerts and causes high CPU usage on the agent.</p>
@@ -2461,7 +2528,7 @@
 <h2 id="change-3-replace-the-default-syscheck-block-entirely">Change 3 — Replace the Default syscheck Block Entirely</h2>
 <h3 id="what-to-find-and-remove">What to find and remove</h3>
 <p>The entire default syscheck block:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="cm">&lt;!-- File integrity monitoring --&gt;</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="cm">&lt;!-- File integrity monitoring --&gt;</span>
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nt">&lt;syscheck&gt;</span>
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">&lt;disabled&gt;</span>no<span class="nt">&lt;/disabled&gt;</span>
 <a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">&lt;frequency&gt;</span>43200<span class="nt">&lt;/frequency&gt;</span>
@@ -2472,6 +2539,7 @@
 <a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">  </span>...
 <a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="nt">&lt;/syscheck&gt;</span>
 </code></pre></div>
+Before replacing the default syscheck block, keep a copy of the original configuration section so it can be restored if validation or performance issues occur.</p>
 <h3 id="replace-with-this-entire-block">Replace with this entire block</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="cm">&lt;!-- File integrity monitoring --&gt;</span>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nt">&lt;syscheck&gt;</span>
@@ -2491,41 +2559,42 @@
 <a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="w">  </span><span class="nt">&lt;directories</span><span class="w"> </span><span class="na">realtime=</span><span class="s">&quot;yes&quot;</span><span class="w"> </span><span class="na">report_changes=</span><span class="s">&quot;yes&quot;</span><span class="w"> </span><span class="na">check_all=</span><span class="s">&quot;yes&quot;</span><span class="nt">&gt;</span>/root<span class="nt">&lt;/directories&gt;</span>
 <a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>
 <a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a><span class="w">  </span><span class="cm">&lt;!-- Web and app directories --&gt;</span>
-<a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="w">  </span><span class="nt">&lt;directories</span><span class="w"> </span><span class="na">realtime=</span><span class="s">&quot;yes&quot;</span><span class="w"> </span><span class="na">report_changes=</span><span class="s">&quot;yes&quot;</span><span class="w"> </span><span class="na">check_all=</span><span class="s">&quot;yes&quot;</span><span class="nt">&gt;</span>/var/www<span class="nt">&lt;/directories&gt;</span>
-<a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="w">  </span><span class="nt">&lt;directories</span><span class="w"> </span><span class="na">realtime=</span><span class="s">&quot;yes&quot;</span><span class="w"> </span><span class="na">check_all=</span><span class="s">&quot;yes&quot;</span><span class="nt">&gt;</span>/tmp<span class="nt">&lt;/directories&gt;</span>
-<a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="w">  </span><span class="nt">&lt;directories</span><span class="w"> </span><span class="na">realtime=</span><span class="s">&quot;yes&quot;</span><span class="w"> </span><span class="na">check_all=</span><span class="s">&quot;yes&quot;</span><span class="nt">&gt;</span>/var/tmp<span class="nt">&lt;/directories&gt;</span>
-<a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a>
-<a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="w">  </span><span class="cm">&lt;!-- Ignore noisy files --&gt;</span>
-<a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/mtab<span class="nt">&lt;/ignore&gt;</span>
-<a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/hosts.deny<span class="nt">&lt;/ignore&gt;</span>
-<a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/mail/statistics<span class="nt">&lt;/ignore&gt;</span>
-<a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/random-seed<span class="nt">&lt;/ignore&gt;</span>
-<a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/random.seed<span class="nt">&lt;/ignore&gt;</span>
-<a id="__codelineno-13-29" name="__codelineno-13-29" href="#__codelineno-13-29"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/adjtime<span class="nt">&lt;/ignore&gt;</span>
-<a id="__codelineno-13-30" name="__codelineno-13-30" href="#__codelineno-13-30"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/httpd/logs<span class="nt">&lt;/ignore&gt;</span>
-<a id="__codelineno-13-31" name="__codelineno-13-31" href="#__codelineno-13-31"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/utmpx<span class="nt">&lt;/ignore&gt;</span>
-<a id="__codelineno-13-32" name="__codelineno-13-32" href="#__codelineno-13-32"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/wtmpx<span class="nt">&lt;/ignore&gt;</span>
-<a id="__codelineno-13-33" name="__codelineno-13-33" href="#__codelineno-13-33"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/cups/certs<span class="nt">&lt;/ignore&gt;</span>
-<a id="__codelineno-13-34" name="__codelineno-13-34" href="#__codelineno-13-34"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/dumpdates<span class="nt">&lt;/ignore&gt;</span>
-<a id="__codelineno-13-35" name="__codelineno-13-35" href="#__codelineno-13-35"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/svc/volatile<span class="nt">&lt;/ignore&gt;</span>
-<a id="__codelineno-13-36" name="__codelineno-13-36" href="#__codelineno-13-36"></a><span class="w">  </span><span class="nt">&lt;ignore</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;sregex&quot;</span><span class="nt">&gt;</span>.log$|.swp$<span class="nt">&lt;/ignore&gt;</span>
-<a id="__codelineno-13-37" name="__codelineno-13-37" href="#__codelineno-13-37"></a>
-<a id="__codelineno-13-38" name="__codelineno-13-38" href="#__codelineno-13-38"></a><span class="w">  </span><span class="nt">&lt;nodiff&gt;</span>/etc/ssl/private.key<span class="nt">&lt;/nodiff&gt;</span>
-<a id="__codelineno-13-39" name="__codelineno-13-39" href="#__codelineno-13-39"></a>
-<a id="__codelineno-13-40" name="__codelineno-13-40" href="#__codelineno-13-40"></a><span class="w">  </span><span class="nt">&lt;skip_nfs&gt;</span>yes<span class="nt">&lt;/skip_nfs&gt;</span>
-<a id="__codelineno-13-41" name="__codelineno-13-41" href="#__codelineno-13-41"></a><span class="w">  </span><span class="nt">&lt;skip_dev&gt;</span>yes<span class="nt">&lt;/skip_dev&gt;</span>
-<a id="__codelineno-13-42" name="__codelineno-13-42" href="#__codelineno-13-42"></a><span class="w">  </span><span class="nt">&lt;skip_proc&gt;</span>yes<span class="nt">&lt;/skip_proc&gt;</span>
-<a id="__codelineno-13-43" name="__codelineno-13-43" href="#__codelineno-13-43"></a><span class="w">  </span><span class="nt">&lt;skip_sys&gt;</span>yes<span class="nt">&lt;/skip_sys&gt;</span>
-<a id="__codelineno-13-44" name="__codelineno-13-44" href="#__codelineno-13-44"></a>
-<a id="__codelineno-13-45" name="__codelineno-13-45" href="#__codelineno-13-45"></a><span class="w">  </span><span class="nt">&lt;process_priority&gt;</span>10<span class="nt">&lt;/process_priority&gt;</span>
-<a id="__codelineno-13-46" name="__codelineno-13-46" href="#__codelineno-13-46"></a><span class="w">  </span><span class="nt">&lt;max_eps&gt;</span>50<span class="nt">&lt;/max_eps&gt;</span>
-<a id="__codelineno-13-47" name="__codelineno-13-47" href="#__codelineno-13-47"></a>
-<a id="__codelineno-13-48" name="__codelineno-13-48" href="#__codelineno-13-48"></a><span class="w">  </span><span class="nt">&lt;synchronization&gt;</span>
-<a id="__codelineno-13-49" name="__codelineno-13-49" href="#__codelineno-13-49"></a><span class="w">    </span><span class="nt">&lt;enabled&gt;</span>yes<span class="nt">&lt;/enabled&gt;</span>
-<a id="__codelineno-13-50" name="__codelineno-13-50" href="#__codelineno-13-50"></a><span class="w">    </span><span class="nt">&lt;interval&gt;</span>5m<span class="nt">&lt;/interval&gt;</span>
-<a id="__codelineno-13-51" name="__codelineno-13-51" href="#__codelineno-13-51"></a><span class="w">    </span><span class="nt">&lt;max_eps&gt;</span>10<span class="nt">&lt;/max_eps&gt;</span>
-<a id="__codelineno-13-52" name="__codelineno-13-52" href="#__codelineno-13-52"></a><span class="w">  </span><span class="nt">&lt;/synchronization&gt;</span>
-<a id="__codelineno-13-53" name="__codelineno-13-53" href="#__codelineno-13-53"></a><span class="nt">&lt;/syscheck&gt;</span>
+<a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="w">  </span><span class="cm">&lt;!-- If applicable --&gt;</span>
+<a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="w">  </span><span class="nt">&lt;directories</span><span class="w"> </span><span class="na">realtime=</span><span class="s">&quot;yes&quot;</span><span class="w"> </span><span class="na">report_changes=</span><span class="s">&quot;yes&quot;</span><span class="w"> </span><span class="na">check_all=</span><span class="s">&quot;yes&quot;</span><span class="nt">&gt;</span>/var/www<span class="nt">&lt;/directories&gt;</span>
+<a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="w">  </span><span class="nt">&lt;directories</span><span class="w"> </span><span class="na">realtime=</span><span class="s">&quot;yes&quot;</span><span class="w"> </span><span class="na">check_all=</span><span class="s">&quot;yes&quot;</span><span class="nt">&gt;</span>/tmp<span class="nt">&lt;/directories&gt;</span>
+<a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="w">  </span><span class="nt">&lt;directories</span><span class="w"> </span><span class="na">realtime=</span><span class="s">&quot;yes&quot;</span><span class="w"> </span><span class="na">check_all=</span><span class="s">&quot;yes&quot;</span><span class="nt">&gt;</span>/var/tmp<span class="nt">&lt;/directories&gt;</span>
+<a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a>
+<a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a><span class="w">  </span><span class="cm">&lt;!-- Ignore noisy files --&gt;</span>
+<a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/mtab<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/hosts.deny<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/mail/statistics<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/random-seed<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-13-29" name="__codelineno-13-29" href="#__codelineno-13-29"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/random.seed<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-13-30" name="__codelineno-13-30" href="#__codelineno-13-30"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/adjtime<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-13-31" name="__codelineno-13-31" href="#__codelineno-13-31"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/httpd/logs<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-13-32" name="__codelineno-13-32" href="#__codelineno-13-32"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/utmpx<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-13-33" name="__codelineno-13-33" href="#__codelineno-13-33"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/wtmpx<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-13-34" name="__codelineno-13-34" href="#__codelineno-13-34"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/cups/certs<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-13-35" name="__codelineno-13-35" href="#__codelineno-13-35"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/dumpdates<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-13-36" name="__codelineno-13-36" href="#__codelineno-13-36"></a><span class="w">  </span><span class="nt">&lt;ignore&gt;</span>/etc/svc/volatile<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-13-37" name="__codelineno-13-37" href="#__codelineno-13-37"></a><span class="w">  </span><span class="nt">&lt;ignore</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;sregex&quot;</span><span class="nt">&gt;</span>.log$|.swp$<span class="nt">&lt;/ignore&gt;</span>
+<a id="__codelineno-13-38" name="__codelineno-13-38" href="#__codelineno-13-38"></a>
+<a id="__codelineno-13-39" name="__codelineno-13-39" href="#__codelineno-13-39"></a><span class="w">  </span><span class="nt">&lt;nodiff&gt;</span>/etc/ssl/private.key<span class="nt">&lt;/nodiff&gt;</span>
+<a id="__codelineno-13-40" name="__codelineno-13-40" href="#__codelineno-13-40"></a>
+<a id="__codelineno-13-41" name="__codelineno-13-41" href="#__codelineno-13-41"></a><span class="w">  </span><span class="nt">&lt;skip_nfs&gt;</span>yes<span class="nt">&lt;/skip_nfs&gt;</span>
+<a id="__codelineno-13-42" name="__codelineno-13-42" href="#__codelineno-13-42"></a><span class="w">  </span><span class="nt">&lt;skip_dev&gt;</span>yes<span class="nt">&lt;/skip_dev&gt;</span>
+<a id="__codelineno-13-43" name="__codelineno-13-43" href="#__codelineno-13-43"></a><span class="w">  </span><span class="nt">&lt;skip_proc&gt;</span>yes<span class="nt">&lt;/skip_proc&gt;</span>
+<a id="__codelineno-13-44" name="__codelineno-13-44" href="#__codelineno-13-44"></a><span class="w">  </span><span class="nt">&lt;skip_sys&gt;</span>yes<span class="nt">&lt;/skip_sys&gt;</span>
+<a id="__codelineno-13-45" name="__codelineno-13-45" href="#__codelineno-13-45"></a>
+<a id="__codelineno-13-46" name="__codelineno-13-46" href="#__codelineno-13-46"></a><span class="w">  </span><span class="nt">&lt;process_priority&gt;</span>10<span class="nt">&lt;/process_priority&gt;</span>
+<a id="__codelineno-13-47" name="__codelineno-13-47" href="#__codelineno-13-47"></a><span class="w">  </span><span class="nt">&lt;max_eps&gt;</span>50<span class="nt">&lt;/max_eps&gt;</span>
+<a id="__codelineno-13-48" name="__codelineno-13-48" href="#__codelineno-13-48"></a>
+<a id="__codelineno-13-49" name="__codelineno-13-49" href="#__codelineno-13-49"></a><span class="w">  </span><span class="nt">&lt;synchronization&gt;</span>
+<a id="__codelineno-13-50" name="__codelineno-13-50" href="#__codelineno-13-50"></a><span class="w">    </span><span class="nt">&lt;enabled&gt;</span>yes<span class="nt">&lt;/enabled&gt;</span>
+<a id="__codelineno-13-51" name="__codelineno-13-51" href="#__codelineno-13-51"></a><span class="w">    </span><span class="nt">&lt;interval&gt;</span>5m<span class="nt">&lt;/interval&gt;</span>
+<a id="__codelineno-13-52" name="__codelineno-13-52" href="#__codelineno-13-52"></a><span class="w">    </span><span class="nt">&lt;max_eps&gt;</span>10<span class="nt">&lt;/max_eps&gt;</span>
+<a id="__codelineno-13-53" name="__codelineno-13-53" href="#__codelineno-13-53"></a><span class="w">  </span><span class="nt">&lt;/synchronization&gt;</span>
+<a id="__codelineno-13-54" name="__codelineno-13-54" href="#__codelineno-13-54"></a><span class="nt">&lt;/syscheck&gt;</span>
 </code></pre></div>
 <h3 id="why-each-part-was-changed-or-added">Why each part was changed or added</h3>
 <table>
@@ -2714,9 +2783,11 @@
 </code></pre></div>
 <hr />
 <h2 id="final-step-restart-and-verify-agent">Final Step — Restart and Verify Agent</h2>
+<p>Before restarting the agent, validate the configuration and review the agent log for configuration errors.</p>
 <p>Restart the agent to apply all five changes:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-agent
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-agent
 </code></pre></div>
+If the service does not start successfully, review the agent logs for configuration errors before proceeding.</p>
 <p>Verify the agent is running and connected:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>wazuh-agent
 </code></pre></div>
