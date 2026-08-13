@@ -1,5 +1,23 @@
 # IMPLEMENTATION GUIDE: AWS CLOUDTRAIL → S3 → SQS → LOGSTASH → WAZUH
 
+<!-- **Author:** Sai Krishna   -->
+**Version:** 1.0  
+<!-- **Created Date:** 2026-07-24  
+**Updated Date:** 2026-07-24 -->
+
+## Prerequisites
+
+Before starting, ensure:
+
+- AWS Account
+- CloudTrail permissions
+- S3 permissions
+- SQS permissions
+- SNS permissions (if required)
+- Logstash installed
+- Wazuh Manager installed
+- Network connectivity verified
+- Required AWS regions identified
 
 ## 1. AWS ACTIVITY LOGS COLLECTION
 
@@ -372,6 +390,10 @@ Usually below ₹100/month
 
 for testing environment.
 
+Costs vary by region, event volume, retention period, and AWS pricing at the time of deployment.
+
+Always verify current pricing using the AWS Pricing Calculator.
+
 ---
 
 ## 9. STEP 1: CREATE CLOUDTRAIL
@@ -496,7 +518,7 @@ CloudTrail starts writing logs like:
 Stored in S3 path like:
 
 ```
-s3://company-cloudtrail-logs/AWSLogs/account-id/CloudTrail/
+s3://<cloudtrail-bucket-name>/AWSLogs/account-id/CloudTrail/
 ```
 
 ---
@@ -559,7 +581,7 @@ Name: cloudtrail-new-file-notify
 Prefix: AWSLogs/
 Suffix: .json.gz
 Event types: s3:ObjectCreated:* (all create events)
-Destination: SQS queue → select cloudtrail-log-notifications
+Destination: SQS queue → select <sqs-queue-name>
 Save changes
 ```
 
@@ -567,7 +589,7 @@ Save changes
 
 ### **Challenge:**
 
-When I am trying to save the changes, it actually gives an error while saving, and the error is as follows:
+An error occurs when attempting to save the changes. The details of the error are provided below.
 
 ```
 Before Amazon S3 can publish messages to a destination, you must grant the Amazon S3
@@ -575,7 +597,7 @@ principal the necessary permissions to call the relevant API to publish messages
 SNS topic, an SQS queue, or a Lambda function. [Learn more](https://docs.aws.amazon.com/console/s3/notifications)
 ```
 
-and when I am trying to save the changes it gives the below error:
+When attempting to save the changes, the following error is displayed:
 
 ```
 Unknown Error
@@ -655,7 +677,7 @@ Prefix: AWSLogs/
 Suffix: .json.gz
 Event types: check s3:ObjectCreated (All)
 Destination: select SQS queue
-SQS queue: choose cloudtrail-log-notifications
+SQS queue: choose <sqs-queue-name>
 Click Save changes
 ```
 
@@ -703,8 +725,8 @@ Example:
         "s3:ListBucket"
       ],
       "Resource": [
-        "arn:aws:s3:::company-cloudtrail-logs",
-        "arn:aws:s3:::company-cloudtrail-logs/*"
+        "arn:aws:s3:::<cloudtrail-bucket-name>",
+        "arn:aws:s3:::<cloudtrail-bucket-name>/*"
       ]
     },
     {
@@ -714,7 +736,7 @@ Example:
         "sqs:DeleteMessage",
         "sqs:GetQueueAttributes"
       ],
-      "Resource": "arn:aws:sqs:REGION:ACCOUNT_ID:cloudtrail-log-notifications"
+      "Resource": "arn:aws:sqs:REGION:ACCOUNT_ID:<sqs-queue-name>"
     }
   ]
 }
@@ -759,7 +781,7 @@ SQS only contains a notification:
 
 ```json
 {
-  "bucket": "company-cloudtrail-logs",
+  "bucket": "<cloudtrail-bucket-name>",
   "key": "AWSLogs/file.json.gz"
 }
 ```
@@ -778,7 +800,7 @@ Then Logstash:
 
 ##### Meaning:
 
-I already have Logstash, and I have an existing config file with Azure Activity Log processing logic. Now I am just updating my existing config file logic with AWS logic, and my fully updated file is as follows:
+An existing Logstash configuration file was already in place with logic for processing Azure Activity Logs. The configuration has now been enhanced to include AWS log processing functionality. The updated configuration file contains both the existing Azure Activity Log processing logic and the newly added AWS processing logic.
 
 ### 15.1 Full Updated Config File
 
@@ -803,7 +825,7 @@ input {
     ]
     threads => 4
     decorate_events => true
-    consumer_group => "wazuh-consumer"
+    consumer_group => "<CONSUMER_GROUP_NAME>"
     storage_connection => "DefaultEndpointsProtocol=https;AccountName=XXXXXXXXXXXXXXX;AccountKey=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX==;EndpointSuffix=core.windows.net"
   }
 }
@@ -813,7 +835,7 @@ input {
   s3snssqs {
     region => "ap-south-1"
 
-    queue => "cloudtrail-log-notifications"
+    queue => "<sqs-queue-name>"
 
     access_key_id => "YOUR_AWS_ACCESS_KEY"
     secret_access_key => "YOUR_AWS_SECRET_KEY"
@@ -1068,7 +1090,7 @@ filter {
 # ============================================
 output {
   tcp {
-    host => "XXX.XXX.XX.43"
+    host => "<WAZUH_MANAGER_IP>"
     port => 9065
     codec => line { format => "%{message}" }
   }
@@ -1193,7 +1215,7 @@ Example rules:
 
 ### **Challenge:**
 
-When I restart Logstash it shows running when I check its status, but when I check with the `journalctl` command it is silently failing. It is due to the following reason:
+After restarting Logstash, the service appears to be running when verified using the service status command. However, a review of the logs through journalctl reveals that Logstash is encountering a silent failure during startup. The issue was identified by analyzing the journalctl logs, which exposed the underlying cause of the failure.
 
 Your IAM policy is MISSING:
 
@@ -1217,7 +1239,7 @@ Add this permission:
 
 ### **Solution:**
 
-I updated the IAM user policy as follows:
+The IAM user policy has been updated accordingly.
 
 #### 19.2 Updated IAM Policy
 
@@ -1246,17 +1268,21 @@ Use this FULL policy:
         "sqs:DeleteMessage",
         "sqs:GetQueueAttributes"
       ],
-      "Resource": "arn:aws:sqs:ap-south-1:XXXXXXXXXXXX:cloudtrail-log-notifications"
+      "Resource": "arn:aws:sqs:ap-south-1:XXXXXXXXXXXX:<sqs-queue-name>"
     }
   ]
 }
 ```
 
-After updating, I again restarted my Logstash. Now Logstash is running and I can't see any failure error when I run the `journalctl` command in the Logstash terminal.
+After applying the updates, Logstash was restarted successfully. The service is now running as expected, and no failure-related errors are observed in the Logstash logs when reviewed using the journalctl command.
 
 ### **Challenge:**
 
-After resolving the previous challenge, I am again facing another challenge saying "TypeError: no implicit conversion of nil into String", and this error is explained clearly as follows:
+After resolving the previous issue, another challenge has been encountered. The current error message is:
+
+TypeError: no implicit conversion of nil into String
+
+A detailed explanation of this error is provided below.
 
 **Main error:**
 
@@ -1420,13 +1446,13 @@ Go:
 
 ```
 SNS
-→ cloudtrail-topic
+→ <sns-topic-name>
 → Create Subscription
 ```
 
 Protocol: `Amazon SQS`
 
-Endpoint: `cloudtrail-log-notifications`
+Endpoint: `<sqs-queue-name>`
 
 ##### Step 3: Update SQS Access Policy
 
@@ -1447,10 +1473,10 @@ Add SNS permission:
         "Service": "sns.amazonaws.com"
       },
       "Action": "SQS:SendMessage",
-      "Resource": "arn:aws:sqs:ap-south-1:XXXXXXXXXXXX:cloudtrail-log-notifications",
+      "Resource": "arn:aws:sqs:ap-south-1:XXXXXXXXXXXX:<sqs-queue-name>",
       "Condition": {
         "ArnEquals": {
-          "aws:SourceArn": "arn:aws:sns:ap-south-1:XXXXXXXXXXXX:cloudtrail-topic"
+          "aws:SourceArn": "arn:aws:sns:ap-south-1:XXXXXXXXXXXX:<sns-topic-name>"
         }
       }
     }
@@ -1475,7 +1501,7 @@ S3
 
 Destination: `SNS Topic`
 
-**Choose:** `cloudtrail-topic`
+**Choose:** `<sns-topic-name>`
 
 ##### Step 5: Purge Queue Again
 
@@ -1508,11 +1534,15 @@ WITHOUT errors.
 
 #### 19.13 Result
 
-Now Logstash is processing AWS CloudTrail logs, and I can verify those in the Logstash terminal using the `sudo journalctl -u logstash -f | grep "AWSCloudTrail"` command, and the result looks as follows:
+Logstash is successfully processing AWS CloudTrail logs. The ingestion and processing status can be verified by monitoring the Logstash service logs using the following command:
+
+sudo journalctl -u logstash -f | grep "AWSCloudTrail"
+
+A successful configuration will display AWS CloudTrail-related log entries in the output, confirming that Logstash is receiving and processing the CloudTrail events as expected.
 
 ![Image 2](<../../../assets/images/POC's/Sai krishna/Implementation_Guide_AWS_CloudTrail_S3_SQS_Logstash_Wazuh/image2.png>)
 
-For these different types of event logs, I extended my custom rule file with more rules to trigger alerts for many event logs.
+To ensure broader event coverage and alerting capabilities, the custom rule file was enhanced with additional rules designed to generate alerts for various types of event logs.
 
 Wazuh Manager custom rules to trigger alerts for incoming AWS CloudTrail logs are as follows.
 

@@ -1,0 +1,2243 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Production implementation guide for multi-tenant Wazuh MSSP on single-node Docker">
+      
+      
+      
+      
+        <link rel="prev" href="../../MySQL_Log_Monitoring_Using_Wazuh_Agent/MySQL_Log_Monitoring_Using_Wazuh_Agent/">
+      
+      
+        <link rel="next" href="../../../Sai%20Krishna/Implementation%20Process%20to%20Monitor%20Filebeat%20Health/Implementation_Process_to_Monitor_Filebeat_Health/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Wazuh_Agent_Log_Buffering_and_Resynchronization - Wazuh MSSP Multi-Tenant Implementation Guide</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../../stylesheets/responsive-nav.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#wazuh-agent-log-buffering-and-resynchronization-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-header__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Wazuh MSSP Multi-Tenant Implementation Guide
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Wazuh_Agent_Log_Buffering_and_Resynchronization
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-nav__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    Wazuh MSSP Multi-Tenant Implementation Guide
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../01-Getting_started/Getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment & Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment & Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../02-index-template-filebeat/index_template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index Template & Filebeat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../04-agent-configuration/agent_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & Access
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Security & Access
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../06-rbac/rbac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RBAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../07-dls/dls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Document Level Security (DLS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../08-sso-entra/sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSO - Microsoft Entra ID
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster and Index Verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../10-reference/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC's
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    POC's
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GitHub_Webhook_to_Logstash/GitHub_Webhook_to_Logstash_POC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub_Webhook_to_Logstash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Wazuh%20Rules-as-Code%20Implementation%20Guide/Wazuh%20Rules-as-Code%20Implementation%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Rules-as-Code Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Windows Agent Deployment & Security Detection logs Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../NetFlowlogs_to_Logstash_and_Wazuh_Indexer/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetFlowlogs_to_Logstash_and_Wazuh_Indexer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/XDR%20Implementation%20Process/XDR%20Implementation%20Process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XDR Implementation Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Second%20use%20case%20of%20XDR/Second%20use%20case%20of%20XDR/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Second use case of XDR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Pipelines_and_Challenges/Pipelines_and_Challenges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipelines_and_Challenges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jira API → Logstash → Wazuh Integration for Non-Agent Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LOGSTASH PIPELINE WORKERS & BATCHSIZE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/GitHub_Logstash_Wazuh_NonAgent_Implementation/GitHub_Logstash_Wazuh_NonAgent_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Logstash Wazuh NonAgent Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MySQL_Log_Monitoring_Using_Wazuh_Agent/MySQL_Log_Monitoring_Using_Wazuh_Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MySQL_Log_Monitoring_Using_Wazuh_Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Agent_Log_Buffering_and_Resynchronization
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Agent_Log_Buffering_and_Resynchronization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Objective
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-important-behavior-during-wazuh-manager-downtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Important Behavior During Wazuh Manager Downtime
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-recommended-buffer-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Recommended Buffer Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Recommended Buffer Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-description" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Description
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#important-sizing-note" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Important Sizing Note
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Process%20to%20Monitor%20Filebeat%20Health/Implementation_Process_to_Monitor_Filebeat_Health/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor Filebeat Health
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20AWS%20CloudTrail%20%E2%86%92%20S3%20%E2%86%92%20SQS%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh/Implementation_Guide_AWS_CloudTrail_S3_SQS_Logstash_Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide AWS CloudTrail → S3 → SQS → Logstash → Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Prometheus/Prometheus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prometheus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/SOC%20Logstash%20Multi-Pipeline%20Architecture%20Implementation%20Guide/SOC_Logstash_Multi_Pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Multi-Pipeline Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/SOC%20Logstash%20Pipeline-to-Pipeline%20%28P2P%29%20Architecture%20Implementation%20Guide/SOC_Logstash_P2P/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Wazuh_Multi_Tenant_MSSP_Implementation/Wazuh_Multi_Tenant_MSSP_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Multi_Tenant_MSSP_Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/Wazuh%20Multi%20Node%20Runbook/Wazuh%20Multi%20Node%20Runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Multi Node Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Availability Log Ingestion Pipeline Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zero Downtime Group Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operating System Based Group Creation in Wazuh GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Objective
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-important-behavior-during-wazuh-manager-downtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Important Behavior During Wazuh Manager Downtime
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-recommended-buffer-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Recommended Buffer Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Recommended Buffer Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-description" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Description
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#important-sizing-note" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Important Sizing Note
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="wazuh-agent-log-buffering-and-resynchronization-guide">Wazuh Agent Log Buffering and Resynchronization Guide</h1>
+<h2 id="1-objective">1. Objective</h2>
+<p>This document explains how Wazuh agents handle log events when the Wazuh Manager is unavailable and how to configure the agent-side buffer on Linux and Windows endpoints.</p>
+<p>The objective is to retain a larger number of events in the Wazuh agent memory buffer during a temporary Wazuh Manager outage and send the queued events after the Manager becomes available again.</p>
+<hr />
+<h2 id="2-important-behavior-during-wazuh-manager-downtime">2. Important Behavior During Wazuh Manager Downtime</h2>
+<p>Wazuh agents use an in-memory leaky bucket buffer when the Wazuh Manager is unavailable.</p>
+<p>By default, the client-side buffer is configured as follows:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Queue size: 5000 events
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Events per second: 500 events/second
+</code></pre></div>
+<p>When the Wazuh Manager goes offline:</p>
+<ol>
+<li>The Wazuh agent detects that the Manager is unavailable.</li>
+<li>The agent continues attempting to reconnect to the Wazuh Manager.</li>
+<li>Events already stored in the agent buffer remain queued.</li>
+<li>When the Manager becomes available, the agent sends queued events at the configured rate.in FIFO order</li>
+<li>The agent sends events at a throttled rate to avoid flooding the Wazuh Manager.</li>
+</ol>
+<p>The Wazuh agent buffer is stored in memory only.</p>
+<p>This means:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>The agent does not store an unlimited queue of logs on disk.
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>The agent cannot replay logs that were discarded after the memory buffer became full.
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>The agent cannot recover events after the Wazuh agent service is restarted while the Manager is unavailable.
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>The agent cannot recover events after the endpoint is restarted while the Manager is unavailable.
+</code></pre></div>
+<p>When the configured queue becomes full, newly generated events can be discarded because the agent cannot keep an unlimited amount of data in memory.</p>
+<p>For long Wazuh Manager outages, increasing the agent buffer can reduce log loss. However, it does not provide unlimited log retention.</p>
+<hr />
+<h2 id="3-architecture">3. Architecture</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Linux / Windows Endpoint
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>        |
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>        | Wazuh Agent collects logs
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        v
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>Wazuh Agent Client Buffer
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        |
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        | Wazuh Manager unavailable
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        | Events remain queued in memory
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        v
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>Wazuh Manager restored
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        |
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        | Agent reconnects
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        | Queued events are sent
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>        v
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>Wazuh Manager
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>        |
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>        v
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>Wazuh Indexer
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>        |
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>        v
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>Wazuh Dashboard Discover
+</code></pre></div>
+<hr />
+<h2 id="4-recommended-buffer-configuration">4. Recommended Buffer Configuration</h2>
+<p>The following configuration is recommended for a proof of concept or moderate-volume endpoint:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">&lt;client_buffer&gt;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">&lt;disabled&gt;</span>no<span class="nt">&lt;/disabled&gt;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">&lt;queue_size&gt;</span>100000<span class="nt">&lt;/queue_size&gt;</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">&lt;events_per_second&gt;</span>1000<span class="nt">&lt;/events_per_second&gt;</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nt">&lt;/client_buffer&gt;</span>
+</code></pre></div>
+<h3 id="configuration-description">Configuration Description</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;disabled&gt;</code></td>
+<td>Enables or disables the agent-side client buffer</td>
+</tr>
+<tr>
+<td><code>&lt;queue_size&gt;</code></td>
+<td>Maximum number of events stored in the Wazuh agent memory buffer</td>
+</tr>
+<tr>
+<td><code>&lt;events_per_second&gt;</code></td>
+<td>Maximum rate at which queued events are sent to the Wazuh Manager after recovery</td>
+</tr>
+</tbody>
+</table>
+<h3 id="important-sizing-note">Important Sizing Note</h3>
+<p>A larger queue uses more endpoint memory.</p>
+<p>Do not use a very large queue without validating memory usage and expected event volume. The correct queue size depends on:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Average events per second generated by the endpoint
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>Expected Wazuh Manager outage duration
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>Available endpoint memory
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>Number of agents reconnecting at the same time
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>Wazuh Manager processing capacity
+</code></pre></div>
+<p>Example calculation:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Average event rate: 10 events per second
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>Expected outage duration: 2 hours
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>Required events:
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>10 × 60 × 60 × 2 = 72,000 events
+</code></pre></div>
+<p>For this example, a queue size of <code>100000</code> events provides a reasonable buffer.</p>
+<hr />
+<h1 id="part-a-configure-client-buffer-on-linux-wazuh-agent">Part A — Configure Client Buffer on Linux Wazuh Agent</h1>
+<h2 id="step-1-connect-to-the-linux-endpoint">Step 1: Connect to the Linux Endpoint</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ssh<span class="w"> </span>&lt;username&gt;@&lt;LINUX_AGENT_IP&gt;
+</code></pre></div>
+<hr />
+<h2 id="step-2-check-wazuh-agent-status">Step 2: Check Wazuh Agent Status</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>wazuh-agent
+</code></pre></div>
+<p>Expected status:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Active: active (running)
+</code></pre></div>
+<hr />
+<h2 id="step-3-back-up-the-wazuh-agent-configuration">Step 3: Back Up the Wazuh Agent Configuration</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sudo<span class="w"> </span>cp<span class="w"> </span>/var/ossec/etc/ossec.conf<span class="w"> </span>/var/ossec/etc/ossec.conf.backup
+</code></pre></div>
+<hr />
+<h2 id="step-4-open-the-wazuh-agent-configuration-file">Step 4: Open the Wazuh Agent Configuration File</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/var/ossec/etc/ossec.conf
+</code></pre></div>
+<hr />
+<h2 id="step-5-add-or-update-the-client-buffer-configuration">Step 5: Add or Update the Client Buffer Configuration</h2>
+<p>Inside the <code>&lt;ossec_config&gt;</code> section, add the following configuration.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">&lt;client_buffer&gt;</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&lt;disabled&gt;</span>no<span class="nt">&lt;/disabled&gt;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">&lt;queue_size&gt;</span>100000<span class="nt">&lt;/queue_size&gt;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">&lt;events_per_second&gt;</span>1000<span class="nt">&lt;/events_per_second&gt;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="nt">&lt;/client_buffer&gt;</span>
+</code></pre></div>
+<p>Example placement:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">&lt;ossec_config&gt;</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">&lt;client&gt;</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="nt">&lt;server&gt;</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">      </span><span class="nt">&lt;address&gt;&lt;WAZUH_MANAGER_IP&gt;&lt;/address&gt;</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">      </span><span class="nt">&lt;port&gt;</span>1514<span class="nt">&lt;/port&gt;</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">      </span><span class="nt">&lt;protocol&gt;</span>tcp<span class="nt">&lt;/protocol&gt;</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="nt">&lt;/server&gt;</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">  </span><span class="nt">&lt;/client&gt;</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">  </span><span class="nt">&lt;client_buffer&gt;</span>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">    </span><span class="nt">&lt;disabled&gt;</span>no<span class="nt">&lt;/disabled&gt;</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">    </span><span class="nt">&lt;queue_size&gt;</span>100000<span class="nt">&lt;/queue_size&gt;</span>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">    </span><span class="nt">&lt;events_per_second&gt;</span>1000<span class="nt">&lt;/events_per_second&gt;</span>
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="w">  </span><span class="nt">&lt;/client_buffer&gt;</span>
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="nt">&lt;/ossec_config&gt;</span>
+</code></pre></div>
+<p>Save the file and exit.</p>
+<hr />
+<h2 id="step-6-restart-the-wazuh-agent">Step 6: Restart the Wazuh Agent</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-agent
+</code></pre></div>
+<hr />
+<h2 id="step-7-verify-wazuh-agent-status">Step 7: Verify Wazuh Agent Status</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>wazuh-agent
+</code></pre></div>
+<hr />
+<h2 id="step-8-check-the-wazuh-agent-log">Step 8: Check the Wazuh Agent Log</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-f<span class="w"> </span>/var/ossec/logs/ossec.log
+</code></pre></div>
+<p>Confirm that the agent starts without configuration errors.</p>
+<hr />
+<h1 id="part-b-configure-client-buffer-on-windows-wazuh-agent">Part B — Configure Client Buffer on Windows Wazuh Agent</h1>
+<h2 id="step-9-log-in-to-the-windows-endpoint">Step 9: Log In to the Windows Endpoint</h2>
+<p>Log in to the Windows server using an account with Administrator privileges.</p>
+<hr />
+<h2 id="step-10-open-wazuh-agent-configuration-file">Step 10: Open Wazuh Agent Configuration File</h2>
+<p>Open the following file from powershell  "run as Administrator":
+it will open in notepad,make changes and enter "ctrl+s"to save</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>notepad &quot;C:\Program Files (x86)\ossec-agent\ossec.conf&quot;
+</code></pre></div>
+<p>If the Wazuh agent is installed in a different directory, locate the <code>ossec.conf</code> file inside the Wazuh agent installation directory.</p>
+<hr />
+<h2 id="step-11-back-up-the-wazuh-agent-configuration">Step 11: Back Up the Wazuh Agent Configuration</h2>
+<p>Open Command Prompt as Administrator and run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>copy &quot;C:\Program Files (x86)\ossec-agent\ossec.conf&quot; &quot;C:\Program Files (x86)\ossec-agent\ossec.conf.backup&quot;
+</code></pre></div>
+<hr />
+<h2 id="step-12-add-or-update-the-client-buffer-configuration">Step 12: Add or Update the Client Buffer Configuration</h2>
+<p>Inside the <code>&lt;ossec_config&gt;</code> section, add the following configuration.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nt">&lt;client_buffer&gt;</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="nt">&lt;disabled&gt;</span>no<span class="nt">&lt;/disabled&gt;</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="nt">&lt;queue_size&gt;</span>100000<span class="nt">&lt;/queue_size&gt;</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span><span class="nt">&lt;events_per_second&gt;</span>1000<span class="nt">&lt;/events_per_second&gt;</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="nt">&lt;/client_buffer&gt;</span>
+</code></pre></div>
+<p>Example placement:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nt">&lt;ossec_config&gt;</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span><span class="nt">&lt;client&gt;</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">    </span><span class="nt">&lt;server&gt;</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">      </span><span class="nt">&lt;address&gt;&lt;WAZUH_MANAGER_IP&gt;&lt;/address&gt;</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">      </span><span class="nt">&lt;port&gt;</span>1514<span class="nt">&lt;/port&gt;</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">      </span><span class="nt">&lt;protocol&gt;</span>tcp<span class="nt">&lt;/protocol&gt;</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">    </span><span class="nt">&lt;/server&gt;</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">  </span><span class="nt">&lt;/client&gt;</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">  </span><span class="nt">&lt;client_buffer&gt;</span>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">    </span><span class="nt">&lt;disabled&gt;</span>no<span class="nt">&lt;/disabled&gt;</span>
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="w">    </span><span class="nt">&lt;queue_size&gt;</span>100000<span class="nt">&lt;/queue_size&gt;</span>
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="w">    </span><span class="nt">&lt;events_per_second&gt;</span>1000<span class="nt">&lt;/events_per_second&gt;</span>
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="w">  </span><span class="nt">&lt;/client_buffer&gt;</span>
+<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a>
+<a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a><span class="nt">&lt;/ossec_config&gt;</span>
+</code></pre></div>
+<p>Save the file.</p>
+<hr />
+<h2 id="step-13-restart-wazuh-agent-service-on-windows">Step 13: Restart Wazuh Agent Service on Windows</h2>
+<p>Open Command Prompt as Administrator and run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>net stop WazuhSvc
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>net start WazuhSvc
+</code></pre></div>
+<p>Alternatively, use PowerShell as Administrator:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nb">Restart-Service</span> <span class="n">-Name</span> <span class="n">WazuhSvc</span>
+</code></pre></div>
+<hr />
+<h2 id="step-14-verify-wazuh-agent-service-status">Step 14: Verify Wazuh Agent Service Status</h2>
+<p>Open PowerShell as Administrator and run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nb">Get-Service</span> <span class="n">-Name</span> <span class="n">WazuhSvc</span>
+</code></pre></div>
+<p>Expected result:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>Status   Name      DisplayName
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>------   ----      -----------
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>Running  WazuhSvc  Wazuh
+</code></pre></div>
+<hr />
+<h2 id="step-15-check-wazuh-agent-logs-on-windows">Step 15: Check Wazuh Agent Logs on Windows</h2>
+<p>Open  PowerShell run as administrator:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="nb">Get-Content</span> <span class="s2">&quot;C:\Program Files (x86)\ossec-agent\ossec.log&quot;</span> <span class="n">-Tail</span> <span class="n">50</span>
+</code></pre></div>
+<p>Confirm that the Wazuh agent starts without configuration errors.</p>
+<hr />
+<h1 id="part-c-test-wazuh-manager-outage-and-recovery">Part C — Test Wazuh Manager Outage and Recovery</h1>
+<h2 id="step-16-confirm-agent-is-connected-before-testing">Step 16: Confirm Agent Is Connected Before Testing</h2>
+<p>On the Wazuh Manager, verify that the agent is active.</p>
+<p>For a Docker-based Wazuh Manager:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>single-node-wazuh.manager-1<span class="w"> </span>/var/ossec/bin/agent_control<span class="w"> </span>-l
+</code></pre></div>
+<p>For a directly installed Wazuh Manager:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>sudo<span class="w"> </span>/var/ossec/bin/agent_control<span class="w"> </span>-l
+</code></pre></div>
+<p>Confirm that the target agent status is <code>Active</code>.</p>
+<hr />
+<h2 id="step-17-stop-wazuh-manager">Step 17: Stop Wazuh Manager</h2>
+<p>If the Wazuh Manager is running in Docker:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>docker<span class="w"> </span>stop<span class="w"> </span>single-node-wazuh.manager-1
+</code></pre></div>
+<p>If the Wazuh Manager is installed directly on the operating system:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>stop<span class="w"> </span>wazuh-manager
+</code></pre></div>
+<hr />
+<h2 id="step-18-generate-events-while-the-manager-is-offline">Step 18: Generate Events While the Manager Is Offline</h2>
+<h3 id="linux-test-event">Linux Test Event</h3>
+<p>On the Linux endpoint, run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>logger<span class="w"> </span><span class="s2">&quot;WAZUH_MANAGER_OUTAGE_TEST_LINUX&quot;</span>
+</code></pre></div>
+<p>Generate multiple events:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">for</span><span class="w"> </span>i<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">{</span><span class="m">1</span>..100<span class="o">}</span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span>logger<span class="w"> </span><span class="s2">&quot;WAZUH_MANAGER_OUTAGE_TEST_LINUX_</span><span class="nv">$i</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">done</span>
+</code></pre></div>
+<h3 id="windows-test-event">Windows Test Event</h3>
+<p>Open PowerShell as Administrator and run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nb">New-EventLog</span> <span class="n">-LogName</span> <span class="n">Application</span> <span class="n">-Source</span> <span class="s2">&quot;WazuhTest&quot;</span>
+</code></pre></div>
+<p>Generate multiple events:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nb">Write-EventLog</span> <span class="n">-LogName</span> <span class="n">Application</span> <span class="n">-Source</span> <span class="s2">&quot;WazuhTest&quot;</span> <span class="n">-EventId</span> <span class="n">1001</span> <span class="n">-EntryType</span> <span class="n">Information</span> <span class="n">-Message</span> <span class="s2">&quot;WAZUH_MANAGER_OUTAGE_TEST_WINDOWS&quot;</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="p">}</span>
+</code></pre></div>
+<blockquote>
+<p>run the above command multiple times</p>
+</blockquote>
+<hr />
+<h2 id="step-19-check-agent-logs-during-manager-downtime">Step 19: Check Agent Logs During Manager Downtime</h2>
+<h3 id="linux">Linux</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-f<span class="w"> </span>/var/ossec/logs/ossec.log
+</code></pre></div>
+<h3 id="windows">Windows</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="nb">Get-Content</span> <span class="s2">&quot;C:\Program Files (x86)\ossec-agent\ossec.log&quot;</span> <span class="n">-Wait</span>
+</code></pre></div>
+<p>The agent log should show connection attempts or communication errors while the Wazuh Manager is unavailable.</p>
+<hr />
+<h2 id="step-20-restore-wazuh-manager">Step 20: Restore Wazuh Manager</h2>
+<p>If the Wazuh Manager is running in Docker:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>docker<span class="w"> </span>start<span class="w"> </span>single-node-wazuh.manager-1
+</code></pre></div>
+<p>If the Wazuh Manager is installed directly on the operating system:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>wazuh-manager
+</code></pre></div>
+<hr />
+<h2 id="step-21-confirm-agent-reconnects">Step 21: Confirm Agent Reconnects</h2>
+<p>On the Wazuh Manager, run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>single-node-wazuh.manager-1<span class="w"> </span>/var/ossec/bin/agent_control<span class="w"> </span>-l
+</code></pre></div>
+<p>For a directly installed Wazuh Manager:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>sudo<span class="w"> </span>/var/ossec/bin/agent_control<span class="w"> </span>-l
+</code></pre></div>
+<p>Confirm that the agent status changes back to <code>Active</code>.</p>
+<hr />
+<h2 id="step-22-verify-queued-events-are-sent">Step 22: Verify Queued Events Are Sent</h2>
+<h3 id="linux-agent">Linux Agent</h3>
+<p>On the Wazuh Manager:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>single-node-wazuh.manager-1<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;grep -i &quot;WAZUH_MANAGER_OUTAGE_TEST_LINUX&quot; /var/ossec/logs/alerts/alerts.json | tail -n 20&#39;</span>
+</code></pre></div>
+<h3 id="windows-agent">Windows Agent</h3>
+<p>On the Wazuh Manager:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>single-node-wazuh.manager-1<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;grep -i &quot;WAZUH_MANAGER_OUTAGE_TEST_WINDOWS&quot; /var/ossec/logs/alerts/alerts.json | tail -n 20&#39;</span>
+</code></pre></div>
+<p>If the Wazuh Manager is installed directly on the operating system:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>sudo<span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;WAZUH_MANAGER_OUTAGE_TEST_LINUX&quot;</span><span class="w"> </span>/var/ossec/logs/alerts/alerts.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">20</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>sudo<span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;WAZUH_MANAGER_OUTAGE_TEST_WINDOWS&quot;</span><span class="w"> </span>/var/ossec/logs/alerts/alerts.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">20</span>
+</code></pre></div>
+<hr />
+<h1 id="part-d-verify-events-in-wazuh-dashboard">Part D — Verify Events in Wazuh Dashboard</h1>
+<h2 id="step-23-open-wazuh-dashboard-discover">Step 23: Open Wazuh Dashboard Discover</h2>
+<p>Navigate to:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>Discover
+</code></pre></div>
+<p>Select the index pattern:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>wazuh-alerts-*
+</code></pre></div>
+<p>Set the time range to include the outage and recovery test period.</p>
+<hr />
+<h2 id="step-24-search-for-linux-test-events">Step 24: Search for Linux Test Events</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>full_log: &quot;WAZUH_MANAGER_OUTAGE_TEST_LINUX&quot;
+</code></pre></div>
+<hr />
+<h2 id="step-25-search-for-windows-test-events">Step 25: Search for Windows Test Events</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>full_log: &quot;WAZUH_MANAGER_OUTAGE_TEST_WINDOWS&quot;
+</code></pre></div>
+<hr />
+<h1 id="part-e-important-limitations">Part E — Important Limitations</h1>
+<h2 id="1-there-is-no-manual-full-resynchronization-of-historical-logs">1. There Is No Manual Full Resynchronization of Historical Logs</h2>
+<p>Wazuh does not provide a command to force an agent to resend all historical local log files after a Wazuh Manager outage.</p>
+<p>The agent forwards events while monitoring files. It does not maintain a permanent disk-based copy of every event for later upload.</p>
+<hr />
+<h2 id="2-the-client-buffer-is-memory-based">2. The Client Buffer Is Memory-Based</h2>
+<p>The client buffer is stored in memory.</p>
+<p>If the Wazuh agent service is restarted during a Manager outage, queued events can be lost.</p>
+<p>If the endpoint is restarted during a Manager outage, queued events can be lost.</p>
+<hr />
+<h2 id="3-events-can-be-lost-when-the-queue-is-full">3. Events Can Be Lost When the Queue Is Full</h2>
+<p>If the Wazuh Manager outage lasts longer than the configured buffer capacity, the Wazuh agent can discard new events.</p>
+<p>Increasing <code>&lt;queue_size&gt;</code> reduces the chance of loss but does not eliminate it for long outages or high-volume endpoints.</p>
+<hr />
+<h2 id="4-recovery-rate-must-be-controlled">4. Recovery Rate Must Be Controlled</h2>
+<p>After the Wazuh Manager becomes available, many agents can reconnect at the same time.</p>
+<p>A very high <code>&lt;events_per_second&gt;</code> value can overload the Wazuh Manager, Wazuh Indexer, or network.</p>
+<p>Use a controlled value such as:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="nt">&lt;events_per_second&gt;</span>1000<span class="nt">&lt;/events_per_second&gt;</span>
+</code></pre></div>
+<p>Increase this value only after validating Wazuh Manager CPU, memory, queue usage, and Indexer performance.</p>
+<hr />
+<h1 id="part-f-production-recommendations">Part F — Production Recommendations</h1>
+<ol>
+<li>
+<p>Size the <code>&lt;queue_size&gt;</code> value based on expected event rate and maximum acceptable Wazuh Manager outage duration.</p>
+</li>
+<li>
+<p>Keep the Wazuh Manager highly available where possible.</p>
+</li>
+<li>
+<p>Monitor Wazuh Manager health, agent connectivity, CPU, memory, disk usage, and queue utilization.</p>
+</li>
+<li>
+<p>Do not restart Wazuh agents during a Wazuh Manager outage unless necessary, because queued in-memory events can be lost.</p>
+</li>
+<li>
+<p>Do not restart endpoints during a Wazuh Manager outage unless necessary, because queued in-memory events can be lost.</p>
+</li>
+<li>
+<p>Use a separate durable log collection architecture, such as Filebeat with Logstash, Kafka, or another disk-backed log shipper, when the requirement is guaranteed delivery during multi-hour or multi-day Wazuh Manager outages.</p>
+</li>
+<li>
+<p>Test the selected queue size in the actual environment before production rollout.</p>
+</li>
+<li>
+<p>Use Wazuh client buffer configuration to reduce temporary event loss, but do not treat it as a replacement for durable disk-based log buffering.</p>
+</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.top", "navigation.tracking", "navigation.indexes", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

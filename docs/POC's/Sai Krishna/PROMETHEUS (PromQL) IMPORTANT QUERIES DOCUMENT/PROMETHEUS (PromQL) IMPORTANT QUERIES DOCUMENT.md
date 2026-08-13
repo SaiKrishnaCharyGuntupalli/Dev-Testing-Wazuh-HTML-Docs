@@ -1,3 +1,21 @@
+
+<!-- **Author:** Sai Krishna   -->
+**Version:** 1.0  
+<!-- **Created Date:** 2026-07-24  
+**Updated Date:** 2026-07-24 -->
+
+## Prerequisites
+
+- Prometheus installed and running
+- Node Exporter installed and configured
+- Target nodes successfully scraped
+- Metrics visible in Prometheus
+- PromQL access available through Prometheus UI or Grafana
+
+## Metric Source
+
+All queries in this document assume metrics are collected from Node Exporter and stored in Prometheus.
+
 ### 1. CPU QUERIES
 
 #### 1.1 Total CPU Cores
@@ -386,7 +404,7 @@ Returns data for last 1 hour
 
 ---
 
-### 7. BONUS (VERY USEFUL)
+### 7. Additional Useful Queries
 
 #### System Load
 
@@ -394,7 +412,7 @@ Returns data for last 1 hour
 node_load1
 ```
 
-System load
+System load average over the last 1 minute
 
 #### Disk Read Speed
 

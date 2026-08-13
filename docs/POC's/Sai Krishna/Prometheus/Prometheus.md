@@ -1,6 +1,18 @@
 # PROMETHEUS 
 
-## 1. WHAT IS PROMETHEUS?
+<!-- **Author:** Sai Krishna   -->
+**Version:** 1.0  
+<!-- **Created Date:** 2026-07-24  
+**Updated Date:** 2026-07-24 -->
+
+## Prerequisites
+  - A Linux VM (Ubuntu/RHEL) with `sudo` access and outbound internet access
+  - Firewall/security-group rules allowing inbound traffic to ports 9090 (Prometheus),
+    9100 (Node Exporter), 9093 (Alertmanager), and 3000 (Grafana) from trusted sources only
+  - Network routing between the Prometheus VM and any monitored VM's Node Exporter port
+  - A Windows machine requires `windows_exporter` instead of Node Exporter
+
+## 1. What Is Prometheus?
 
 **Prometheus** is an **open-source monitoring and alerting tool** mainly used to track system performance like:
 
@@ -157,11 +169,11 @@ http://<Manager_VM_IP>:9090
 
 ##### **Challenge:**
 
-When I run the Step 1 command, I faced an issue related to the version.
+While executing the command in Step 1, a version-related issue was encountered.
 
 ##### **Solution:**
 
-I found a stable version, then downloaded that stable version and followed the above process.
+A stable release was identified and downloaded, and the installation/configuration process was completed by following the steps outlined above.
 
 **Working link:**
 
@@ -206,11 +218,11 @@ http://<IP>:9100/metrics
 
 ##### **Challenge:**
 
-When I run the Step 1 command, I faced an issue related to the version.
+While executing the command in Step 1, a version-related issue was encountered.
 
 ##### **Solution:**
 
-I found a stable version, then downloaded that stable version and followed the above process.
+A stable version was identified and downloaded, and the implementation process was completed by following the steps outlined above.
 
 **Working link:**
 
@@ -248,11 +260,11 @@ pkill prometheus
 
 ##### **Challenge:**
 
-In my case, when I tried to configure Node Exporter with Prometheus in the `prometheus.yml` file, I faced a firewall-related issue because my Prometheus and Node Exporter are in different subnets under the same private network.
+When configuring Node Exporter with Prometheus in the prometheus.yml file, connectivity issues may occur if the Prometheus server and Node Exporter instance are located in different network segments or subnets. In such cases, firewall rules and network access controls should be reviewed to ensure that Prometheus can successfully reach the Node Exporter endpoint.
 
 ##### **Solution:**
 
-I took the help of a DevOps engineer, and he implemented routing between them to make them communicate with each other. After that it worked fine, and I could see the data in my browser.
+A DevOps engineer configured the necessary routing between the services to enable communication. Once the routing was established, the integration functioned correctly, and the data became accessible through the browser.
 
 ---
 
@@ -652,7 +664,9 @@ After 15 days (default) → Old blocks DELETED
 | Default retention period | **15 days** |
 | Your setup (no custom flag set) | **15 days** |
 
-Since your Prometheus started on **Apr 2** and today is **Apr 7**, you have **~5 days of data** stored right now.
+For example, if Prometheus has been running for 5 days and no custom retention flag was
+  set, you would have approximately 5 days of data stored (since 5 days < the 15-day default
+  retention window).
 
 ### 14.5 What Happens to Old Data After Retention?
 
@@ -1345,11 +1359,11 @@ You'll see all active/resolved alerts here.
 
 ### **Challenge:**
 
-I faced a challenge in the notification part — in the UI I could see the generated alerts, but I couldn't receive any email notification in my Gmail inbox.
+A challenge was encountered with the notification functionality. Although the generated alerts were successfully displayed in the user interface, email notifications were not being delivered to the configured Gmail inbox.
 
 ### **Solution:**
 
-Then I modified the `alertmanager.yml` file with the below new configuration:
+The alertmanager.yml file was updated with the following configuration:
 
 ```yaml
 global:
@@ -1374,17 +1388,17 @@ receivers:
         send_resolved: true
 ```
 
-Then I followed the same running process, and I tested the implementation, and I successfully received the email notification when the instance was down:
+Following the implementation procedure, the solution was executed and validated. During testing, email notifications were successfully generated and received when the monitored instance became unavailable, confirming that the alerting mechanism was functioning as expected.
 
 ![Image 5](<../../../assets/images/POC's/Sai krishna/Prometheus/image5.png>)
 
-And I received another email notification after resolving that fired alert.
+After the alert was resolved, an additional email notification was received.
 
 ![Image 6](<../../../assets/images/POC's/Sai krishna/Prometheus/image6.png>)
 
 ---
 
-## 20. WHAT IS GRAFANA?
+## 20. What Is Grafana?
 
 **Grafana is an open-source visualization and monitoring tool (application).**
 
@@ -1486,11 +1500,11 @@ Default:
 
 ### **Challenge:**
 
-While following the above process, I faced an issue while downloading Grafana, and the issue was related to the version.
+During the implementation process, an issue was encountered while downloading Grafana due to a version compatibility mismatch.
 
 ### **Solution:**
 
-I used the below approach to install the correct working version of Grafana:
+The following approach was used to install a compatible and properly functioning version of Grafana.
 
 #### Correct Working Versions
 

@@ -1,8 +1,13 @@
 # Agent Configuration: FIM & Tenant Label Mapping
 
+<!-- **Author:** Abhinav   -->
+**Version:** 1.0  
+<!-- **Created Date:** 2026-07-28  
+**Updated Date:** 2026-07-28 -->
+
 ## Overview
 
-These changes are made to `/var/ossec/etc/ossec.conf` on each agent VM. There are 5 changes in total. Apply them in order.
+These changes are made to `/var/ossec/etc/ossec.conf` on each Linux agent VM. There are 5 changes in total. Apply them in order.
 
 !!! warning "Always take a backup first"
 
@@ -24,8 +29,10 @@ sudo nano /var/ossec/etc/ossec.conf
 
 ```xml
 
-    ...
-    yes
+<rootcheck>
+  ...
+  <skip_nfs>yes</skip_nfs>
+</rootcheck>
 
 ```
 
@@ -41,9 +48,9 @@ Immediately after `<skip_nfs>yes</skip_nfs>`, before `</rootcheck>`:
 ### Result after change
 
 ```xml
-    yes
-    /var/lib/containerd
-    /var/lib/docker/overlay2
+<skip_nfs>yes</skip_nfs>
+<ignore>/var/lib/containerd</ignore>
+<ignore>/var/lib/docker/overlay2</ignore>
   
 ```
 
@@ -150,6 +157,7 @@ The entire default syscheck block:
   ...
 </syscheck>
 ```
+Before replacing the default syscheck block, keep a copy of the original configuration section so it can be restored if validation or performance issues occur.
 
 ### Replace with this entire block
 
@@ -172,6 +180,7 @@ The entire default syscheck block:
   <directories realtime="yes" report_changes="yes" check_all="yes">/root</directories>
 
   <!-- Web and app directories -->
+  <!-- If applicable -->
   <directories realtime="yes" report_changes="yes" check_all="yes">/var/www</directories>
   <directories realtime="yes" check_all="yes">/tmp</directories>
   <directories realtime="yes" check_all="yes">/var/tmp</directories>
@@ -363,11 +372,14 @@ sudo grep -A2 'labels' /var/ossec/etc/ossec.conf
 
 ## Final Step — Restart and Verify Agent
 
+Before restarting the agent, validate the configuration and review the agent log for configuration errors.
+
 Restart the agent to apply all five changes:
 
 ```bash
 sudo systemctl restart wazuh-agent
 ```
+If the service does not start successfully, review the agent logs for configuration errors before proceeding.
 
 Verify the agent is running and connected:
 

@@ -1,5 +1,10 @@
 # Second use case of XDR
 
+<!-- **Author:** Sai Krishna   -->
+**Version:** 1.0  
+<!-- **Created Date:** 2026-07-24  
+**Updated Date:** 2026-07-24 -->
+
 ### Use Case:
 
 Detect and Block Malware Execution (Suspicious Process)
@@ -9,21 +14,31 @@ Detect and Block Malware Execution (Suspicious Process)
 - A user downloads a suspicious file from the internet.
 - The user executes the file (malware.exe or suspicious script).
 - The system starts a malicious process.
-- The Wazuh agent detects the suspicious process.
-- The Wazuh manager triggers an alert.
+- The Wazuh Agent detects the suspicious process.
+- The Wazuh Manager triggers an alert.
 - Active Response automatically kills the malicious process.
+
+## Prerequisites
+
+- Wazuh Manager installed and running
+- Wazuh Dashboard accessible
+- Windows endpoint available
+- Wazuh Agent installed
+- Administrative access on Windows
+- Active Response enabled
+- PowerShell execution permissions available
 
 ### Step 1: Install Wazuh Agent on Windows
 
-First we have to install the agent on your Windows machine.
+Install the Wazuh Agent on the Windows machine.
 
-Go to the Wazuh manager in the browser and navigate to the agent's section and click on add new agent and select Windows machine and fill all the required fields and follow the implementation process. In Wazuh browser you will see the steps same as below figure 1.
+Go to the Wazuh Manager in the browser and navigate to the agent's section and click on add new agent and select Windows machine and fill all the required fields and follow the implementation process. In Wazuh browser you will see the steps same as below figure 1.
 
 ![Fig 1](../../../assets/images/POC's/Sai krishna/Second use case of XDR/fig 1.png)
 
 ### Step 2: Verify Agent on Manager
 
-Login to the wazuh manager in the browser if not login and nagivate to the agents section and verify that the agent is successfully installed or not. If it is successfully installed and connected with wazuh manager you can see that agent as active and it is same as below figure 2.
+Login to the Wazuh Manager in the browser if not loged in, then nagivate to the agents section and verify that the agent is successfully installed or not. If it is successfully installed and connected with Wazuh Manager you can see that agent as active and it is same as below figure 2.
 
 ![Fig 2](../../../assets/images/POC's/Sai krishna/Second use case of XDR/fig 2.png)
 
@@ -81,11 +96,11 @@ Restart-Service WazuhSvc
 
 Or
 
-You can restart wazuh agent from the services of windows machine.
+You can restart Wazuh Agent from the services of windows machine.
 
 ### Step 4: Create Detection Rule on Manager
 
-Login to the manager VM.
+Login to the Manager VM.
 
 Open:
 
@@ -125,6 +140,8 @@ Then
 Restart manager:
 
 ```
+sudo /var/ossec/bin/wazuh-control check-config
+
 sudo systemctl restart wazuh-manager
 ```
 
@@ -181,13 +198,15 @@ Explanation:
 Meaning:
 
 ```
-If rule 100600 triggers
+If rule 100500 triggers
 kill the malicious process on the endpoint
 ```
 
 Restart manager:
 
 ```
+sudo /var/ossec/bin/wazuh-control check-config
+
 sudo systemctl restart wazuh-manager
 ```
 
@@ -211,7 +230,7 @@ malware.ps1
 
 Or easier:
 
-Create a fake executable name.
+Create a test executable using a controlled method such as PS2EXE or another approved test application.
 
 Example:
 
@@ -229,7 +248,7 @@ Open PowerShell in Administration mode and Run:
 
 #### Challenge
 
-When I run the above command, I got the error something as given below:
+Issue Encountered: the error something as given below:
 
 ```
 Program 'malware.exe' failed to run: The specified executable is not a valid application for this OS platform.At line:1 char:1
@@ -246,7 +265,7 @@ At line:1 char:1
 
 The error is because the specified executable is not a valid application for this OS platform.
 
-Then I convert the PowerShell script into Executable by installing the PS2EXE module from the PowerShell Gallery and I installed by running the below command in PowerShell and I give the required permissions to successfully install.
+Then convert the PowerShell script into Executable by installing the PS2EXE module from the PowerShell Gallery and install by running the below command in PowerShell and provide required permissions to successfully install.
 
 Command:
 
@@ -254,7 +273,7 @@ Command:
 Install-Module -Name ps2exe -Scope CurrentUser
 ```
 
-After instaling the ps2exe module, I again faced challenge while converting .ps to .exe. Then I followed the below approach to convert and run the malware.exe file in the windows machine.
+After instaling the ps2exe module, again face the challenge while converting .ps to .exe. Then follow the below approach to convert and run the malware.exe file in the windows machine.
 
 ##### Step 1: Find where the module is installed
 
@@ -269,7 +288,7 @@ You will see something like:
 ```
 InstalledLocation
 -----------------
-C:\Users\sai87\Documents\WindowsPowerShell\Modules\ps2exe\1.0.17
+C:\Users\<USERNAME>\Documents\WindowsPowerShell\Modules\ps2exe\1.0.17
 ```
 
 ##### Step 2: Import module using full path
@@ -279,7 +298,7 @@ Use the location you got above.
 Example:
 
 ```powershell
-Import-Module "C:\Users\sai87\Documents\WindowsPowerShell\Modules\ps2exe\1.0.17\ps2exe.psm1"
+Import-Module "C:\Users\<USERNAME>\Documents\WindowsPowerShell\Modules\ps2exe\1.0.17\ps2exe.psm1"
 ```
 
 Now verify:
@@ -334,11 +353,11 @@ malware.exe   24560 Console   1   8000 K
 
 #### Challenge
 
-Now open Wazuh manager in the browser and navigate to the discover section to verify the generated alerts. But when I open discover section, I cannot see any generated alerts for running malware process.
+Now open Wazuh Manager in the browser and navigate to the discover section to verify the generated alerts. But after opening discover section,it is not showing any generated alerts for running malware process.
 
 #### Solution
 
-Then I change my custom rule logic like:
+Then update custom rule logic like:
 
 ```xml
 <group name="malware_detection">
@@ -354,7 +373,7 @@ Then I change my custom rule logic like:
 
 Because rule 530 is commonly used as a base rule for command outputs.
 
-Then I restart the Wazuh manager. After that change, I can see generated alerts based on custom rule in the discover section.
+Then restart the Wazuh Manager. After that change, now the generated alerts based on custom rule is displaying in the discover section.
 
 
 
@@ -362,7 +381,7 @@ Then I restart the Wazuh manager. After that change, I can see generated alerts 
 
 #### Challenge
 
-When I observe the alert is triggering correctly, but the Active Response is not executed on the Windows agent. This usually happens because of location settings, missing agent configuration, or command mismatch in Wazuh. Then I check for the solution in different cases like:
+While observing, the alert is triggering correctly but the Active Response is not executed on the Windows agent. This usually happens because of location settings, missing agent configuration, or command mismatch in Wazuh. Then check for the solution in different cases like:
 
 ##### Case 1: Problem in your Active Response configuration
 
@@ -418,11 +437,11 @@ kill-process.cmd
 
 If the script is missing, the response will never execute.
 
-After verifying all this cases one by one, finally, I found that the kill-process.cmd file does not exist at specified location.
+After verifying all this cases one by one, finally, found that the kill-process.cmd file does not exist at specified location.
 
 #### Solution
 
-Then I followed the below approach step by step:
+Then followed the below approach step by step:
 
 ##### Step 1: Create the Active Response Script on Windows Agent
 
@@ -462,13 +481,13 @@ C:\Program Files (x86)\ossec-agent\active-response\bin\
 
 ##### Step 3: Configure command in Wazuh Manager
 
-On the Wazuh manager, edit:
+On the Wazuh Manager, edit:
 
 ```
 /var/ossec/etc/ossec.conf
 ```
 
-Add or update this inside the wazuh manager config file:
+Add or update this inside the Wazuh Manager config file:
 
 ```xml
 <command>
@@ -504,10 +523,12 @@ Explanation:
 Run:
 
 ```
+sudo /var/ossec/bin/wazuh-control check-config
+
 sudo systemctl restart wazuh-manager
 ```
 
-For better response restart the wazuh agent in windows
+For better response restart the Wazuh Agent in windows
 
 ##### Step 6: Test the setup
 

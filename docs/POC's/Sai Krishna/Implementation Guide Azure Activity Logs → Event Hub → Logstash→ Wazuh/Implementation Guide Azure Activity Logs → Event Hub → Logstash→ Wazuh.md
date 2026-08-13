@@ -1,12 +1,32 @@
 # Implementation Guide: Azure Activity Logs → Event Hub → Logstash → Wazuh
 
+<!-- **Author:** Sai Krishna   -->
+**Version:** 1.0  
+<!-- **Created Date:** 2026-07-24  
+**Updated Date:** 2026-07-24 -->
+
+## Prerequisites
+
+Before starting, ensure:
+
+- Azure Subscription
+- Contributor or Owner permissions
+- Event Hub permissions
+- Storage Account permissions
+- Linux server with Logstash installed
+- Wazuh Manager deployed
+- Network connectivity between Logstash and Wazuh
+- Required firewall ports opened
+
 ## Full Implementation Guide: Azure Activity Logs → Event Hub → Wazuh
 
 ### Is It Possible? Is It Recommended?
 
 
-YES — It is 100% POSSIBLE
-YES — It is RECOMMENDED for Wazuh-based SOCs
+This architecture is supported and commonly used for integrating Azure Activity Logs with Wazuh through Logstash.
+
+Suitability depends on ingestion volume, operational requirements, and infrastructure design.
+
 It needs a pipeline: Event Hub → Logstash → Wazuh
 
 Wazuh does NOT natively consume Event Hub — so we use Logstash as the bridge.
@@ -52,15 +72,16 @@ Go to Event Hub (azure-activity-logs)
 
 → Create
 
-COPY THESE (you'll need them later):
-- Connection string–primary key
-- Event Hub name: azure-activity-logs
+Copy the following values securely:
+
+- Event Hub Connection String
+- Event Hub Name
 
 #### Step 4 — Create Consumer Group
 
 Go to Event Hub → Consumer Groups → + Add
 
-Name: wazuh-consumer
+Name: <consumer-group-name>
 
 (This ensures Logstash has its own read pointer
 and doesn't conflict with other consumers)
@@ -113,7 +134,7 @@ Azure Portal
 
 ![Does Azure write immediately or is there delay?](<../../../assets/images/POC's/Sai krishna/Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh/Does Azure Write Immediately or Is There Delay.png>)
 
-So after you do an action in Azure (like create/delete a resource), wait 3-5 minutes before expecting to see it in Event Hub.
+So after you do an action in Azure (like create/delete a resource), Azure Activity Logs typically appear within a few minutes, but actual latency varies depending on Azure service, region, and workload.
 
 #### Where Are Logs Stored Inside Event Hub?
 
@@ -140,7 +161,7 @@ Blob Storage checkpoint file location (auto-created):
 azure-webjobs-eventhub/ 
   └── soc-eventhub-ns/ 
         └── azure-activity-logs/ 
-              └── wazuh-consumer/ 
+              └── <consumer-group-name>/ 
                     └── checkpoint  ← offset saved here 
 ```
 
@@ -152,15 +173,19 @@ sudo apt-get update
 sudo apt-get install logstash -y
 ```
 
-If logstash is already installed, then skip the step 6. In my case I already installed previously. So, I just modifying the existing logstash config file and installing the supported plugin.
+If Logstash is already installed in your environment, you can skip Step 6. In this implementation, Logstash had been installed previously; therefore, only the existing Logstash configuration file was updated, and the required supported plugin was installed.
 
 ### PHASE 3: Updated Logstash Config (Azure Added)
 
-Here is your fully updated config — I only added the Azure Event Hub input block and updated the azure filter section. All your existing logic is 100% untouched:
+The Logstash configuration has been updated to include Azure Event Hub integration while preserving all existing processing logic and configurations.
 
-Now let me build the full updated config and data flow diagram for you.
+The following changes have been implemented:
 
-Now here is your fully updated logstash.conf — I only added the Event Hub input block and updated the Azure filter section. Every single line of your existing logic is preserved exactly.
+- Added the Azure Event Hub input configuration.
+- Updated the Azure-specific filter section to support Event Hub log processing.
+- Retained all existing Logstash logic, rules, filters, and outputs without modification.
+
+In addition, the complete updated Logstash configuration and the corresponding data flow diagram have been prepared to reflect the new Azure Event Hub integration.
 
 ![Updated Logstash config](<../../../assets/images/POC's/Sai krishna/Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh/updated logstash config.png>)
 
@@ -186,7 +211,7 @@ input {
     ]
     threads              => 4
     decorate_events      => true
-    consumer_group       => "wazuh-consumer"
+    consumer_group       => "<consumer-group-name>"
     storage_connection   => "DefaultEndpointsProtocol=https;AccountName=YOUR_STORAGE_ACCOUNT;AccountKey=<YOUR_STORAGE_ACCOUNT_KEY>;EndpointSuffix=core.windows.net"
     # ↑ This enables checkpointing — Logstash remembers where it stopped reading
     # Without this, every restart reads from latest only (you lose logs during downtime)
@@ -423,7 +448,7 @@ What Storage Account saves (automatically, inside a blob container):
 azure-webjobs-eventhub/ 
   └── nseventhub.servicebus.windows.net/ 
         └── activity-logs-event-hub/ 
-              └── wazuh-consumer/ 
+              └── <consumer-group-name>/ 
                     ├── 0        ← offset for partition 0 
                     └── 1        ← offset for partition 1 
 
@@ -437,7 +462,7 @@ Each file contains a number — the last message position read. That is your che
 sudo nano /var/ossec/etc/rules/azure_activity_rules.xml
 ```
 
-Local_file.xml:
+azure_activity_rules.xml:
 
 ```
 <group name="azure,activity_log,">
@@ -489,7 +514,7 @@ sudo systemctl restart wazuh-manager
 sudo ss -tlnp | grep 9065
 ```
 
-You can also add above custom rule from the wazuh UI. I did in that way only, but after saving the rule must reload wazuh, then only changes will apply.
+The custom rule can also be added through the Wazuh UI. After saving the rule, ensure that the Wazuh service is reloaded for the changes to take effect.
 
 ### Phase 5: Verify the Full Flow End-to-End
 
@@ -523,11 +548,11 @@ sudo docker exec -it single-node-wazuh.manager-1 tail -f /var/ossec/logs/alerts/
 
 #### Challenge:
 
-I followed and implemented same as above, but when I observe logstash related logs in terminal. The azure activity logs are reaching logstash, but not passing to wazuh and there is no alerts generated in alerts.json file in wazuh manager for activity logs even I wrote custom rule.
+After implementing the configuration as described above, log analysis confirmed that Azure Activity Logs were successfully reaching Logstash. However, the logs were not being forwarded to Wazuh Manager for processing. As a result, no corresponding alerts were generated in the alerts.json file, despite the presence of custom detection rules designed to trigger alerts for these activity log events.
 
 ### Solution:
 
-The challenge was logstash filter logic, current logic is not filtering properly due to this wazuh can't understand properly and can't apply rules on it. Then I changed the logstash config file logic something like below.
+The challenge was with the Logstash filter logic, as the existing configuration was not processing and filtering the incoming logs correctly. As a result, Wazuh was unable to properly parse the events and apply the corresponding detection rules. To address this issue, the Logstash configuration was reviewed and the filter logic was modified as shown below, enabling accurate log processing and rule matching within Wazuh.
 
 logstash.config:
 
@@ -545,7 +570,7 @@ input {
     ]
     threads => 4
     decorate_events => true
-    consumer_group => "wazuh-consumer"
+    consumer_group => "<consumer-group-name>"
     storage_connection => "DefaultEndpointsProtocol=https;AccountName=<YOUR_STORAGE_ACCOUNT_NAME>;AccountKey=<YOUR_STORAGE_ACCOUNT_KEY>;EndpointSuffix=core.windows.net"
   }
 }
@@ -693,11 +718,15 @@ output {
 
 #### Challenge:
 
-After changing the logstash filter logic, now alerts are generating for the azure activity logs based on written custom rule in wazuh manager. But when I observe the generated alerts in alerts.json file in wazuh manager, all generated alerts are based on only one rule i.e rule id is 100200 this will look like another challenge. The challenge is, for different type of azure activity logs, only one rule is triggering even I wrote multiple child rules for different type of activity logs. You can see generated alerts in alerts.json file from the below image.
+After modifying the Logstash filter logic, alerts are now being successfully generated for Azure Activity Logs based on the custom rules configured in the Wazuh Manager. However, upon reviewing the generated alerts in the alerts.json file, it was observed that all alerts are being triggered by a single rule (Rule ID: 100200).
+
+This behavior introduces an additional challenge. Although multiple child rules have been created to detect and classify different types of Azure Activity Log events, only the parent rule (100200) is being matched and generating alerts. As a result, the expected child-rule-specific alert classification is not occurring, making it difficult to distinguish between different Azure Activity Log event types based on rule identification.
+
+The generated alerts captured in the alerts.json file demonstrate that all detected events are currently associated with Rule ID 100200.
 
 ### Solution:
 
-The current custom rule is not properly triggering the different type of activity logs due the the match is not properly defined, so I updated the current custom rule with the below one.
+The existing custom rule was not consistently triggering alerts for various activity log types because the matching conditions were not adequately defined. To address this issue, the custom rule was reviewed and updated with the revised rule configuration shown below, ensuring improved detection and alert generation across different activity log events.
 
 ### Custom rule
 
@@ -802,7 +831,7 @@ The current custom rule is not properly triggering the different type of activit
 
 Save the changes and restart or reload the wazuh to apply the changes.
 
-Now I again generate the logs by creating and deleting the vm in azure cloud and observed those logs in logstash and wazuh terminal. Now alerts are triggering differently for different type of azure activity logs with different rule id and level. If you observe alerts.json file in wazuh manager, you will see generated alerts with different rule id and level and it is something like same as below image.
+For validation purposes, VM creation and deletion activities were performed again in the Azure cloud environment, and the corresponding logs were observed in both Logstash and Wazuh. The generated alerts were successfully triggered and categorized based on the specific Azure Activity Log event type, with each alert being assigned a unique rule ID and severity level. By reviewing the alerts.json file on the Wazuh Manager, you can verify that the alerts are being generated with different rule IDs and levels, similar to those shown in the image below.
 
 ## Adding metadata to the Azure Activity logs
 
@@ -821,9 +850,9 @@ if "azure_activity_log" in [tags] {
 
       "source_platform" => "azure"
       "event_category" => "cloud_security"
-      "environment" => "poc"
-      "tenant" => "azure_poc"
-      "non_agent_id" => "7001"
+      "environment" => "<environment>"
+      "tenant" => "<tenant_name>"
+      "non_agent_id" => "<non_agent_identifier>"
       "device_type" => "azure_activity_log"
       "cloud_provider" => "azure"
 

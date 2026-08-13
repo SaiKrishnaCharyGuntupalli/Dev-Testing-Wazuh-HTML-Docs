@@ -1,0 +1,3646 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Production implementation guide for multi-tenant Wazuh MSSP on single-node Docker">
+      
+      
+      
+      
+        <link rel="prev" href="../../SOC%20Logstash%20Multi-Pipeline%20Architecture%20Implementation%20Guide/SOC_Logstash_Multi_Pipeline/">
+      
+      
+        <link rel="next" href="../../../Junaid/Wazuh_Multi_Tenant_MSSP_Implementation/Wazuh_Multi_Tenant_MSSP_Implementation/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide - Wazuh MSSP Multi-Tenant Implementation Guide</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../../stylesheets/responsive-nav.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#complete-step-by-step-soc-logstash-pipeline-to-pipeline-p2p-architecture-implementation-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-header__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Wazuh MSSP Multi-Tenant Implementation Guide
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-nav__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    Wazuh MSSP Multi-Tenant Implementation Guide
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../01-Getting_started/Getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment & Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment & Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../02-index-template-filebeat/index_template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index Template & Filebeat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../04-agent-configuration/agent_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & Access
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Security & Access
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../06-rbac/rbac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RBAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../07-dls/dls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Document Level Security (DLS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../08-sso-entra/sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSO - Microsoft Entra ID
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster and Index Verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../10-reference/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC's
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    POC's
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/GitHub_Webhook_to_Logstash/GitHub_Webhook_to_Logstash_POC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub_Webhook_to_Logstash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Rules-as-Code%20Implementation%20Guide/Wazuh%20Rules-as-Code%20Implementation%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Rules-as-Code Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Windows Agent Deployment & Security Detection logs Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetFlowlogs_to_Logstash_and_Wazuh_Indexer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/XDR%20Implementation%20Process/XDR%20Implementation%20Process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XDR Implementation Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Second%20use%20case%20of%20XDR/Second%20use%20case%20of%20XDR/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Second use case of XDR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Pipelines_and_Challenges/Pipelines_and_Challenges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipelines_and_Challenges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jira API → Logstash → Wazuh Integration for Non-Agent Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LOGSTASH PIPELINE WORKERS & BATCHSIZE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GitHub_Logstash_Wazuh_NonAgent_Implementation/GitHub_Logstash_Wazuh_NonAgent_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Logstash Wazuh NonAgent Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/MySQL_Log_Monitoring_Using_Wazuh_Agent/MySQL_Log_Monitoring_Using_Wazuh_Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MySQL_Log_Monitoring_Using_Wazuh_Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Agent_Log_Buffering_and_Resynchronization/Wazuh_Agent_Log_Buffering_and_Resynchronization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Agent_Log_Buffering_and_Resynchronization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Process%20to%20Monitor%20Filebeat%20Health/Implementation_Process_to_Monitor_Filebeat_Health/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor Filebeat Health
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20AWS%20CloudTrail%20%E2%86%92%20S3%20%E2%86%92%20SQS%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh/Implementation_Guide_AWS_CloudTrail_S3_SQS_Logstash_Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide AWS CloudTrail → S3 → SQS → Logstash → Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Prometheus/Prometheus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prometheus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SOC%20Logstash%20Multi-Pipeline%20Architecture%20Implementation%20Guide/SOC_Logstash_Multi_Pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Multi-Pipeline Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-objective-of-the-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Objective of the Task
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-understanding-pipeline-to-pipeline-p2p-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Understanding Pipeline-to-Pipeline (P2P) Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-realtime-log-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Realtime Log Generation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-filebeat-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Filebeat Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-creation-of-multiple-pipelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — Creation of Multiple Pipelines
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-6-ingestion-pipeline-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 — Ingestion Pipeline Implementation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-7-normalization-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 — Normalization Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-8-enrichment-pipeline-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8 — Enrichment Pipeline Implementation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-9-routing-pipeline-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 9 — Routing Pipeline Implementation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-10-pipeline-verification-and-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 10 — Pipeline Verification and Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-11-persistent-queue-pq-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 11 — Persistent Queue (PQ) Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-13-dead-letter-queue-dlq-reprocessing-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 13 — Dead Letter Queue (DLQ) Reprocessing Pipeline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 13 — Dead Letter Queue (DLQ) Reprocessing Pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-dlq-reprocessing-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create DLQ Reprocessing Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#register-the-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Register the Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validate-the-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validate the Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restart-logstash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restart Logstash
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-pipeline-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Pipeline Creation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#working-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Working Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-14-infrastructure-monitoring-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 14 — Infrastructure Monitoring Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 14 — Infrastructure Monitoring Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#components-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Components Used
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring Objectives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-15-node-exporter-installation-and-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 15 — Node Exporter Installation and Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 15 — Node Exporter Installation and Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-node-exporter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Node Exporter?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installation-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-16-install-prometheus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 16 — Install Prometheus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-17-grafana-installation-and-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 17 — Grafana Installation and Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Grafana?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Grafana
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verify-grafana-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Grafana Service
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-19-connect-grafana-with-prometheus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 19 — Connect Grafana with Prometheus
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 19 — Connect Grafana with Prometheus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#navigation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Navigation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Result
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-20-logstash-pipeline-monitoring-using-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 20 — Logstash Pipeline Monitoring Using Grafana
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 20 — Logstash Pipeline Monitoring Using Grafana">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-we-used-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why We Used Grafana?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-architecture_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creating-the-panel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating the Panel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuring-the-prometheus-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuring the Prometheus Query
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-this-query-was-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Query Was Used?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Result">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pipeline-failure-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pipeline Failure Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Observation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-this-test-was-performed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Test Was Performed?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benefits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benefits
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Benefits">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overall-monitoring-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overall Monitoring Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Multi_Tenant_MSSP_Implementation/Wazuh_Multi_Tenant_MSSP_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Multi_Tenant_MSSP_Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/Wazuh%20Multi%20Node%20Runbook/Wazuh%20Multi%20Node%20Runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Multi Node Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Availability Log Ingestion Pipeline Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zero Downtime Group Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operating System Based Group Creation in Wazuh GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-objective-of-the-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Objective of the Task
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-understanding-pipeline-to-pipeline-p2p-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Understanding Pipeline-to-Pipeline (P2P) Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-realtime-log-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Realtime Log Generation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-filebeat-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Filebeat Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-creation-of-multiple-pipelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — Creation of Multiple Pipelines
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-6-ingestion-pipeline-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 — Ingestion Pipeline Implementation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-7-normalization-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 — Normalization Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-8-enrichment-pipeline-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8 — Enrichment Pipeline Implementation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-9-routing-pipeline-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 9 — Routing Pipeline Implementation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-10-pipeline-verification-and-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 10 — Pipeline Verification and Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-11-persistent-queue-pq-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 11 — Persistent Queue (PQ) Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-13-dead-letter-queue-dlq-reprocessing-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 13 — Dead Letter Queue (DLQ) Reprocessing Pipeline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 13 — Dead Letter Queue (DLQ) Reprocessing Pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-dlq-reprocessing-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create DLQ Reprocessing Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#register-the-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Register the Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validate-the-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validate the Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restart-logstash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restart Logstash
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-pipeline-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Pipeline Creation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#working-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Working Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-14-infrastructure-monitoring-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 14 — Infrastructure Monitoring Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 14 — Infrastructure Monitoring Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#components-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Components Used
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring Objectives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-15-node-exporter-installation-and-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 15 — Node Exporter Installation and Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 15 — Node Exporter Installation and Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-node-exporter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Node Exporter?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installation-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-16-install-prometheus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 16 — Install Prometheus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-17-grafana-installation-and-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 17 — Grafana Installation and Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Grafana?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Grafana
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verify-grafana-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Grafana Service
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-19-connect-grafana-with-prometheus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 19 — Connect Grafana with Prometheus
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 19 — Connect Grafana with Prometheus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#navigation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Navigation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Result
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-20-logstash-pipeline-monitoring-using-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 20 — Logstash Pipeline Monitoring Using Grafana
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 20 — Logstash Pipeline Monitoring Using Grafana">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-we-used-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why We Used Grafana?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-architecture_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creating-the-panel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating the Panel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuring-the-prometheus-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuring the Prometheus Query
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-this-query-was-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Query Was Used?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Result">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pipeline-failure-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pipeline Failure Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Observation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-this-test-was-performed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Test Was Performed?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benefits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benefits
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Benefits">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overall-monitoring-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overall Monitoring Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="complete-step-by-step-soc-logstash-pipeline-to-pipeline-p2p-architecture-implementation-guide">Complete Step-by-Step SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide</h1>
+<hr />
+<h2 id="step-1-objective-of-the-task">Step 1 — Objective of the Task</h2>
+<p>The main objective of this implementation was to build a production-style SOC log processing architecture using Logstash Pipeline-to-Pipeline (P2P) communication. Instead of using one large Logstash pipeline, the architecture was divided into multiple pipelines to improve scalability, troubleshooting, monitoring, and fault isolation.</p>
+<p><strong>What is P2P architecture</strong></p>
+<p>Pipeline-to-Pipeline architecture splits processing into multiple pipelines where each pipeline handles a specific task. This improves modularity, makes debugging easier, and allows independent scaling and monitoring.</p>
+<p><strong>What pipelines we used</strong></p>
+<p>I used four pipelines: Ingestion for parsing logs, Normalization for field standardization, Enrichment for detection logic and Routing for filtering and sending output.</p>
+<p><strong>Where I configured pipelines</strong></p>
+<p>I configured multiple pipelines in pipelines.yml, and each pipeline has its own configuration file inside <code>/etc/logstash/conf.d/</code>.</p>
+<hr />
+<h2 id="step-2-understanding-pipeline-to-pipeline-p2p-architecture">Step 2 — Understanding Pipeline-to-Pipeline (P2P) Architecture</h2>
+<p>Pipeline-to-Pipeline (P2P) architecture means one Logstash pipeline internally forwards logs to another Logstash pipeline instead of processing everything inside one configuration file.</p>
+<p><strong>Architecture flow used:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Realtime Logs
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Filebeat
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Ingestion Pipeline
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>Normalization Pipeline
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>Enrichment Pipeline
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>↓
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>Routing Pipeline
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>↓
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>Grafana Visualization
+</code></pre></div>
+<p><strong>Purpose of using P2P:</strong>
+1. modular architecture
+2. easier troubleshooting
+3. better scalability
+4. pipeline isolation
+5. independent monitoring
+6. easier failure identification (this is the main)</p>
+<hr />
+<h2 id="step-3-realtime-log-generation">Step 3 — Realtime Log Generation</h2>
+<p>Realtime logs were generated continuously to simulate endpoint activity. Different types of logs such as:
+1. ERROR logs
+2. INFO logs
+3. DEBUG logs
+4. failed authentication logs</p>
+<p>were continuously written into:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>/home/vahandjango/test_eps.log
+</code></pre></div>
+<p><strong>Command used:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>nohup<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="s1">while true; do</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="s1">echo &quot;ERROR: DB failed $RANDOM&quot; &gt;&gt; /home/vahandjango/test_eps.log</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="s1">echo &quot;INFO: session started from 192.168.1.$((RANDOM%255))&quot; &gt;&gt; /home/vahandjango/test_eps.log</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="s1">echo &quot;DEBUG: connection attempt from 192.168.1.$((RANDOM%255))&quot; &gt;&gt; /home/vahandjango/test_eps.log</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="s1">echo &quot;ERROR: auth failed from 192.168.1.$((RANDOM%255))&quot; &gt;&gt; /home/vahandjango/test_eps.log</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="s1">sleep 0.5</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="s1">done</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="s1">&#39;</span><span class="w"> </span><span class="p">&amp;</span>
+</code></pre></div>
+<p><strong>Purpose:</strong>
+1. simulate realtime endpoint logs
+2. continuously generate traffic
+3. test pipeline flow under continuous ingestion</p>
+<hr />
+<h2 id="step-4-filebeat-configuration">Step 4 — Filebeat Configuration</h2>
+<p>Filebeat was configured to monitor the generated log file and send logs to Logstash.</p>
+<p><strong>Configuration used:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">filebeat.inputs</span><span class="p">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">paths</span><span class="p">:</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/home/vahandjango/test_eps.log</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="nt">output.logstash</span><span class="p">:</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;192.168.35.37:5044&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="nt">logging.level</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">info</span>
+</code></pre></div>
+<p><strong>Purpose of Filebeat:</strong>
+1. lightweight log shipper
+2. continuous realtime forwarding
+3. reliable delivery to Logstash</p>
+<p>Filebeat continuously monitored the log file and pushed logs into Logstash ingestion pipeline.</p>
+<hr />
+<h2 id="step-5-creation-of-multiple-pipelines">Step 5 — Creation of Multiple Pipelines</h2>
+<p>Four separate Logstash pipelines were created:
+1. ingestion
+2. normalization
+3. enrichment
+4. routing</p>
+<p>These pipelines were configured inside:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/etc/logstash/pipelines.yml
+</code></pre></div>
+<p><strong>Configuration:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">pipeline.id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ingestion</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">path.config</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/etc/logstash/conf.d/ingestion.conf&quot;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">pipeline.id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">normalization</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nt">path.config</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/etc/logstash/conf.d/normalization.conf&quot;</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">pipeline.id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">enrichment</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="nt">path.config</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/etc/logstash/conf.d/enrichment.conf&quot;</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">pipeline.id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">routing</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="nt">path.config</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/etc/logstash/conf.d/routing.conf&quot;</span>
+</code></pre></div>
+<p><strong>Purpose:</strong>
+1. separate responsibilities
+2. isolate failures
+3. monitor pipelines independently</p>
+<hr />
+<h2 id="step-6-ingestion-pipeline-implementation">Step 6 — Ingestion Pipeline Implementation</h2>
+<p>The ingestion pipeline acted as the entry point for all logs coming from Filebeat.</p>
+<p><strong>Configuration:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">input</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="n">beats</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="n">port</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">5044</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">}</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="n">filter</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="n">grok</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="n">match</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">      </span><span class="s2">&quot;message&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;%{GREEDYDATA:log_message}&quot;</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="p">}</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="n">output</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">  </span><span class="n">pipeline</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="n">send_to</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;normalization&quot;</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Purpose of Grok Filter:</strong>
+1. parse incoming raw logs
+2. extract message structure
+3. prepare logs for downstream processing</p>
+<p><strong>Why Grok was used:</strong>
+1. widely used in SOC parsing
+2. useful for pattern extraction
+3. helps normalize unstructured logs</p>
+<hr />
+<h2 id="step-7-normalization-pipeline">Step 7 — Normalization Pipeline</h2>
+<p>The normalization pipeline standardized log fields into a common schema format.</p>
+<p><strong>Configuration:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">input</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="n">pipeline</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="n">address</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;normalization&quot;</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">}</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="n">filter</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="n">mutate</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="n">add_field</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">      </span><span class="s2">&quot;log_type&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;application&quot;</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="p">}</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="n">output</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">  </span><span class="n">pipeline</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">    </span><span class="n">send_to</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;enrichment&quot;</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Purpose:</strong>
+1. normalize field names
+2. create consistent schema
+3. prepare logs for enrichment</p>
+<p><strong>Why Mutate Filter was used:</strong>
+1. It is lightweight
+2. efficient field modification
+3. field renaming and additions</p>
+<hr />
+<h2 id="step-8-enrichment-pipeline-implementation">Step 8 — Enrichment Pipeline Implementation</h2>
+<p>The enrichment pipeline was used to add additional context and detection-related information into logs after normalization. This stage is very important in SOC architectures because raw logs alone are not enough for security analysis.</p>
+<p><strong>Configuration:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">input</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="n">pipeline</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">address</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;enrichment&quot;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="p">}</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">filter</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="c1"># Example enrichment (tagging)</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="n">log_type</span><span class="o">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;auth&quot;</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="s2">&quot;failed&quot;</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">[</span><span class="n">message</span><span class="o">]</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="n">mutate</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">      </span><span class="n">add_field</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;alert&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;FAILED_LOGIN&quot;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">  </span><span class="c1"># Example aggregation (simple)</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="n">source</span><span class="o">][</span><span class="n">ip</span><span class="o">]</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">    </span><span class="n">mutate</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">      </span><span class="n">add_tag</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">[</span><span class="s2">&quot;has_ip&quot;</span><span class="o">]</span>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">  </span><span class="c1"># (Optional test failure --- REMOVE in real)</span>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">  </span><span class="c1"># ruby {</span>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">  </span><span class="c1">#   code =&gt; &quot;event.set(&#39;test&#39;, 1/0)&quot;</span>
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">  </span><span class="c1"># }</span>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="p">}</span>
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="n">output</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="w">  </span><span class="n">pipeline</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">send_to</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;routing&quot;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Severity Classification Configuration:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">input</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="n">pipeline</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="n">address</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;enrichment&quot;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">}</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">filter</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="s2">&quot;ERROR&quot;</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">[</span><span class="n">message</span><span class="o">]</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="n">mutate</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">      </span><span class="n">add_field</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">        </span><span class="s2">&quot;severity&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;high&quot;</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">  </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">    </span><span class="n">mutate</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">      </span><span class="n">add_field</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="w">        </span><span class="s2">&quot;severity&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;low&quot;</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="p">}</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="n">output</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="w">  </span><span class="n">pipeline</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="w">    </span><span class="n">send_to</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;routing&quot;</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Purpose of Enrichment Pipeline:</strong>
+1. add security context
+2. identify severity
+3. prepare logs for SOC analysis
+4. classify important events
+5. improve detection visibility</p>
+<p><strong>Why enrichment is important:</strong>
+1. raw logs alone are difficult to analyze
+2. enrichment improves threat visibility
+3. security teams can prioritize alerts faster
+4. helps SIEM correlation and filtering</p>
+<p><strong>Explanation:</strong>
+If logs contained ERROR messages, the pipeline automatically tagged them with high severity. Other logs were marked as low severity. This simulates SOC detection logic where suspicious or failed events receive higher priority.</p>
+<hr />
+<h2 id="step-9-routing-pipeline-implementation">Step 9 — Routing Pipeline Implementation</h2>
+<p>The routing pipeline was responsible for final filtering and sending logs to output destinations.</p>
+<p><strong>Configuration:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">input</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="n">pipeline</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">address</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;routing&quot;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="p">}</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">filter</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="s2">&quot;DEBUG&quot;</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">[</span><span class="n">message</span><span class="o">]</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="n">drop</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="p">}</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="n">output</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">  </span><span class="n">file</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">    </span><span class="n">path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;/var/log/session_tracking.log&quot;</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">    </span><span class="n">codec</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">rubydebug</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Purpose:</strong>
+1. final output handling
+2. centralized log storage
+3. output isolation
+4. separate processing from delivery layer</p>
+<p><strong>Why routing pipeline is important:</strong>
+1. output failures stay isolated
+2. easier troubleshooting
+3. independent output scaling
+4. prevents entire pipeline failure</p>
+<p><strong>Explanation:</strong>
+Instead of sending logs directly from enrichment stage, a separate routing pipeline handled output delivery. This is useful in production SOC environments because output systems like Elasticsearch, Wazuh. But also here all logs are stored in <code>/var/log/session_tracking.log</code> which was created for in Logstash output so we can see properly logs are going out or not.</p>
+<hr />
+<h2 id="step-10-pipeline-verification-and-monitoring">Step 10 — Pipeline Verification and Monitoring</h2>
+<p>After creating all pipelines, Logstash pipeline statistics API was used to verify that all pipelines were running correctly.</p>
+<p><strong>Command used:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>localhost:9600/_node/pipelines?pretty
+</code></pre></div>
+<p><strong>Purpose:</strong>
+1. verify all pipelines are active
+2. monitor workers and queues
+3. validate pipeline isolation
+4. check pipeline health</p>
+<p><strong>What was verified:</strong>
+1. pipeline IDs
+2. pipeline workers
+3. batch sizes
+4. queue configuration
+5. pipeline statistics</p>
+<p>This confirmed that all pipelines were running independently in modular P2P architecture.</p>
+<hr />
+<h2 id="step-11-persistent-queue-pq-configuration">Step 11 — Persistent Queue (PQ) Configuration</h2>
+<p>Persistent Queue (PQ) was enabled to prevent data loss during high EPS or output failures.</p>
+<p><strong>Configuration added inside pipelines.yml:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">queue.type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">persisted</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nt">queue.max_bytes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1gb</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="nt">pipeline.workers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="nt">pipeline.batch.size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">125</span>
+</code></pre></div>
+<p><strong>Purpose of Persistent Queue:</strong>
+1. prevent event loss
+2. store events temporarily on disk
+3. handle output failures safely
+4. improve reliability during spikes</p>
+<p><strong>Why PQ is important:</strong>
+1. if destination becomes unavailable logs are buffered
+2. protects realtime SOC pipelines
+3. improves fault tolerance
+4. supports recovery after restart</p>
+<p><strong>Explanation:</strong>
+When downstream systems become slow or unreachable, Logstash stores events temporarily inside persistent queues instead of immediately dropping logs.</p>
+<hr />
+<h2 id="step-13-dead-letter-queue-dlq-reprocessing-pipeline">Step 13 — Dead Letter Queue (DLQ) Reprocessing Pipeline</h2>
+<p>After configuring the Dead Letter Queue (DLQ), a dedicated DLQ Reprocessing Pipeline was created to automatically read failed events stored in the DLQ and send them back through Logstash for successful indexing.</p>
+<p>This ensures that events which previously failed due to mapping conflicts or indexing errors are not permanently lost.</p>
+<p><strong>Purpose:</strong>
+1. Reprocess failed events stored inside the Dead Letter Queue.
+2. Recover logs that failed during indexing.
+3. Prevent permanent log loss.
+4. Improve overall pipeline reliability.</p>
+<h3 id="create-dlq-reprocessing-pipeline">Create DLQ Reprocessing Pipeline</h3>
+<p>Create a new Logstash pipeline configuration file.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/logstash/conf.d/dlq-reprocessing.conf
+</code></pre></div>
+<p>Add the following configuration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">input</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="n">dead_letter_queue</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="n">path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;/var/lib/logstash/dead_letter_queue&quot;</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="n">pipeline_id</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;main&quot;</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="n">commit_offsets</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="kp">true</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">}</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="n">filter</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">  </span><span class="c1"># Optional filter section</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">  </span><span class="c1"># Modify or clean failed events before reprocessing if required.</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="p">}</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="n">output</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">  </span><span class="n">elasticsearch</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="w">    </span><span class="n">hosts</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">[</span><span class="s2">&quot;http://localhost:9200&quot;</span><span class="o">]</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="w">    </span><span class="n">index</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;reprocessed-logs-%{+YYYY.MM.dd}&quot;</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="w">  </span><span class="n">stdout</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="w">    </span><span class="n">codec</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">rubydebug</span>
+<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="register-the-pipeline">Register the Pipeline</h3>
+<p>Open the Logstash pipelines configuration file.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/logstash/pipelines.yml
+</code></pre></div>
+<p>Add the following pipeline entry:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">pipeline.id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dlq-reprocessing</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nt">path.config</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/etc/logstash/conf.d/dlq-reprocessing.conf&quot;</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nt">queue.type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">persisted</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nt">queue.max_bytes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1gb</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">  </span><span class="nt">pipeline.workers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">  </span><span class="nt">pipeline.batch.size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">125</span>
+</code></pre></div>
+<h3 id="validate-the-configuration">Validate the Configuration</h3>
+<p>Before restarting Logstash, verify that the configuration contains no syntax errors.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>sudo<span class="w"> </span>/usr/share/logstash/bin/logstash<span class="w"> </span>--config.test_and_exit
+</code></pre></div>
+<p><strong>Expected Output:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>Configuration OK
+</code></pre></div>
+<h3 id="restart-logstash">Restart Logstash</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>logstash
+</code></pre></div>
+<p>Verify that the Logstash service is running successfully.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>logstash
+</code></pre></div>
+<p><strong>Expected Output:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>Active: active (running)
+</code></pre></div>
+<h3 id="verify-pipeline-creation">Verify Pipeline Creation</h3>
+<p>Check whether the DLQ Reprocessing Pipeline has been loaded successfully.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>localhost:9600/_node/pipelines?pretty
+</code></pre></div>
+<p><strong>Expected Result:</strong></p>
+<p>The output should include the following pipeline.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>pipeline.id : dlq-reprocessing
+</code></pre></div>
+<h3 id="working-flow">Working Flow</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>Elasticsearch Rejects Event
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>│
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>▼
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>Dead Letter Queue (DLQ)
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>│
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>▼
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a>DLQ Reprocessing Pipeline
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>│
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a>▼
+<a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a>Elasticsearch
+</code></pre></div>
+<h3 id="validation">Validation</h3>
+<p>To validate the implementation:
+1. Generate an event that causes an Elasticsearch indexing failure.
+2. Confirm that the event is stored inside the Dead Letter Queue.
+3. Start the DLQ Reprocessing Pipeline.
+4. Verify that the failed event is successfully reprocessed.
+5. Confirm that the event appears in Elasticsearch under the configured index.</p>
+<p>This confirms that the DLQ Reprocessing Pipeline is functioning correctly and can recover failed events without data loss.</p>
+<p><strong>Next Step:</strong> After validating the Dead Letter Queue Reprocessing Pipeline, the next objective was to monitor the Logstash server and pipeline performance using Node Exporter, Prometheus, and Grafana.</p>
+<hr />
+<h2 id="step-14-infrastructure-monitoring-setup">Step 14 — Infrastructure Monitoring Setup</h2>
+<p>After successfully implementing the Logstash Pipeline-to-Pipeline architecture along with Persistent Queue (PQ) and Dead Letter Queue (DLQ), the next requirement was to monitor the health and performance of the Logstash server.</p>
+<p>To achieve this, a complete monitoring stack consisting of Node Exporter, Prometheus, and Grafana was implemented. This monitoring stack provides real-time visibility into system resources and Logstash performance.</p>
+<h3 id="components-used">Components Used</h3>
+<ol>
+<li>Node Exporter</li>
+<li>Prometheus</li>
+<li>Grafana</li>
+</ol>
+<h3 id="monitoring-objectives">Monitoring Objectives</h3>
+<ol>
+<li>Monitor CPU utilization.</li>
+<li>Monitor Memory utilization.</li>
+<li>Monitor Disk usage.</li>
+<li>Monitor Network statistics.</li>
+<li>Monitor Logstash performance.</li>
+<li>Monitor Pipeline throughput.</li>
+<li>Monitor Events Per Second (EPS).</li>
+<li>Monitor JVM utilization.</li>
+</ol>
+<h3 id="monitoring-architecture">Monitoring Architecture</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>Linux VM (Logstash Server)
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>│
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>▼
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>Node Exporter
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>│
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>▼
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>Exposes Metrics (:9100)
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>│
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a>▼
+<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a>Prometheus
+<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a>│
+<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a>▼
+<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a>Scrapes Metrics Periodically
+<a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a>│
+<a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a>▼
+<a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a>Grafana
+<a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a>│
+<a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a>▼
+<a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a>Real-Time Monitoring Dashboard
+</code></pre></div>
+<p>During the setup, four separate terminal windows were used to independently run and verify each monitoring component.</p>
+<table>
+<thead>
+<tr>
+<th>Terminal</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Terminal 1</td>
+<td>Node Exporter</td>
+</tr>
+<tr>
+<td>Terminal 2</td>
+<td>Prometheus</td>
+</tr>
+<tr>
+<td>Terminal 3</td>
+<td>Logstash Monitoring / Metrics Verification</td>
+</tr>
+<tr>
+<td>Terminal 4</td>
+<td>Grafana Dashboard</td>
+</tr>
+</tbody>
+</table>
+<p>Next Step: The first component of the monitoring stack is Node Exporter, which collects infrastructure metrics from the Linux server.</p>
+<hr />
+<h2 id="step-15-node-exporter-installation-and-configuration">Step 15 — Node Exporter Installation and Configuration</h2>
+<p>Node Exporter is an open-source monitoring agent developed by Prometheus. It collects operating system metrics from the Linux server where Logstash is installed. These metrics are exposed through an HTTP endpoint and later collected by Prometheus.</p>
+<h3 id="why-node-exporter">Why Node Exporter?</h3>
+<p>Node Exporter was installed to monitor the infrastructure resources of the Logstash server, including CPU utilization, memory utilization, disk usage, network statistics, filesystem usage, and system load.</p>
+<p>Without Node Exporter, Prometheus cannot collect operating system metrics.</p>
+<h3 id="installation-commands">Installation Commands</h3>
+<p><strong>Install Node Exporter</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nb">cd</span><span class="w"> </span>/opt
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>wget<span class="w"> </span>https://github.com/prometheus/node_exporter/releases/download/v1.8.1/node_exporter-1.8.1.linux-amd64.tar.gz
+</code></pre></div>
+<p><strong>Extract</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>tar<span class="w"> </span>-xvf<span class="w"> </span>node_exporter-1.8.1.linux-amd64.tar.gz
+</code></pre></div>
+<p><strong>Move Binary</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>sudo<span class="w"> </span>mv<span class="w"> </span>node_exporter-1.8.1.linux-amd64/node_exporter<span class="w"> </span>/usr/local/bin/
+</code></pre></div>
+<p><strong>Create Service User</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>sudo<span class="w"> </span>useradd<span class="w"> </span>--no-create-home<span class="w"> </span>--shell<span class="w"> </span>/bin/false<span class="w"> </span>node_exporter
+</code></pre></div>
+<p><strong>Create Service</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>sudo<span class="w"> </span>vi<span class="w"> </span>/etc/systemd/system/node_exporter.service
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">[Unit]</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="na">Description</span><span class="o">=</span><span class="s">Node Exporter</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="k">[Service]</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="na">User</span><span class="o">=</span><span class="s">node_exporter</span>
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="na">ExecStart</span><span class="o">=</span><span class="s">/usr/local/bin/node_exporter</span>
+<a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a>
+<a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="k">[Install]</span>
+<a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a><span class="na">WantedBy</span><span class="o">=</span><span class="s">multi-user.target</span>
+</code></pre></div>
+<p><strong>Reload</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload
+</code></pre></div>
+<p><strong>Enable</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>node_exporter
+</code></pre></div>
+<p><strong>Start</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>node_exporter
+</code></pre></div>
+<p><strong>Verify</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>node_exporter
+</code></pre></div>
+<p><strong>Open Browser</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>http://&lt;SERVER-IP&gt;:9100/metrics
+</code></pre></div>
+<p>Thousands of metrics should be displayed, confirming that Node Exporter is successfully exposing server metrics.</p>
+<p><strong>Next Step:</strong> After successfully exposing infrastructure metrics using Node Exporter, the next step is to install Prometheus to collect and store these metrics.</p>
+<hr />
+<h2 id="step-16-install-prometheus">Step 16 — Install Prometheus</h2>
+<p><strong>Why Prometheus?</strong>
+Node Exporter only exposes metrics and does not store them. Prometheus periodically collects (scrapes) these metrics and stores them in its time-series database. These stored metrics are later visualized in Grafana.</p>
+<p><strong>Download</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="nb">cd</span><span class="w"> </span>/opt
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>wget<span class="w"> </span>https://github.com/prometheus/prometheus/releases/download/v2.53.0/prometheus-2.53.0.linux-amd64.tar.gz
+</code></pre></div>
+<p><strong>Extract</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>tar<span class="w"> </span>-xvf<span class="w"> </span>prometheus-2.53.0.linux-amd64.tar.gz
+</code></pre></div>
+<p><strong>Move</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>sudo<span class="w"> </span>mv<span class="w"> </span>prometheus-2.53.0.linux-amd64<span class="w"> </span>/opt/prometheus
+</code></pre></div>
+<p><strong>Open Configuration</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/opt/prometheus/prometheus.yml
+</code></pre></div>
+<p>Add the Node Exporter target:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="nt">scrape_configs</span><span class="p">:</span>
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">job_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;node_exporter&quot;</span>
+<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a><span class="w">    </span><span class="nt">static_configs</span><span class="p">:</span>
+<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">targets</span><span class="p">:</span>
+<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost:9100</span>
+</code></pre></div>
+<p><strong>Start Prometheus</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="nb">cd</span><span class="w"> </span>/opt/prometheus
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>./prometheus<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="w">  </span>--config.file<span class="o">=</span>prometheus.yml
+</code></pre></div>
+<p><strong>Open</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>http://&lt;SERVER-IP&gt;:9090
+</code></pre></div>
+<p><strong>Verify</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>Status → Targets
+<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>Expected: node_exporter UP
+</code></pre></div>
+<p>This confirms Prometheus is successfully collecting metrics from Node Exporter.</p>
+<p><strong>Next Step:</strong> After Prometheus begins collecting metrics, the next step is to install Grafana to visualize these metrics through dashboards.</p>
+<hr />
+<h2 id="step-17-grafana-installation-and-configuration">Step 17 — Grafana Installation and Configuration</h2>
+<h2 id="why-grafana">Why Grafana?</h2>
+<p>Although Prometheus stores metrics, it cannot provide rich visual dashboards. Grafana connects to Prometheus and displays the collected metrics through graphs, gauges, and monitoring panels. This enables administrators to monitor Logstash and overall server health in real time.</p>
+<h2 id="install-grafana">Install Grafana</h2>
+<p>Updates the package repository.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update
+</code></pre></div>
+<p>Installs the Grafana package from the Ubuntu repository.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>grafana<span class="w"> </span>-y
+</code></pre></div>
+<p><strong>Enable Grafana Service</strong>
+Enables the Grafana service so it starts automatically after every system reboot.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>grafana-server
+</code></pre></div>
+<p><strong>Start Grafana Service</strong>
+Starts the Grafana service immediately without requiring a server restart.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>grafana-server
+</code></pre></div>
+<h2 id="verify-grafana-service">Verify Grafana Service</h2>
+<p>Checks the current status of the Grafana service and confirms that it is running successfully.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>grafana-server
+</code></pre></div>
+<hr />
+<h2 id="step-19-connect-grafana-with-prometheus">Step 19 — Connect Grafana with Prometheus</h2>
+<p>After installing Grafana, it must be connected to Prometheus so that infrastructure metrics can be visualized through dashboards.</p>
+<h3 id="navigation">Navigation</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>Connections
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>↓
+<a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a>Data Sources
+<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a>↓
+<a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a>Add Data Source
+<a id="__codelineno-50-6" name="__codelineno-50-6" href="#__codelineno-50-6"></a>↓
+<a id="__codelineno-50-7" name="__codelineno-50-7" href="#__codelineno-50-7"></a>Prometheus
+</code></pre></div>
+<h3 id="configuration">Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Server URL</td>
+<td>http://localhost:9090</td>
+</tr>
+</tbody>
+</table>
+<p>Click <strong>Save &amp; Test</strong>.</p>
+<h3 id="expected-result">Expected Result</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>Data source is working
+</code></pre></div>
+<p>This confirms that Grafana has successfully connected to Prometheus and can retrieve metrics.</p>
+<hr />
+<h2 id="step-20-logstash-pipeline-monitoring-using-grafana">Step 20 — Logstash Pipeline Monitoring Using Grafana</h2>
+<p><strong>Objective</strong>
+After successfully installing Node Exporter, Prometheus, and Grafana, the next objective was to monitor the Logstash Pipeline-to-Pipeline (P2P) architecture in real time.</p>
+<p>Instead of checking Logstash logs manually, Grafana was configured to visualize pipeline metrics collected by Prometheus. This allowed real-time monitoring of every Logstash pipeline, making it easier to verify pipeline health, identify failures, and analyze performance.</p>
+<h3 id="why-we-used-grafana">Why We Used Grafana?</h3>
+<p>Grafana was implemented to provide a centralized dashboard for monitoring Logstash pipeline performance. The dashboard enables administrators to:
+1. Monitor each pipeline independently.
+2. Detect pipeline failures immediately.
+3. Observe event flow through every processing stage.
+4. Verify that all pipelines are processing logs correctly.
+5. Analyze throughput and pipeline performance.</p>
+<p>Without Grafana, pipeline statistics would have to be checked manually using the Logstash Metrics API.</p>
+<h3 id="monitoring-architecture_1">Monitoring Architecture</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>Linux Logstash Server
+<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a>↓
+<a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a>Node Exporter
+<a id="__codelineno-52-4" name="__codelineno-52-4" href="#__codelineno-52-4"></a>↓
+<a id="__codelineno-52-5" name="__codelineno-52-5" href="#__codelineno-52-5"></a>Prometheus
+<a id="__codelineno-52-6" name="__codelineno-52-6" href="#__codelineno-52-6"></a>↓
+<a id="__codelineno-52-7" name="__codelineno-52-7" href="#__codelineno-52-7"></a>Collects Metrics
+<a id="__codelineno-52-8" name="__codelineno-52-8" href="#__codelineno-52-8"></a>↓
+<a id="__codelineno-52-9" name="__codelineno-52-9" href="#__codelineno-52-9"></a>Grafana
+<a id="__codelineno-52-10" name="__codelineno-52-10" href="#__codelineno-52-10"></a>↓
+<a id="__codelineno-52-11" name="__codelineno-52-11" href="#__codelineno-52-11"></a>Visualizes Pipeline Metrics
+</code></pre></div>
+<p><strong>Metrics Collected</strong></p>
+<p>Prometheus continuously collected Logstash pipeline metrics such as:
+- Events Received
+- Events Processed
+- Events Output
+- Pipeline Throughput
+- Pipeline Health
+- Pipeline Status
+- Worker Performance
+- Queue Utilization</p>
+<p>These metrics were visualized inside Grafana using Time Series graphs.</p>
+<p><strong>Creating the Pipeline Monitoring Dashboard</strong>
+After connecting Grafana with Prometheus, a new dashboard named Logstash Pipeline Monitoring was created. Inside this dashboard, separate visualization panels were configured to monitor every Logstash pipeline.</p>
+<h3 id="creating-the-panel">Creating the Panel</h3>
+<p><strong>Navigate to:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>Grafana
+<a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a>↓
+<a id="__codelineno-53-3" name="__codelineno-53-3" href="#__codelineno-53-3"></a>Dashboards
+<a id="__codelineno-53-4" name="__codelineno-53-4" href="#__codelineno-53-4"></a>↓
+<a id="__codelineno-53-5" name="__codelineno-53-5" href="#__codelineno-53-5"></a>New Dashboard
+<a id="__codelineno-53-6" name="__codelineno-53-6" href="#__codelineno-53-6"></a>↓
+<a id="__codelineno-53-7" name="__codelineno-53-7" href="#__codelineno-53-7"></a>Add Visualization
+<a id="__codelineno-53-8" name="__codelineno-53-8" href="#__codelineno-53-8"></a>↓
+<a id="__codelineno-53-9" name="__codelineno-53-9" href="#__codelineno-53-9"></a>Select Prometheus Data Source
+</code></pre></div>
+<p>The visualization type selected was: <strong>Time Series</strong> because pipeline metrics continuously change over time.</p>
+<h3 id="configuring-the-prometheus-query">Configuring the Prometheus Query</h3>
+<p>To monitor the number of events entering every Logstash pipeline, the following PromQL query was configured.</p>
+<p><strong>Query</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>{__name__=~&quot;logstash_.*_events_in&quot;}
+</code></pre></div>
+<h3 id="why-this-query-was-used">Why This Query Was Used?</h3>
+<p><code>logstash_</code> — Selects only Logstash metrics.</p>
+<p><code>.*</code> — Matches every Logstash pipeline.</p>
+<p><strong>Examples:</strong>
+1. logstash_ingestion_events_in
+2. logstash_normalization_events_in
+3. logstash_enrichment_events_in
+4. logstash_routing_events_in</p>
+<p><code>events_in</code> — Displays the number of events entering each pipeline. Therefore, one PromQL query automatically monitors every pipeline without creating separate queries for each stage.</p>
+<h2 id="result">Result</h2>
+<p>Grafana automatically displayed four different metrics:
+1. logstash_ingestion_events_in
+2. logstash_normalization_events_in
+3. logstash_enrichment_events_in
+4. logstash_routing_events_in</p>
+<p>Each metric appeared as a separate line on the graph. This allowed real-time comparison of pipeline activity.</p>
+<p><strong>Understanding the Graph</strong>
+Each colored line represents one Logstash pipeline.</p>
+<table>
+<thead>
+<tr>
+<th>Color</th>
+<th>Pipeline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Blue</td>
+<td>Normalization Pipeline</td>
+</tr>
+<tr>
+<td>Orange</td>
+<td>Routing Pipeline</td>
+</tr>
+<tr>
+<td>Yellow</td>
+<td>Ingestion Pipeline</td>
+</tr>
+<tr>
+<td>Green</td>
+<td>Enrichment Pipeline</td>
+</tr>
+</tbody>
+</table>
+<p>As logs pass through Logstash, every pipeline processes events independently, causing each graph to increase over time. If all pipelines are functioning correctly, all graphs continue increasing.</p>
+<h3 id="pipeline-failure-testing">Pipeline Failure Testing</h3>
+<p>To verify monitoring accuracy, one pipeline was intentionally stopped.</p>
+<p><strong>Pipeline Stopped:</strong> Enrichment Pipeline</p>
+<p>After stopping the pipeline:
+1. Ingestion Pipeline continued processing logs.
+2. Normalization Pipeline continued processing logs.
+3. Routing Pipeline continued processing logs.
+4. Enrichment Pipeline stopped receiving events.</p>
+<h2 id="observation">Observation</h2>
+<p>Inside Grafana, the Enrichment Pipeline graph immediately became a straight horizontal line. The remaining pipeline graphs continued increasing. This confirmed that Grafana was successfully monitoring each pipeline independently.</p>
+<h3 id="why-this-test-was-performed">Why This Test Was Performed?</h3>
+<p>The objective of this validation was to verify that:
+1. Every pipeline is monitored separately.
+2. Pipeline failures can be identified immediately.
+3. Monitoring is independent for each processing stage.
+4. Administrators can quickly locate failed pipelines.</p>
+<h2 id="verification">Verification</h2>
+<p>The following conditions were verified successfully:</p>
+<ol>
+<li>Ingestion Pipeline receiving events.</li>
+<li>Normalization Pipeline processing events.</li>
+<li>Enrichment Pipeline stopped.</li>
+<li>Routing Pipeline processing events.</li>
+<li>Grafana immediately reflected pipeline failure.</li>
+<li>Prometheus continuously updated metrics.</li>
+</ol>
+<h2 id="benefits">Benefits</h2>
+<p>Using Grafana for pipeline monitoring provides several advantages:
+1. Real-time monitoring.
+2. Easy visualization.
+3. Immediate failure detection.
+4. Pipeline performance analysis.
+5. Historical metric analysis.
+6. Simplified troubleshooting.
+7. Better operational visibility.</p>
+<h3 id="overall-monitoring-flow">Overall Monitoring Flow</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>Application Logs
+<a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a>↓
+<a id="__codelineno-55-3" name="__codelineno-55-3" href="#__codelineno-55-3"></a>Filebeat
+<a id="__codelineno-55-4" name="__codelineno-55-4" href="#__codelineno-55-4"></a>↓
+<a id="__codelineno-55-5" name="__codelineno-55-5" href="#__codelineno-55-5"></a>Logstash Ingestion Pipeline
+<a id="__codelineno-55-6" name="__codelineno-55-6" href="#__codelineno-55-6"></a>↓
+<a id="__codelineno-55-7" name="__codelineno-55-7" href="#__codelineno-55-7"></a>Normalization Pipeline
+<a id="__codelineno-55-8" name="__codelineno-55-8" href="#__codelineno-55-8"></a>↓
+<a id="__codelineno-55-9" name="__codelineno-55-9" href="#__codelineno-55-9"></a>Enrichment Pipeline
+<a id="__codelineno-55-10" name="__codelineno-55-10" href="#__codelineno-55-10"></a>↓
+<a id="__codelineno-55-11" name="__codelineno-55-11" href="#__codelineno-55-11"></a>Routing Pipeline
+<a id="__codelineno-55-12" name="__codelineno-55-12" href="#__codelineno-55-12"></a>↓
+<a id="__codelineno-55-13" name="__codelineno-55-13" href="#__codelineno-55-13"></a>Elasticsearch
+<a id="__codelineno-55-14" name="__codelineno-55-14" href="#__codelineno-55-14"></a>↓
+<a id="__codelineno-55-15" name="__codelineno-55-15" href="#__codelineno-55-15"></a>Logstash Metrics API
+<a id="__codelineno-55-16" name="__codelineno-55-16" href="#__codelineno-55-16"></a>↓
+<a id="__codelineno-55-17" name="__codelineno-55-17" href="#__codelineno-55-17"></a>Prometheus
+<a id="__codelineno-55-18" name="__codelineno-55-18" href="#__codelineno-55-18"></a>↓
+<a id="__codelineno-55-19" name="__codelineno-55-19" href="#__codelineno-55-19"></a>Grafana Dashboard
+</code></pre></div>
+<hr />
+<p><img alt="Grafana Dashboard - Pipeline Monitoring" src="../../../../assets/images/POC%27s/Yaseen/SOC%20Logstash%20Pipeline-to-Pipeline%20%28P2P%29%20Architecture%20Implementation%20Guide/grafana%20part.png" /></p>
+<p><strong>Grafana dashboard displaying real-time event counts for the Ingestion, Normalization, Enrichment, and Routing pipelines using the <code>logstash_.*_events_in</code> Prometheus query.</strong></p>
+<hr />
+<p><img alt="Grafana Dashboard - Pipeline Failure Validation" src="../../../../assets/images/POC%27s/Yaseen/SOC%20Logstash%20Pipeline-to-Pipeline%20%28P2P%29%20Architecture%20Implementation%20Guide/grafana%20part.png" /></p>
+<p><strong>Validation of pipeline monitoring by intentionally stopping the Enrichment Pipeline. Grafana immediately reflected the failure by displaying a flat line for the Enrichment Pipeline while the remaining pipelines continued processing events normally.</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.top", "navigation.tracking", "navigation.indexes", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

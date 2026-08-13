@@ -1,5 +1,10 @@
 ﻿# SSO — Microsoft Entra ID (SAML)
 
+<!-- **Author:** Abhinav   -->
+**Version:** 1.0  
+<!-- **Created Date:** 2026-07-28  
+**Updated Date:** 2026-07-28 -->
+
 ## Overview
 
 This process can be completed in three simple steps to configure SSO and role-based access for Wazuh in Microsoft Entra ID. Follow the steps below in sequence to set up the application, define roles, and assign access to users.
@@ -20,16 +25,16 @@ Before registering and configuring the Wazuh application in the Azure portal, us
 | --- | --- | --- |
 | **Application name** | Name of the enterprise application to create in Microsoft Entra ID. | wazuh-sso |
 | **Application type** | Select a non-gallery enterprise application. | Integrate any other application you do not find in the gallery. |
-| **Wazuh dashboard URL** | Public or internal HTTPS URL used to access the Wazuh dashboard. | https://10.10.100.100/ |
+| **Wazuh dashboard URL** | Public or internal HTTPS URL used to access the Wazuh dashboard. | https://WAZUH_DASHBOARD_URL/ |
 | **Identifier / Entity ID** | Service Provider entity ID configured in Basic SAML Configuration. | wazuh-saml |
-| **Reply URL / ACS URL** | Assertion Consumer Service URL for Wazuh SAML login. | https://10.10.100.100/_opendistro/_security/saml/acs |
-| **Sign-on URL** | Main Wazuh dashboard URL. | https://10.10.100.100/ |
+| **Reply URL / ACS URL** | Assertion Consumer Service URL for Wazuh SAML login. | https://WAZUH_DASHBOARD_URL/_opendistro/_security/saml/acs |
+| **Sign-on URL** | Main Wazuh dashboard URL. | https://WAZUH_DASHBOARD_URL/ |
 | **App role display name** | User-friendly role name shown in Microsoft Entra ID. | Tenant A Admin, Tenant A Analyst |
 | **App role value** | Backend role value sent to Wazuh. This must match the Wazuh role mapping exactly. | indexer_role, soc_analyst_role |
 | **App role description** | Description of what the role provides. | Tenant Level Administrative Permissions, Tenant Level Analyst Permissions |
 | **Role enabled** | Confirm the app role is enabled before saving. | Enabled / checked |
 | **Allowed member types** | Type of identities allowed to receive the role. | Users/Groups |
-| **Users or groups** | Users or groups that should be assigned to the Wazuh enterprise application. | Internal: CISO, Users as needed. External: Shekark@vidyayug.com (admin), vineethreddy@vidyayug.com (Analyst), Tharun@vidyayug.com (Analyst) |
+| **Users or groups** | Users or groups that should be assigned to the Wazuh enterprise application. | Internal: Security administrators and authorized users. External: admin@example.com (admin), analyst1@example.com (Analyst), analyst2@example.com(Analyst) |
 | **SAML claim name** | Name of the claim used to send assigned roles to Wazuh. | Roles |
 | **SAML claim source attribute** | Source attribute for the role claim. | user.assignedroles |
 
@@ -126,8 +131,8 @@ After the one-time SSO setup, collect these values from the Azure portal and sen
 | **App Federation Metadata URL** (`idp.metadata_url`) | Enterprise app → Single sign-on → Option 3 SAML Certificates → App Federation Metadata Url | `https://login.microsoftonline.com/<tenant-id>/federationmetadata/2007-06/federationmetadata.xml?appid=<app-id>` |
 | **Entity ID / Identifier** | Enterprise app → Single sign-on → Option 1 Basic SAML Configuration → Identifier | `wazuh-saml-sai` |
 | `idp.entity_id` | Enterprise app → Single sign-on → Option 4 Set up `<App>` → Microsoft Entra ID Identifier | `https://sts.windows.net/<tenant-id>/` |
-| **Tenant ID** | Microsoft Entra ID → Overview → Tenant ID | `4d327ebb-24ba-46d0-a50a-0e777e00e023` |
-| **Client ID (Application ID)** | App registrations → our app → Overview → Application (client) ID | `73c4bf32-97b3-4268-a944-44b9986f0b3b` |
+| **Tenant ID** | Microsoft Entra ID → Overview → Tenant ID | `<tenant-id>` |
+| **Client ID (Application ID)** | App registrations → our app → Overview → Application (client) ID | `<client-id>` |
 
 ---
 
@@ -136,7 +141,7 @@ After the one-time SSO setup, collect these values from the Azure portal and sen
 **Step — Run this command inside your VM:**
 
 ```bash
-docker exec -it single-node-wazuh.indexer-1 bash
+docker exec -it <WAZUH_INDEXER_CONTAINER> bash
 ```
 
 Back up the indexer security configuration before you make changes.
@@ -152,6 +157,8 @@ JAVA_HOME=/usr/share/wazuh-indexer/jdk /usr/share/wazuh-indexer/plugins/opensear
 ```
 
 Generate the `exchange_key`:
+
+Generate a unique exchange key and store it securely. Do not reuse the same value across environments and do not commit it to source control.
 
 ```bash
 openssl rand -hex 32
@@ -285,7 +292,7 @@ export JAVA_HOME=/usr/share/wazuh-indexer/jdk && \
 **Step — Run this command inside your VM:**
 
 ```bash
-docker exec -it single-node-wazuh.dashboard-1 bash
+docker exec -it <WAZUH_DASHBOARD_CONTAINER> bash
 ```
 
 Verify `run_as` is enabled:
@@ -409,8 +416,8 @@ server.xsrf.allowlist: ["/_opendistro/_security/saml/acs", "/_opendistro/_securi
 
 Restart the dashboard:
 
-```bash
-systemctl restart wazuh-dashboard
-```
+Restart the Wazuh Dashboard container using the deployment method used in your environment (Docker, Docker Compose, Kubernetes, or systemd-based installation).
 
 Test the configuration by opening the Wazuh dashboard and logging in with your Microsoft account.
+
+If authentication fails, review the Wazuh Dashboard logs, OpenSearch security logs, and Microsoft Entra ID sign-in logs to identify claim-mapping or SAML assertion issues.

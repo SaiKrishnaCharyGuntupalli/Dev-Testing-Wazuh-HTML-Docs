@@ -1,12 +1,17 @@
 # IMPLEMENTATION PROCESS TO MONITOR FILEBEAT HEALTH
 
+<!-- **Author:** Sai Krishna   -->
+**Version:** 1.0  
+<!-- **Created Date:** 2026-07-24  
+**Updated Date:** 2026-07-24 -->
+
 ## 1. EXISTING SETUP
 
 ##### Meaning:
 
-I already installed Filebeat on the XXX.XXX.XX.12 VM, installed Logstash on the XXX.XXX.XX.87 VM, and installed Wazuh on the XXX.XXX.XX.43 VM.
+Already installed Filebeat on the source VM, Logstash on the processing VM, and Wazuh on the monitoring VM.
 
-I already have a pipeline to collect application logs by using Filebeat. My pipeline is: Filebeat → Logstash → Wazuh Manager.
+Already haveing a pipeline to collect application logs by using Filebeat. Pipeline is: Filebeat → Logstash → Wazuh Manager.
 
 ---
 
@@ -145,8 +150,8 @@ output {
     password => "YOUR-OPENSEARCH-PASSWORD"
     index => "filebeat-health-%{+YYYY.MM.dd}"
     # creates daily index like filebeat-health-2026.05.18
-    ssl_certificate_verification => false
-    # for lab/dev — set to true with proper certs in production
+    ssl_certificate_verification => false  # for lab/dev
+    # set to true with proper certs in production
   }
 }
 ```
@@ -211,7 +216,7 @@ sudo env OPENSEARCH_INITIAL_ADMIN_PASSWORD=XXXXXXXXXXXX apt install opensearch -
 
 ##### **Challenge:**
 
-When I am trying to install OpenSearch, I faced an error: `Unable to locate package opensearch`.
+While installing OpenSearch, encountered the following error:: `Unable to locate package opensearch`.
 
 ##### **Solution:**
 
@@ -249,7 +254,7 @@ discovery.type: single-node  # single server, not a cluster
 sudo systemctl enable opensearch && sudo systemctl start opensearch
 
 # Verify it is working (run from OpenSearch VM itself)
-curl -k -u admin:XXXXXXXXXXXX https://localhost:9200
+curl -k -u admin:<password> https://localhost:9200
 # You should see JSON with cluster_name and version
 ```
 
@@ -270,6 +275,7 @@ opensearch.hosts: ["https://localhost:9200"]
 opensearch.username: "kibanaserver"
 opensearch.password: "XXXXXXXXXXXX"
 opensearch.ssl.verificationMode: none
+# Change opensearch.ssl.verificationMode: full in production
 ```
 
 ```bash
@@ -283,7 +289,7 @@ Your existing Filebeat → Logstash → Wazuh pipeline continues running exactly
 
 ##### **Challenge:**
 
-After doing the changes at the Logstash level, I am trying to restart Logstash, but it is taking a long time to restart and is not restarting. When I investigate, I find an error as follows:
+After applying the changes at the Logstash level, an attempt was made to restart the Logstash service. However, the service is taking an unusually long time to restart and is not coming up successfully. Upon further investigation, the following error was identified:
 
 **Logstash is stuck in `deactivating (stop-sigterm)` for 1 hour 36 minutes**
 
@@ -350,14 +356,18 @@ sudo ss -tlnp | grep -E "5044|5045"
 
 ##### **Challenge:**
 
-After fixing the previous challenge, when I am trying to access OpenSearch Dashboards from the browser to display the data in the UI, I faced another challenge: when opening the OpenSearch dashboard in the browser using the `http://XXX.XXX.XX.87:5601` URL, it displays "OpenSearch Dashboards server is not ready yet" in the browser.
+After resolving the previous issue, an additional challenge was encountered while attempting to access OpenSearch Dashboards through the web browser to visualize data in the user interface. When navigating to the OpenSearch Dashboards URL (http://XXX.XXX.XX.87:5601), the browser displayed the message:
+
+"OpenSearch Dashboards server is not ready yet."
+
+As a result, the OpenSearch Dashboards interface was unavailable and the data could not be accessed through the UI.
 
 ###### Exact cause of the problem
 
 Look at this output you got:
 
 ```bash
-curl -k -u kibanaserver:XXXXXXXXXXXX https://localhost:9200
+curl -k -u kibanaserver:<password> https://localhost:9200
 Unauthorized
 ```
 
@@ -414,17 +424,19 @@ sudo ss -tlnp | grep 5044
 # should ALSO still show — confirms existing pipeline untouched
 
 # On OpenSearch VM: did data arrive?
-curl -k -u admin:XXXXXXXXXXXX \
+curl -k -u admin:<password> \
   "https://localhost:9200/_cat/indices?v"
 # After 1-2 minutes you should see: filebeat-health-2026.05.18
 
 # Count documents to confirm data is flowing
-curl -k -u admin:XXXXXXXXXXXX \
+curl -k -u admin:<password> \
   "https://localhost:9200/filebeat-health-*/_count"
 # Should return { "count": some_number_greater_than_0 }
 ```
 
-And check by accessing OpenSearch Dashboards from the browser using `admin` / `<your admin password>` as username and password, and it will be based on your setup and configured values. When we open OpenSearch Dashboards for the first time it will ask a few setup questions. So first we need to complete those steps before seeing the data in the UI. This setup will look like the following:
+Access OpenSearch Dashboards through a web browser using the administrator credentials configured in your environment. The username is typically admin, while the password should be the value defined during your installation and configuration process.
+
+When accessing OpenSearch Dashboards for the first time, an initial setup and configuration wizard may be displayed. Complete the required setup steps before proceeding to the dashboard interface and viewing data. An example of the initial setup screen is shown below.
 
 ![Image 2](<../../../assets/images/POC's/Sai krishna/Implementation Process to Monitor Filebeat Health/image2.png>)
 
@@ -432,7 +444,9 @@ After completing the initial setup, you can now see the incoming metric data in 
 
 ![Image 3](<../../../assets/images/POC's/Sai krishna/Implementation Process to Monitor Filebeat Health/image3.png>)
 
-Now data is reaching and being stored in OpenSearch, and we can verify data using the Discover section — that is fine, but for monitoring this is not the recommended way. To monitor agent health, we must create a dashboard to display all the agents on one screen, so that we can monitor multiple agents in one place — this is the recommended way.
+Data is now being successfully ingested into and stored within OpenSearch. While the data can be verified through the Discover section, this approach is not recommended for ongoing monitoring purposes.
+
+For effective agent health monitoring, it is recommended to create a dedicated dashboard that provides a centralized view of all agents on a single screen. This enables administrators to monitor the status and health of multiple agents efficiently from one location, improving visibility and operational management.
 
 ---
 
@@ -945,15 +959,19 @@ Change 120 to 300 for 5 minutes. Change the same number in the color line below 
 
 ##### **Challenge:**
 
-When I run the above custom script in OpenSearch Dashboards in Vega Visualize, it actually gives errors while running the script. The errors are: `"width" and "height" params are ignored because "autosize" is enabled. Set "autosize": "none" to disable` and `url.%context% and url.%timefield% must not be used when url.body.query is set`.
+While runing the above custom script in OpenSearch Dashboards in Vega Visualize, it actually gives errors. The errors are: `"width" and "height" params are ignored because "autosize" is enabled. Set "autosize": "none" to disable` and `url.%context% and url.%timefield% must not be used when url.body.query is set`.
 
 **Error 1** — width and height are ignored because OpenSearch Dashboards enables autosize automatically. The fix is to add `"autosize": "none"`.
 
-**Error 2** — In OpenSearch Dashboards Vega, you cannot use `%context%` and `%timefield%` together with a custom `body.query`. You must choose one approach. Since we need a custom query to filter by `event.module` and `beat.type`, we remove `%context%` and `%timefield%` and write the time filter manually inside the query.
+**Error 2** — In OpenSearch Dashboards Vega visualizations, %context% and %timefield% cannot be used together with a custom body.query. When a custom query is required (for example, to filter data by event.module and beat.type), the dashboard context parameters must be removed, and the time range filter should be explicitly defined within the query itself.
 
 ##### **Solution:**
 
-I updated the code, and now the errors are resolved. But visually it was not good, so I again updated the code to look better, and the condition was also changed to 30 seconds instead of 120 seconds, and I updated the code to display 0 minutes when Filebeat is not running. After making all these modifications, the final code is as follows:
+The code has been updated and all previously reported errors have been resolved. Following the issue resolution, additional enhancements were implemented to improve the overall visual appearance of the interface.
+
+As part of these updates, the monitoring condition threshold was modified from 120 seconds to 30 seconds to better align with the current requirements. Furthermore, the logic was enhanced to display 0 minutes when the Filebeat service is not running, ensuring clearer and more accurate status representation.
+
+After incorporating these changes and improvements, the final version of the code is provided below.
 
 ```json
 {

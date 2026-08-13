@@ -1,5 +1,10 @@
 # Wazuh Dashboard — Security Role Permissions Master Reference
 
+<!-- **Author:** Abhinav   -->
+**Version:** 1.0  
+<!-- **Created Date:** 2026-07-28  
+**Updated Date:** 2026-07-28 -->
+
 **Source:** OpenSearch Security Plugin (used by Wazuh Indexer / Wazuh Dashboard)  
 **Configuration Location:** Indexer Management → Security → Edit Role → Cluster Permissions & Index Permissions
 
@@ -9,18 +14,22 @@
 
 Applied in the **Cluster Permissions** field of a role. These control cluster-wide operations independent of any specific index.
 
+After assigning permissions, validate access using a non-administrative test account before deploying role changes to production users.
+
 ### 1.1 Cluster-Level Action Groups
 Shorthand names you can type directly to apply multiple permissions at once.
 
 | Action Group Name | What It Allows |
 | :--- | :--- |
-| `cluster_all` | Full access to all cluster-level operations; alias for `cluster:*` wildcard. |
+| `cluster_all` | Full access to all cluster-level operations; alias for `cluster:*` wildcard. Grant only to trusted cluster administrators. |
 | `cluster_monitor` | Read-only access to all cluster monitoring APIs (health, stats, info, pending tasks, etc.). |
 | `cluster_composite_ops` | Permits bulk, multi-get (mget), multi-search (msearch), multi-term vector, and reindex operations. |
 | `cluster_composite_ops_ro` | Read-only composite ops: msearch, mget, and multi-term vector (no write operations). |
 | `manage_snapshots` | Allows creating, deleting, restoring, and querying snapshots and snapshot repositories. |
 | `manage_point_in_time` | Allows creating and deleting Point-in-Time (PIT) contexts for consistent paginated searches. |
 | `indices_monitor` | Cluster-level alias that grants monitoring permission across all indices (stats, segments, recovery). |
+
+Note: In multi-tenant environments, cluster monitoring permissions may expose infrastructure and cluster metadata. Evaluate whether tenant-facing roles require these permissions. 
 
 ### 1.2 Administrative Permissions (`cluster:admin/*`)
 Control cluster configuration, snapshots, ingest pipelines, scripts, templates, and plugin-specific operations.
@@ -112,7 +121,7 @@ Shorthand names used in Index Permissions `allowed_actions` to apply groups of i
 
 | Action Group Name | What It Allows |
 | :--- | :--- |
-| `indices_all` | Full access to every index operation (alias for `indices:*` wildcard). |
+| `indices_all` | Full access to every index operation (alias for `indices:*` wildcard). Assign only to trusted administrative roles. |
 | `read` | Allows searches, gets, mget, explain, field caps, msearch, scroll, and mapping reads on an index. |
 | `write` | Allows indexing (create/update) documents and related bulk write operations on an index. |
 | `delete` | Allows deleting documents by ID or via delete-by-query on an index. |

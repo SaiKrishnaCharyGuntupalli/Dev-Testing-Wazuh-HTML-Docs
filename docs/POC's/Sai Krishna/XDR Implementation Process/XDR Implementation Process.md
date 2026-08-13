@@ -1,8 +1,22 @@
 # XDR Implementation Process
 
+<!-- **Author:** Sai Krishna   -->
+**Version:** 1.0  
+<!-- **Created Date:** 2026-07-24  
+**Updated Date:** 2026-07-24 -->
+
+## Prerequisites
+
+- Wazuh Manager installed and running
+- Wazuh Agent installed and connected
+- Administrative privileges
+- Backup of existing ossec.conf
+- Network connectivity between agents and manager
+- Supported Wazuh version identified
+
 ## First Understand: What is XDR in Wazuh?
 
-XDR = Correlating security data from:
+Extended Detection and Response (XDR) correlates security telemetry from:
 
 - Endpoint (agent logs)
 - System activity
@@ -26,6 +40,15 @@ Wazuh already supports XDR features. You just need to enable and configure them 
 ## Configuration Files You Must Edit
 
 ---
+
+## Backup Existing Configuration
+
+Before modifying any Wazuh configuration file:
+
+```bash
+sudo cp /var/ossec/etc/ossec.conf /var/ossec/etc/ossec.conf.backup
+
+```
 
 ## On Agent VM
 
@@ -63,6 +86,8 @@ Inside `<localfile>`:
   <frequency>3600</frequency> 
   <directories check_all="yes">/etc,/usr/bin</directories> 
 </syscheck> 
+
+<!-- Adjust monitored directories based on system size and performance requirements -->
 
 ```
 
@@ -129,6 +154,7 @@ File: `/var/ossec/etc/ossec.conf`
 ### Enable Vulnerability Detection
 
 ```xml
+<!-- Verify the vulnerability detection configuration syntax against your installed Wazuh version before applying changes. -->
 
 <vulnerability-detector> 
   <enabled>yes</enabled> 
@@ -154,6 +180,12 @@ If you want to write a custom rule, add it to:
 
 ```
 Example — block connections from blacklisted IPs:
+
+Ensure the referenced list file exists:
+
+`/var/ossec/etc/lists/bad-ip-list`
+
+Add one IP address per line.
 
 ```xml
 <group name="threat_intel">
@@ -192,6 +224,8 @@ In `/var/ossec/etc/ossec.conf` on the manager:
   <rules_id>5710</rules_id>
   <timeout>60</timeout>
 </active-response>
+
+<!-- Validate active response behavior in a test environment before enabling in production. -->
 ```
 
 **Why?** Automatically block a brute force attacker's IP address.
@@ -230,11 +264,11 @@ When verifying the Wazuh manager configuration, a Wazuh manager server-related i
     If the Wazuh Dashboard becomes unreachable after editing `ossec.conf`, the most likely cause is a syntax error in the configuration file. Validate the XML before restarting:
 
 ```bash
-    /var/ossec/bin/wazuh-control check-config
+/var/ossec/bin/wazuh-control check-config
 ```
 
-    Fix any reported errors, then restart:
+Fix any reported errors, then restart:
 
 ```bash
-    sudo systemctl restart wazuh-manager
+sudo systemctl restart wazuh-manager
 ```

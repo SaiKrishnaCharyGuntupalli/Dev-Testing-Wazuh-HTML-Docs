@@ -1,12 +1,27 @@
 # PIPELINES AND CHALLENGES
 
+<!-- **Author:** Sai Krishna   -->
+**Version:** 1.0  
+<!-- **Created Date:** 2026-07-24  
+**Updated Date:** 2026-07-24 -->
+
+## Prerequisites
+
+- Ubuntu/Debian Linux VM
+- Docker-based Wazuh deployment
+- Root or sudo access
+- Network connectivity between all pipeline components
+- Required firewall ports opened
+- Filebeat 7.x (or specified version)
+- Logstash 8.x (or specified version)
+
 ## 1. PIPELINE 1 (WAZUH AGENT → MANAGER → INDEXER → DASHBOARD)
 
 ### 1.1 How to Install Wazuh Agent in Linux VM
 
 ##### Meaning:
 
-To install the Wazuh agent on a Linux VM, Windows machine, or Mac, follow the approach below (from the Wazuh UI) to install and connect it with the Wazuh manager properly without any challenges.
+To install the Wazuh Agent on a Linux VM, Windows machine, or Mac, follow the approach below (from the Wazuh UI) to install and connect it with the Wazuh Manager properly without any challenges.
 
 ![Image 1](../../../assets/images/POC's/Sai krishna/Pipelines and Challenges/image1.png)
 
@@ -46,7 +61,7 @@ After installation, the agent is placed here:
 /var/ossec/
 ```
 
-This is the **main directory of the Wazuh agent**.
+This is the **main directory of the Wazuh Agent**.
 
 ##### Explanation:
 
@@ -117,7 +132,7 @@ If you want to add metadata at the agent level, then you have to modify the agen
 
 ##### Query:
 
-In `ossec.config`:
+In `ossec.conf`:
 
 ```xml
 <ossec_config>
@@ -131,7 +146,7 @@ In `ossec.config`:
 
 ##### Explanation:
 
-Add this as a separate block in the agent `ossec.config` file, which is shown in the image below.
+Add this block to the agent `ossec.conf` file under the `<ossec_config>` section., which is shown in the image below.
 
 ![Image 4](../../../assets/images/POC's/Sai krishna/Pipelines and Challenges/image4.png)
 
@@ -153,14 +168,14 @@ sudo systemctl restart wazuh-agent
 
 #### How to Verify
 
-From now onwards, you can see the added metadata for every alert that the Wazuh manager is generating. It will display the same as the image below:
+From now onwards, you can see the added metadata for every alert that the Wazuh Manager is generating. It will display the same as the image below:
 
 ![Image 5](../../../assets/images/POC's/Sai krishna/Pipelines and Challenges/image5.png)
 
 #### Simple Understanding
 
 - `<labels>` = metadata (like tags)
-- Used for filtering in the Wazuh dashboard
+- Used for filtering in the Wazuh Dashboard
 
 ---
 
@@ -242,11 +257,12 @@ You should see incoming logs.
 
 ##### **Challenge:**
 
-When I was following the above process, the synthetic logs are not generating and not writing to the `auth.log` file, and not reaching the `archives.log` file in the manager VM.
+Issue Encountered: 
+the synthetic logs are not generating and not writing to the `auth.log` file, and not reaching the `archives.log` file in the manager VM.
 
 ##### **Solution:**
 
-I changed the synthetic log generation script to the following one:
+Then changed the synthetic log generation script to the following one:
 
 **Script:**
 
@@ -259,11 +275,12 @@ done
 
 #### **Challenge:**
 
-When I was using the above script, the synthetic logs are generating and writing to the `auth.log` file but not reaching the `archives.log` file in the manager VM.
+Issue Encountered:
+ the synthetic logs are generating and writing to the `auth.log` file but not reaching the `archives.log` file in the manager VM.
 
 #### **Solution:**
 
-Then I changed the synthetic log generation script again to:
+Then changed the synthetic log generation script again to:
 
 **Script:**
 
@@ -663,7 +680,7 @@ This will tell you if Filebeat can reach `XXX.XXX.XX.13:9065`.
 
 ### **Challenge:**
 
-When I test the connectivity to the Wazuh manager, I faced an error the same as in the image below:
+While test the connectivity to the Wazuh Manager, we may faced an error the same as in the image below:
 
 ![Image 7](../../../assets/images/POC's/Sai krishna/Pipelines and Challenges/image7.png)
 
@@ -746,7 +763,7 @@ If you see all those **OK** messages — your Filebeat is successfully connected
 
 ### **Challenge:**
 
-When I followed the above solution, it actually displayed all OK's when I ran the test command. But I again faced a challenge while passing generated synthetic logs from Filebeat to the Wazuh manager, and those synthetic logs are not reaching the `archives.log` file in the Wazuh manager VM.
+While following the above solution, it actually displayed all OK's while ran the test command. But again faced a challenge while passing generated synthetic logs from Filebeat to the Wazuh Manager, and those synthetic logs are not reaching the `archives.log` file in the Wazuh Manager VM.
 
 #### Why output.logstash on Port 1514 Shows OK But Doesn't Work
 
@@ -821,7 +838,7 @@ sudo systemctl status filebeat
 
 ### **Challenge:**
 
-When I was trying to restart Filebeat, it is not starting and is giving the following error, the same as in the given image:
+When trying to restart Filebeat, it is not starting and is giving the following error, the same as in the given image:
 
 ![Image 8](../../../assets/images/POC's/Sai krishna/Pipelines and Challenges/image8.png)
 
@@ -1004,7 +1021,7 @@ Paste this:
 input {
   beats {
     port => 5044          # Logstash listens on this port for Filebeat
-    host => "0.0.0.0"     # Accept from any IP
+    host => "0.0.0.0"     # Listen on all interfaces. Restrict to specific interfaces in production where possible.
   }
 }
 
@@ -1105,11 +1122,11 @@ sudo systemctl restart wazuh-manager
 
 ### **Challenge:**
 
-After implementing the above process clearly, when I am trying to pass the logs from Logstash to the Wazuh manager, those logs are not reaching the Wazuh manager and there are no new alerts in the Wazuh UI.
+After implementing the above process clearly, trying to pass the logs from Logstash to the Wazuh Manager, those logs are not reaching the Wazuh Manager and there are no new alerts in the Wazuh UI.
 
 ### **Solution:**
 
-Then I modified the existing Logstash config file with some filters and allowed the ports at the VM level by taking the DevOps engineer's help.
+Then modified the existing Logstash config file with some filters and allowed the ports at the VM level by taking the DevOps engineer's help.
 
 Modified Logstash config file:
 
@@ -1120,7 +1137,7 @@ Modified Logstash config file:
 input {
   beats {
     port => 5044          # Logstash listens on this port for Filebeat
-    host => "0.0.0.0"     # Accept from any IP
+    host => "0.0.0.0"     # Listen on all interfaces. Restrict to specific interfaces in production where possible.
   }
 }
 
@@ -1176,13 +1193,13 @@ output {
 
 ### **Challenge:**
 
-After following the above approach, the issue still remains the same, and when I debug, I get an error in my Logstash log file, the same as in the image below.
+After following the above approach, the issue still remains the same, and when we debug, we get an error in the Logstash log file, the same as in the image below.
 
 ![Image 9](../../../assets/images/POC's/Sai krishna/Pipelines and Challenges/image9.png)
 
 ### **Solution:**
 
-Then I connected with the DevOps engineer and he opened the new port 9065 to the Wazuh manager, then added the below config code snippet to the Wazuh manager config file and restarted.
+Then connected with the DevOps engineer and he opened the new port 9065 to the Wazuh Manager, then added the below config code snippet to the Wazuh Manager config file and restarted.
 
 **Manager `ossec.conf`:**
 
@@ -1197,7 +1214,7 @@ Then I connected with the DevOps engineer and he opened the new port 9065 to the
 </ossec_config>
 ```
 
-Then I updated the Logstash config file output part with the code below.
+Then update the Logstash config file output part with the code below.
 
 **`Wazuh.conf`:**
 
@@ -1211,7 +1228,7 @@ output {
 }
 ```
 
-And restarted Logstash. Now the logs are passing through Logstash to the Wazuh manager, and alerts are also displayed in the Wazuh UI.
+And restarted Logstash. Now the logs are passing through Logstash to the Wazuh Manager, and alerts are also displayed in the Wazuh UI.
 
 ---
 
@@ -1276,3 +1293,10 @@ You can also see the generated alerts in the Wazuh UI, and it will display somet
 
 ---
 
+## Pipeline Comparison
+
+| Pipeline | Components | Recommended |
+|-----------|-----------|-----------|
+| Pipeline 1 | Agent → Manager → Indexer → Dashboard | Yes |
+| Pipeline 2 | Filebeat → Manager | No |
+| Pipeline 3 | Filebeat → Logstash → Manager | Yes |

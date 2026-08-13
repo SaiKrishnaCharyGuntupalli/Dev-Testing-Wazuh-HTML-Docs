@@ -22,7 +22,7 @@ This runbook covers certificate generation and distribution, Wazuh Indexer clust
 The objective of this document is to provide a repeatable deployment procedure that can be used by DevOps, SOC, and infrastructure teams to deploy, operate, troubleshoot, and maintain a secure and scalable Wazuh multi-node environment.
 
 ## Architecture diagram
-![Multi node](<../../../assets/images/POC's/Vineeth\Wazuh Multi Node Runbook\Multi node.png>)
+![Multi node](<../../../assets/images/POC's/Vineeth/Wazuh Multi Node Runbook/Multi node.png>)
 
 
 ## 1. certificate generation guide

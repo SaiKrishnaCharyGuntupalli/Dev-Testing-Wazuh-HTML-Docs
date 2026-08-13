@@ -41,14 +41,14 @@ nav:
   - Getting Started: 01-Getting_started/Getting_started.md
   - Deployment & Configuration:
       - Index Template & Filebeat: 02-index-template-filebeat/index_template.md
-      - Agent Deployment: 03-agent-deployment/agent_deplyment.md
+      - Agent Deployment: 03-agent-deployment/agent_deployment.md
       - Agent Configuration: 04-agent-configuration/agent_config.md
   - Security & Access:
       - RBAC: 06-rbac/rbac.md
       - Document Level Security (DLS): 07-dls/dls.md
       - SSO - Microsoft Entra ID: 08-sso-entra/sso.md
   - Reference:
-      - Cluster and Index Verification: 09-Cluster and Index Verification/Cluster and Index Verification.md
+      - Cluster and Index Verification: 09-cluster-index-verification/cluster-index-verification.md
       - Reference: 10-reference/reference.md
   - "POC's":
       - "GitHub_Webhook_to_Logstash": "POC's/Junaid/GitHub_Webhook_to_Logstash/GitHub_Webhook_to_Logstash_POC.md"
@@ -79,4 +79,5 @@ nav:
       - Zero Downtime Group Configuration: POC's/Junaid/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA.md
       - Single Agent Multi Group in Wazuh: POC's/Junaid/POC- Single Agent Multi-Group in Wazuh/POC- Single Agent Multi-Group in Wazuh.md
       - Operating System Based Group Creation in Wazuh GitHub: POC's/Junaid/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub.md
-  
+      - Microsoft 365 to Wazuh Integration Complete Imp and Config: POC's/Yaseen/Microsoft 365 to Wazuh Integration Complete Imp and Config\Microsoft_365_to_Wazuh_Integration_Complete_Implementation_and_Configuration.md
+      - Non Wazuh SOC Onboarding and Implementation Guide: POC's/Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide.md

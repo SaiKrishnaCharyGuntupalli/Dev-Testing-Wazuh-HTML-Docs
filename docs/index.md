@@ -1,8 +1,13 @@
 # Wazuh MSSP Multi-Tenant Implementation Guide
 
-<div class="intro-card">
-This guide provides a practical, production-oriented walkthrough for implementing a multi-tenant Wazuh MSSP deployment with centralized management, OpenSearch-based indexing, and tenant-aware security controls.
-</div>
+<!-- **Author:** Abhinav   -->
+**Version:** 1.0  
+<!-- **Created Date:** 2026-07-28  
+**Updated Date:** 2026-07-28 -->
+
+!!! info "Overview"
+
+    This guide provides a practical, production-oriented walkthrough for implementing a multi-tenant Wazuh MSSP deployment with centralized management, OpenSearch-based indexing, and tenant-aware security controls.
 
 This documentation is structured to help you move from planning and prerequisites to deployment, security configuration, verification, and reference material in a clear sequence.
 
@@ -34,13 +39,13 @@ This documentation is structured to help you move from planning and prerequisite
 
 ## Navigation
 
-- [Getting_started](01-Getting_started/Getting_started.md)
+- [Getting Started](01-Getting_started/Getting_started.md)
 - [Index Template & Filebeat](02-index-template-filebeat/index_template.md)
-- [Agent Deployment](03-agent-deployment/agent_deplyment.md)
+- [Agent Deployment](03-agent-deployment/agent_deployment.md)
 - [Agent Configuration](04-agent-configuration/agent_config.md)
 - [RBAC](06-rbac/rbac.md)
 - [Document Level Security (DLS)](07-dls/dls.md)
 - [SSO - Microsoft Entra ID](08-sso-entra/sso.md)
-- [Cluster and Index verification](09-Cluster and Index Verification/Cluster and Index Verification.md)
+- [Cluster and Index Verification](09-cluster-index-verification/cluster-index-verification.md)
 - [Reference](10-reference/reference.md)
 

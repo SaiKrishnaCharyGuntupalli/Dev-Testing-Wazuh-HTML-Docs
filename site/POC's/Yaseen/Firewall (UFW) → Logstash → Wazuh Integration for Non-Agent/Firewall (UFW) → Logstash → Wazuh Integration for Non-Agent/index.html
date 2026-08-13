@@ -1,0 +1,3745 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Production implementation guide for multi-tenant Wazuh MSSP on single-node Docker">
+      
+      
+      
+      
+        <link rel="prev" href="../../Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/">
+      
+      
+        <link rel="next" href="../../GitHub_Logstash_Wazuh_NonAgent_Implementation/GitHub_Logstash_Wazuh_NonAgent_Implementation/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent - Wazuh MSSP Multi-Tenant Implementation Guide</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../../stylesheets/responsive-nav.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#firewall-ufw-logstash-wazuh-integration-for-non-agent-firewall-monitoring" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-header__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Wazuh MSSP Multi-Tenant Implementation Guide
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-nav__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    Wazuh MSSP Multi-Tenant Implementation Guide
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../01-Getting_started/Getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment & Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment & Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../02-index-template-filebeat/index_template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index Template & Filebeat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../04-agent-configuration/agent_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & Access
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Security & Access
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../06-rbac/rbac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RBAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../07-dls/dls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Document Level Security (DLS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../08-sso-entra/sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSO - Microsoft Entra ID
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster and Index Verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../10-reference/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC's
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    POC's
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/GitHub_Webhook_to_Logstash/GitHub_Webhook_to_Logstash_POC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub_Webhook_to_Logstash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Rules-as-Code%20Implementation%20Guide/Wazuh%20Rules-as-Code%20Implementation%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Rules-as-Code Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Windows Agent Deployment & Security Detection logs Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetFlowlogs_to_Logstash_and_Wazuh_Indexer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/XDR%20Implementation%20Process/XDR%20Implementation%20Process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XDR Implementation Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Second%20use%20case%20of%20XDR/Second%20use%20case%20of%20XDR/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Second use case of XDR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Pipelines_and_Challenges/Pipelines_and_Challenges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipelines_and_Challenges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jira API → Logstash → Wazuh Integration for Non-Agent Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LOGSTASH PIPELINE WORKERS & BATCHSIZE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objective
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-ufw-firewall-installation-and-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1 — UFW Firewall Installation and Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 1 — UFW Firewall Installation and Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-a-firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is a Firewall?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-is-ufw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is UFW?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-ufw-was-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why UFW Was Used
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ufw-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UFW Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enabling-firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enabling Firewall
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-2-firewall-rule-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2 — Firewall Rule Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-firewall-event-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 — Firewall Event Generation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3 — Firewall Event Generation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#initial-testing-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Initial Testing Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actual-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actual Observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-logs-were-generated-automatically" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Logs Were Generated Automatically
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#understanding-port-179" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding Port 179
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-understanding-firewall-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4 — Understanding Firewall Logs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 4 — Understanding Firewall Logs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-kernel-appears" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why "kernel" Appears
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-sonarqube-appears" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why "sonarqube" Appears
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-5-logstash-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5 — Logstash Deployment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 5 — Logstash Deployment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-logstash-was-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Logstash Was Used
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-6-logstash-pipeline-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6 — Logstash Pipeline Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6 — Logstash Pipeline Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#complete-logstash-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Logstash Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-61-input-section" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6.1 — Input Section
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6.1 — Input Section">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-input-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Input Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation-of-each-parameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation of Each Parameter
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-62-filter-section" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6.2 — Filter Section
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6.2 — Filter Section">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#firewall-event-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Firewall Event Detection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-63-metadata-enrichment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6.3 — Metadata Enrichment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-64-message-modification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6.4 — Message Modification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6.4 — Message Modification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-was-this-added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Was This Added?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-65-file-output-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6.5 — File Output Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6.5 — File Output Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-rubydebug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why rubydebug?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-66-tcp-output-to-wazuh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6.6 — TCP Output to Wazuh
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-7-wazuh-manager-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 7 — Wazuh Manager Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 7 — Wazuh Manager Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wazuh-syslog-listener-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wazuh Syslog Listener Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verifying-incoming-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifying Incoming Events
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verifying Incoming Events">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-archivesjson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is archives.json?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-8-wazuh-rule-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 8 — Wazuh Rule Development
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 8 — Wazuh Rule Development">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problem-identified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem Identified
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#understanding-wazuh-alert-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding Wazuh Alert Processing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#local-rule-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local Rule Creation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-explanation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-9-troubleshooting-and-issue-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 9 — Troubleshooting and Issue Resolution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 9 — Troubleshooting and Issue Resolution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#issue-1-logstash-unable-to-read-syslog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 1 — Logstash Unable to Read Syslog
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-2-events-not-appearing-in-wazuh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 2 — Events Not Appearing in Wazuh
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-3-logs-in-archivesjson-but-no-alerts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 3 — Logs in archives.json but No Alerts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-4-local_rulesxml-permission-denied" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 4 — local_rules.xml Permission Denied
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-5-rule-validation-failure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 5 — Rule Validation Failure
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-10-dashboard-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 10 — Dashboard Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 10 — Dashboard Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#observed-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observed Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GitHub_Logstash_Wazuh_NonAgent_Implementation/GitHub_Logstash_Wazuh_NonAgent_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Logstash Wazuh NonAgent Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/MySQL_Log_Monitoring_Using_Wazuh_Agent/MySQL_Log_Monitoring_Using_Wazuh_Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MySQL_Log_Monitoring_Using_Wazuh_Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Agent_Log_Buffering_and_Resynchronization/Wazuh_Agent_Log_Buffering_and_Resynchronization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Agent_Log_Buffering_and_Resynchronization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Process%20to%20Monitor%20Filebeat%20Health/Implementation_Process_to_Monitor_Filebeat_Health/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor Filebeat Health
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20AWS%20CloudTrail%20%E2%86%92%20S3%20%E2%86%92%20SQS%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh/Implementation_Guide_AWS_CloudTrail_S3_SQS_Logstash_Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide AWS CloudTrail → S3 → SQS → Logstash → Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Prometheus/Prometheus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prometheus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SOC%20Logstash%20Multi-Pipeline%20Architecture%20Implementation%20Guide/SOC_Logstash_Multi_Pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Multi-Pipeline Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SOC%20Logstash%20Pipeline-to-Pipeline%20%28P2P%29%20Architecture%20Implementation%20Guide/SOC_Logstash_P2P/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Multi_Tenant_MSSP_Implementation/Wazuh_Multi_Tenant_MSSP_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Multi_Tenant_MSSP_Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/Wazuh%20Multi%20Node%20Runbook/Wazuh%20Multi%20Node%20Runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Multi Node Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Availability Log Ingestion Pipeline Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zero Downtime Group Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operating System Based Group Creation in Wazuh GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objective
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-ufw-firewall-installation-and-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1 — UFW Firewall Installation and Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 1 — UFW Firewall Installation and Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-a-firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is a Firewall?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-is-ufw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is UFW?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-ufw-was-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why UFW Was Used
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ufw-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UFW Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enabling-firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enabling Firewall
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-2-firewall-rule-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2 — Firewall Rule Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-firewall-event-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 — Firewall Event Generation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3 — Firewall Event Generation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#initial-testing-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Initial Testing Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actual-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actual Observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-logs-were-generated-automatically" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Logs Were Generated Automatically
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#understanding-port-179" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding Port 179
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-understanding-firewall-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4 — Understanding Firewall Logs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 4 — Understanding Firewall Logs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-kernel-appears" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why "kernel" Appears
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-sonarqube-appears" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why "sonarqube" Appears
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-5-logstash-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5 — Logstash Deployment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 5 — Logstash Deployment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-logstash-was-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Logstash Was Used
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-6-logstash-pipeline-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6 — Logstash Pipeline Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6 — Logstash Pipeline Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#complete-logstash-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Logstash Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-61-input-section" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6.1 — Input Section
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6.1 — Input Section">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-input-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Input Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation-of-each-parameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation of Each Parameter
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-62-filter-section" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6.2 — Filter Section
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6.2 — Filter Section">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#firewall-event-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Firewall Event Detection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-63-metadata-enrichment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6.3 — Metadata Enrichment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-64-message-modification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6.4 — Message Modification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6.4 — Message Modification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-was-this-added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Was This Added?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-65-file-output-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6.5 — File Output Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 6.5 — File Output Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-rubydebug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why rubydebug?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-66-tcp-output-to-wazuh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6.6 — TCP Output to Wazuh
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-7-wazuh-manager-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 7 — Wazuh Manager Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 7 — Wazuh Manager Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wazuh-syslog-listener-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wazuh Syslog Listener Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verifying-incoming-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifying Incoming Events
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verifying Incoming Events">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-archivesjson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is archives.json?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-8-wazuh-rule-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 8 — Wazuh Rule Development
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 8 — Wazuh Rule Development">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problem-identified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem Identified
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#understanding-wazuh-alert-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding Wazuh Alert Processing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#local-rule-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local Rule Creation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-explanation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-9-troubleshooting-and-issue-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 9 — Troubleshooting and Issue Resolution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 9 — Troubleshooting and Issue Resolution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#issue-1-logstash-unable-to-read-syslog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 1 — Logstash Unable to Read Syslog
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-2-events-not-appearing-in-wazuh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 2 — Events Not Appearing in Wazuh
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-3-logs-in-archivesjson-but-no-alerts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 3 — Logs in archives.json but No Alerts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-4-local_rulesxml-permission-denied" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 4 — local_rules.xml Permission Denied
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-5-rule-validation-failure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 5 — Rule Validation Failure
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-10-dashboard-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 10 — Dashboard Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 10 — Dashboard Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#observed-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observed Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="firewall-ufw-logstash-wazuh-integration-for-non-agent-firewall-monitoring">Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent Firewall Monitoring</h1>
+<h2 id="objective">Objective</h2>
+<p>The objective of this implementation is to collect Linux firewall security events generated by UFW (Uncomplicated Firewall), process and enrich those events using Logstash, forward them to the Wazuh Manager, and generate actionable security alerts in the Wazuh Dashboard.</p>
+<p>This implementation demonstrates a complete SOC-style firewall monitoring pipeline where real network security events are collected, analyzed, enriched with custom metadata, and visualized for security monitoring and investigation.</p>
+<hr />
+<h2 id="architecture-overview">Architecture Overview</h2>
+<p><img alt="Architecture Overview" src="../../../../assets/images/POC%27s/Yaseen/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/Architecture%20Overview.png" /></p>
+<hr />
+<h2 id="phase-1-ufw-firewall-installation-and-configuration">Phase 1 — UFW Firewall Installation and Configuration</h2>
+<h3 id="what-is-a-firewall">What is a Firewall?</h3>
+<p>A firewall is a security mechanism that monitors and controls incoming and outgoing network traffic based on predefined security rules.</p>
+<p>Think of a firewall as a security guard standing at the entrance of a building. Every network packet entering or leaving the system is checked against configured rules. Based on those rules, traffic can either be allowed or blocked.</p>
+<p>Without a firewall, any device on the network can attempt to communicate with the system. A firewall helps protect servers from unauthorized access, malicious traffic, port scanning activities, and network attacks.</p>
+<p>In this project, the firewall was used as the primary source for generating security events that could be monitored through Logstash and Wazuh.</p>
+<h3 id="what-is-ufw">What is UFW?</h3>
+<p>UFW stands for Uncomplicated Firewall. It is a Linux firewall management utility that provides a simplified interface for configuring firewall rules. Internally, UFW works on top of iptables and helps administrators manage network access without dealing directly with complex firewall commands.</p>
+<p>In enterprise environments, UFW is commonly used to control incoming and outgoing network traffic, protect servers from unauthorized access, and generate security events that can be monitored by SOC teams.</p>
+<h3 id="why-ufw-was-used">Why UFW Was Used</h3>
+<p>For this project, a reliable source of real security events was required. UFW was selected because every blocked connection attempt automatically generates firewall logs that can be collected and analyzed.</p>
+<p>Using UFW allowed us to simulate a real SOC monitoring use case where network activity, blocked connections, source IPs, destination IPs, and protocols can be monitored and investigated.</p>
+<h3 id="ufw-installation">UFW Installation</h3>
+<p>Verify the firewall package:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>status
+</code></pre></div>
+<p>If UFW is not installed:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ufw<span class="w"> </span>-y
+</code></pre></div>
+<p>Verify installation:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>version
+</code></pre></div>
+<h3 id="enabling-firewall">Enabling Firewall</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sudo<span class="w"> </span>ufw<span class="w"> </span><span class="nb">enable</span>
+</code></pre></div>
+<p>Verification:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>status<span class="w"> </span>verbose
+</code></pre></div>
+<p>Expected Result:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Status: active
+</code></pre></div>
+This confirms that the firewall is actively monitoring network traffic.</p>
+<hr />
+<h2 id="phase-2-firewall-rule-configuration">Phase 2 — Firewall Rule Configuration</h2>
+<p>To generate meaningful security events, multiple deny rules were configured.</p>
+<p>Commands executed:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>deny<span class="w"> </span><span class="m">3333</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>deny<span class="w"> </span><span class="m">4444</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>deny<span class="w"> </span><span class="m">5555</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>deny<span class="w"> </span><span class="m">6666</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>deny<span class="w"> </span><span class="m">7777</span>
+</code></pre></div>
+<p>Verification:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>status<span class="w"> </span>numbered
+</code></pre></div>
+<p>Observed Output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>3333  DENY
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>4444  DENY
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>5555  DENY
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>6666  DENY
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>7777  DENY
+</code></pre></div>
+These rules instruct UFW to block traffic attempting to access these ports.</p>
+<hr />
+<h2 id="phase-3-firewall-event-generation">Phase 3 — Firewall Event Generation</h2>
+<h3 id="initial-testing-approach">Initial Testing Approach</h3>
+<p>Initially, blocked connections could be generated manually using:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>nc<span class="w"> </span>-vz<span class="w"> </span>&lt;IP-address&gt;<span class="w"> </span><span class="m">6666</span>
+</code></pre></div>
+<p>This was used only for validation purposes.</p>
+<h3 id="actual-observation">Actual Observation</h3>
+<p>While monitoring firewall logs, it was observed that events were continuously being generated even when no manual commands were executed.</p>
+<p>Verification:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-f<span class="w"> </span>/var/log/syslog<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>UFW
+</code></pre></div>
+<p>Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>[UFW BLOCK] SRC=&lt;IP-address&gt; DST=&lt;IP-address&gt; PROTO=TCP DPT=179
+</code></pre></div></p>
+<h3 id="why-logs-were-generated-automatically">Why Logs Were Generated Automatically</h3>
+<p>The environment already contained real network traffic attempting to connect to the Linux server. Whenever these packets reached the firewall:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Network Packet
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>↓
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>Linux Kernel
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>↓
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>UFW Inspection
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>↓
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>Packet Blocked
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>↓
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>Syslog Event Generated
+</code></pre></div>
+As a result, UFW continuously produced firewall events without requiring manual traffic generation.</p>
+<h3 id="understanding-port-179">Understanding Port 179</h3>
+<p>During analysis, many logs contained <code>DPT=179</code>.</p>
+<ul>
+<li><strong>DPT</strong> = Destination Port</li>
+<li><strong>179</strong> = BGP Port (Border Gateway Protocol)</li>
+</ul>
+<p>The project did not configure BGP. The network itself was generating traffic toward port 179, and UFW was automatically logging those blocked connection attempts.</p>
+<hr />
+<h2 id="phase-4-understanding-firewall-logs">Phase 4 — Understanding Firewall Logs</h2>
+<p>Firewall events are written to:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>/var/log/syslog
+</code></pre></div>
+Monitoring command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-f<span class="w"> </span>/var/log/syslog<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>UFW
+</code></pre></div>
+<p>Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Jun 12 sonarqube kernel: [UFW BLOCK] SRC=&lt;IP-address&gt; DST=&lt;IP-address&gt; PROTO=TCP
+</code></pre></div></p>
+<h3 id="why-kernel-appears">Why "kernel" Appears</h3>
+<p>UFW operates inside the Linux networking stack. Whenever network traffic is inspected:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Network Packet
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>↓
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>Linux Kernel
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>↓
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>UFW Processing
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>↓
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>Syslog
+</code></pre></div>
+Therefore, Linux records the source program as <code>kernel</code>.</p>
+<h3 id="why-sonarqube-appears">Why "sonarqube" Appears</h3>
+<p>The firewall logs were generated on the Sonarqube VM. Linux automatically includes the hostname in log entries. Therefore:</p>
+<ul>
+<li><code>sonarqube</code> = Hostname</li>
+<li><code>kernel</code> = Process generating event</li>
+</ul>
+<hr />
+<h2 id="phase-5-logstash-deployment">Phase 5 — Logstash Deployment</h2>
+<h3 id="why-logstash-was-used">Why Logstash Was Used</h3>
+<p>Logstash acts as a centralized log processing engine. Responsibilities:</p>
+<ol>
+<li>Log Collection</li>
+<li>Event Parsing</li>
+<li>Event Enrichment</li>
+<li>Event Routing</li>
+<li>Event Forwarding</li>
+</ol>
+<p>With Logstash:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>Firewall → Logstash → Wazuh
+</code></pre></div>
+This provides better scalability and flexibility.</p>
+<hr />
+<h2 id="phase-6-logstash-pipeline-configuration">Phase 6 — Logstash Pipeline Configuration</h2>
+<h3 id="complete-logstash-pipeline">Complete Logstash Pipeline</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">input</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="n">file</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="n">path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;/var/log/syslog&quot;</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="n">start_position</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;end&quot;</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">    </span><span class="n">sincedb_path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;/dev/null&quot;</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">    </span><span class="n">mode</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;tail&quot;</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="p">}</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="n">filter</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="s2">&quot;UFW BLOCK&quot;</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">[</span><span class="n">message</span><span class="o">]</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">    </span><span class="n">mutate</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">      </span><span class="n">add_field</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">        </span><span class="s2">&quot;source_platform&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;firewall&quot;</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="w">        </span><span class="s2">&quot;event_category&quot;</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;network_security&quot;</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="w">        </span><span class="s2">&quot;environment&quot;</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;poc&quot;</span>
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">        </span><span class="s2">&quot;tenant&quot;</span><span class="w">          </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;network_poc&quot;</span>
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">        </span><span class="s2">&quot;non_agent_id&quot;</span><span class="w">    </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;5001&quot;</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a><span class="w">        </span><span class="s2">&quot;device_type&quot;</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;linux_ufw&quot;</span>
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="w">    </span><span class="n">mutate</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a><span class="w">      </span><span class="n">replace</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a><span class="w">        </span><span class="s2">&quot;message&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;%{message} tenant=network_poc non_agent_id=5001&quot;</span>
+<a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-18-26" name="__codelineno-18-26" href="#__codelineno-18-26"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-18-27" name="__codelineno-18-27" href="#__codelineno-18-27"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a><span class="p">}</span>
+<a id="__codelineno-18-29" name="__codelineno-18-29" href="#__codelineno-18-29"></a>
+<a id="__codelineno-18-30" name="__codelineno-18-30" href="#__codelineno-18-30"></a><span class="n">output</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-31" name="__codelineno-18-31" href="#__codelineno-18-31"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="n">source_platform</span><span class="o">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;firewall&quot;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-32" name="__codelineno-18-32" href="#__codelineno-18-32"></a><span class="w">    </span><span class="n">file</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-33" name="__codelineno-18-33" href="#__codelineno-18-33"></a><span class="w">      </span><span class="n">path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;/tmp/firewall-events.log&quot;</span>
+<a id="__codelineno-18-34" name="__codelineno-18-34" href="#__codelineno-18-34"></a><span class="w">      </span><span class="n">codec</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">rubydebug</span>
+<a id="__codelineno-18-35" name="__codelineno-18-35" href="#__codelineno-18-35"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-18-36" name="__codelineno-18-36" href="#__codelineno-18-36"></a><span class="w">    </span><span class="n">tcp</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-37" name="__codelineno-18-37" href="#__codelineno-18-37"></a><span class="w">      </span><span class="n">host</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;100.80.13.125&quot;</span>
+<a id="__codelineno-18-38" name="__codelineno-18-38" href="#__codelineno-18-38"></a><span class="w">      </span><span class="n">port</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">1514</span>
+<a id="__codelineno-18-39" name="__codelineno-18-39" href="#__codelineno-18-39"></a><span class="w">      </span><span class="n">codec</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-40" name="__codelineno-18-40" href="#__codelineno-18-40"></a><span class="w">        </span><span class="nb">format</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;&lt;134&gt;%{message}&quot;</span>
+<a id="__codelineno-18-41" name="__codelineno-18-41" href="#__codelineno-18-41"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-18-42" name="__codelineno-18-42" href="#__codelineno-18-42"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-18-43" name="__codelineno-18-43" href="#__codelineno-18-43"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-18-44" name="__codelineno-18-44" href="#__codelineno-18-44"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h3 id="phase-61-input-section">Phase 6.1 — Input Section</h3>
+<h4 id="purpose">Purpose</h4>
+<p>The Input section is responsible for collecting firewall logs from the Linux operating system. UFW firewall events are written to <code>/var/log/syslog</code>, therefore Logstash was configured to continuously monitor this file.</p>
+<h4 id="file-input-configuration">File Input Configuration</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">input</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="n">file</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="n">path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;/var/log/syslog&quot;</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">    </span><span class="n">start_position</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;end&quot;</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">    </span><span class="n">sincedb_path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;/dev/null&quot;</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">    </span><span class="n">mode</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;tail&quot;</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="p">}</span>
+</code></pre></div>
+<h4 id="explanation-of-each-parameter">Explanation of Each Parameter</h4>
+<p><strong>path</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;/var/log/syslog&quot;</span>
+</code></pre></div>
+<p>Specifies the file Logstash should monitor. UFW firewall events are written into syslog. Without monitoring syslog, Logstash cannot collect firewall events.</p>
+<p><strong>start_position</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">start_position</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;end&quot;</span>
+</code></pre></div>
+<p>Tells Logstash where to begin reading. Options are <code>beginning</code> or <code>end</code>. Only newly generated firewall events were required — old historical logs were not needed. Therefore: read new logs only.</p>
+<p><strong>sincedb_path</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">sincedb_path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;/dev/null&quot;</span>
+</code></pre></div>
+<p>Controls Logstash file tracking. Normally Logstash remembers the last read position inside a sincedb file. For testing, Logstash was set to always read events fresh, so tracking was disabled.</p>
+<p><strong>mode</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">mode</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;tail&quot;</span>
+</code></pre></div>
+<p>Continuously monitors file updates. Firewall events are generated continuously so Logstash must keep watching the file in real time.</p>
+<p><strong>Result:</strong> Logstash successfully collected firewall events from Linux syslog.</p>
+<hr />
+<h3 id="phase-62-filter-section">Phase 6.2 — Filter Section</h3>
+<h4 id="purpose_1">Purpose</h4>
+<p>The filter section was used to identify firewall events and enrich them with custom metadata.</p>
+<p>Without filtering: Raw Firewall Logs</p>
+<p>With filtering: Enriched Security Events</p>
+<h4 id="firewall-event-detection">Firewall Event Detection</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">if</span><span class="w"> </span><span class="s2">&quot;UFW BLOCK&quot;</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">[</span><span class="n">message</span><span class="o">]</span>
+</code></pre></div>
+<p>Purpose: Process only firewall block events. Syslog contains many types of logs (SSH logs, system logs, kernel logs, application logs, firewall logs). Only <code>UFW BLOCK</code> events were required.</p>
+<hr />
+<h3 id="phase-63-metadata-enrichment">Phase 6.3 — Metadata Enrichment</h3>
+<p>SOC analysts often need additional context. Metadata helps identify event source, environment, tenant, device type, and non-agent source.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Field</strong></th>
+<th><strong>Value</strong></th>
+<th><strong>Purpose</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>source_platform</code></td>
+<td><code>firewall</code></td>
+<td>Identifies firewall as the source</td>
+</tr>
+<tr>
+<td><code>event_category</code></td>
+<td><code>network_security</code></td>
+<td>Classifies event type</td>
+</tr>
+<tr>
+<td><code>environment</code></td>
+<td><code>poc</code></td>
+<td>Identifies testing environment</td>
+</tr>
+<tr>
+<td><code>tenant</code></td>
+<td><code>network_poc</code></td>
+<td>Logical tenant separation</td>
+</tr>
+<tr>
+<td><code>non_agent_id</code></td>
+<td><code>5001</code></td>
+<td>Unique identifier for non-agent source</td>
+</tr>
+<tr>
+<td><code>device_type</code></td>
+<td><code>linux_ufw</code></td>
+<td>Identifies Linux UFW firewall source</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Result:</strong> Firewall events now contain meaningful SOC metadata.</p>
+<hr />
+<h3 id="phase-64-message-modification">Phase 6.4 — Message Modification</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">mutate</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">  </span><span class="n">replace</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">    </span><span class="s2">&quot;message&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;%{message} tenant=network_poc non_agent_id=5001&quot;</span>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="p">}</span>
+</code></pre></div>
+<h4 id="why-was-this-added">Why Was This Added?</h4>
+<p>During testing, Wazuh was receiving events but some custom fields were not visible after processing. To preserve important identifiers, metadata was appended directly into the message payload.</p>
+<p><strong>Before:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>[UFW BLOCK] SRC=&lt;IP-address&gt; DST=&lt;IP-address&gt;
+</code></pre></div>
+<strong>After:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>[UFW BLOCK] SRC=&lt;IP-address&gt; DST=&lt;IP-address&gt; tenant=network_poc non_agent_id=5001
+</code></pre></div>
+<strong>Result:</strong> Custom identifiers remained visible after forwarding to Wazuh.</p>
+<hr />
+<h3 id="phase-65-file-output-validation">Phase 6.5 — File Output Validation</h3>
+<p>Before sending logs to Wazuh, validation was required. Therefore a temporary file output was configured.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">file</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">  </span><span class="n">path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;/tmp/firewall-events.log&quot;</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">  </span><span class="n">codec</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">rubydebug</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="p">}</span>
+</code></pre></div>
+<h4 id="why-rubydebug">Why rubydebug?</h4>
+<p><code>codec =&gt; rubydebug</code> displays the complete event structure. Used to verify metadata fields, parsed values, and event formatting.</p>
+<h4 id="verification">Verification</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>tail<span class="w"> </span>-f<span class="w"> </span>/tmp/firewall-events.log
+</code></pre></div>
+<h4 id="observation">Observation</h4>
+<p>Successfully observed: <code>source_platform</code>, <code>tenant</code>, <code>device_type</code>, <code>event_category</code>, <code>non_agent_id</code>.</p>
+<p><strong>Result:</strong> Logstash enrichment validated successfully.</p>
+<hr />
+<h3 id="phase-66-tcp-output-to-wazuh">Phase 6.6 — TCP Output to Wazuh</h3>
+<p>Forward enriched firewall events to Wazuh Manager:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">tcp</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">  </span><span class="n">host</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;100.80.13.125&quot;</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">  </span><span class="n">port</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">1514</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">  </span><span class="n">codec</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w">    </span><span class="nb">format</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;&lt;134&gt;%{message}&quot;</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="p">}</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th><strong>Parameter</strong></th>
+<th><strong>Value</strong></th>
+<th><strong>Purpose</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>host</code></td>
+<td><code>100.80.13.125</code></td>
+<td>Destination Wazuh Manager IP</td>
+</tr>
+<tr>
+<td><code>port</code></td>
+<td><code>1514</code></td>
+<td>Wazuh Syslog Listener Port</td>
+</tr>
+<tr>
+<td><code>codec</code></td>
+<td><code>line</code></td>
+<td>Send events as single-line syslog messages</td>
+</tr>
+<tr>
+<td><code>format</code></td>
+<td><code>&lt;134&gt;%{message}</code></td>
+<td>Convert firewall event into syslog format expected by Wazuh</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Result:</strong> Firewall events successfully forwarded to Wazuh Manager.</p>
+<hr />
+<h2 id="phase-7-wazuh-manager-configuration">Phase 7 — Wazuh Manager Configuration</h2>
+<p>After Logstash successfully collected and enriched firewall events, the next step was to configure the Wazuh Manager to receive those events. The Wazuh Manager acts as the central security analysis engine. It receives incoming logs, processes them using decoders and rules, and generates alerts that can be viewed in the Wazuh Dashboard.</p>
+<h3 id="wazuh-syslog-listener-configuration">Wazuh Syslog Listener Configuration</h3>
+<p>The Wazuh Manager was configured to receive Syslog events on TCP port 1514.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>Configuration file: /var/ossec/etc/ossec.conf
+</code></pre></div>
+Purpose: Allow external systems such as Logstash to forward events into Wazuh.</p>
+<h3 id="verifying-incoming-events">Verifying Incoming Events</h3>
+<p>After Logstash started forwarding logs, verification was performed using:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>single-node-wazuh.manager-1<span class="w"> </span>bash
+</code></pre></div>
+<p>Inside the container:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>tail<span class="w"> </span>-f<span class="w"> </span>/var/ossec/logs/archives/archives.json
+</code></pre></div>
+<h4 id="what-is-archivesjson">What is archives.json?</h4>
+<p><code>archives.json</code> stores raw events received by Wazuh before alert generation. Purpose:</p>
+<ol>
+<li>Verify logs are reaching Wazuh</li>
+<li>Verify log content</li>
+<li>Troubleshoot decoder issues</li>
+<li>Validate event reception</li>
+</ol>
+<h3 id="observation_1">Observation</h3>
+<p>Firewall events appeared in <code>archives.json</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="p">{</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">  </span><span class="nt">&quot;source_platform&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;firewall&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">  </span><span class="nt">&quot;tenant&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;network_poc&quot;</span><span class="p">,</span>
+<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">  </span><span class="nt">&quot;event_category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;network_security&quot;</span>
+<a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>This confirmed the following communication was successful:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>Firewall
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>↓
+<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a>
+<a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a>Logstash
+<a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a>
+<a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a>↓
+<a id="__codelineno-35-8" name="__codelineno-35-8" href="#__codelineno-35-8"></a>
+<a id="__codelineno-35-9" name="__codelineno-35-9" href="#__codelineno-35-9"></a>Wazuh Manager
+</code></pre></div></p>
+<hr />
+<h2 id="phase-8-wazuh-rule-development">Phase 8 — Wazuh Rule Development</h2>
+<h3 id="problem-identified">Problem Identified</h3>
+<p>Events were visible in <code>archives.json</code> but no alerts were appearing in <code>alerts.json</code>.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>archives.json  → YES
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>alerts.json    → NO
+<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>
+<a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a>Dashboard      → NO
+</code></pre></div>
+This indicated that Wazuh was receiving logs but not generating alerts.</p>
+<h3 id="understanding-wazuh-alert-processing">Understanding Wazuh Alert Processing</h3>
+<p>Wazuh generates alerts only when:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>Raw Event
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>
+<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>↓
+<a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a>
+<a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a>Decoder Match
+<a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a>
+<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a>↓
+<a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a>
+<a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a>Rule Match
+<a id="__codelineno-37-10" name="__codelineno-37-10" href="#__codelineno-37-10"></a>
+<a id="__codelineno-37-11" name="__codelineno-37-11" href="#__codelineno-37-11"></a>↓
+<a id="__codelineno-37-12" name="__codelineno-37-12" href="#__codelineno-37-12"></a>
+<a id="__codelineno-37-13" name="__codelineno-37-13" href="#__codelineno-37-13"></a>Alert Generated
+<a id="__codelineno-37-14" name="__codelineno-37-14" href="#__codelineno-37-14"></a>
+<a id="__codelineno-37-15" name="__codelineno-37-15" href="#__codelineno-37-15"></a>If decoder fails:
+<a id="__codelineno-37-16" name="__codelineno-37-16" href="#__codelineno-37-16"></a>
+<a id="__codelineno-37-17" name="__codelineno-37-17" href="#__codelineno-37-17"></a>archives.json = YES
+<a id="__codelineno-37-18" name="__codelineno-37-18" href="#__codelineno-37-18"></a>
+<a id="__codelineno-37-19" name="__codelineno-37-19" href="#__codelineno-37-19"></a>alerts.json   = NO
+<a id="__codelineno-37-20" name="__codelineno-37-20" href="#__codelineno-37-20"></a>
+<a id="__codelineno-37-21" name="__codelineno-37-21" href="#__codelineno-37-21"></a>If rule fails:
+<a id="__codelineno-37-22" name="__codelineno-37-22" href="#__codelineno-37-22"></a>
+<a id="__codelineno-37-23" name="__codelineno-37-23" href="#__codelineno-37-23"></a>archives.json = YES
+<a id="__codelineno-37-24" name="__codelineno-37-24" href="#__codelineno-37-24"></a>
+<a id="__codelineno-37-25" name="__codelineno-37-25" href="#__codelineno-37-25"></a>alerts.json   = NO
+</code></pre></div></p>
+<h3 id="local-rule-creation">Local Rule Creation</h3>
+<p>Custom rule file: <code>/var/ossec/etc/rules/local_rules.xml</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nt">&lt;group</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;firewall,&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="w">  </span><span class="nt">&lt;rule</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;100010&quot;</span><span class="w"> </span><span class="na">level=</span><span class="s">&quot;7&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="w">    </span><span class="nt">&lt;if_sid&gt;</span>4100<span class="nt">&lt;/if_sid&gt;</span>
+<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="w">    </span><span class="nt">&lt;match&gt;</span>UFW<span class="w"> </span>BLOCK<span class="nt">&lt;/match&gt;</span>
+<a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="w">    </span><span class="nt">&lt;description&gt;</span>UFW<span class="w"> </span>Firewall<span class="w"> </span>Blocked<span class="w"> </span>Connection<span class="nt">&lt;/description&gt;</span>
+<a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="w">    </span><span class="nt">&lt;group&gt;</span>firewall,ufw,network_security,<span class="nt">&lt;/group&gt;</span>
+<a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a><span class="w">  </span><span class="nt">&lt;/rule&gt;</span>
+<a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a><span class="nt">&lt;/group&gt;</span>
+</code></pre></div>
+<h3 id="rule-explanation">Rule Explanation</h3>
+<table>
+<thead>
+<tr>
+<th><strong>Element</strong></th>
+<th><strong>Value</strong></th>
+<th><strong>Purpose</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>100010</code></td>
+<td>Unique identifier for custom firewall alert</td>
+</tr>
+<tr>
+<td><code>level</code></td>
+<td><code>7</code></td>
+<td>Alert severity — higher level = higher importance</td>
+</tr>
+<tr>
+<td><code>if_sid</code></td>
+<td><code>4100</code></td>
+<td>Trigger only after Wazuh's built-in firewall rule matches — prevents false positives</td>
+</tr>
+<tr>
+<td><code>match</code></td>
+<td><code>UFW BLOCK</code></td>
+<td>Detect UFW firewall block events</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rule-validation">Rule Validation</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>/var/ossec/bin/wazuh-logtest
+</code></pre></div>
+<p>Sample input:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>Jun 12 sonarqube kernel: [UFW BLOCK] SRC=&lt;IP-address&gt; DST=&lt;IP-address&gt; PROTO=TCP
+</code></pre></div>
+Result:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>Rule ID:     100010
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>
+<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>Description: UFW Firewall Blocked Connection
+<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a>
+<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a>Level:       7
+<a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a>
+<a id="__codelineno-41-7" name="__codelineno-41-7" href="#__codelineno-41-7"></a>Alert Generated: YES
+</code></pre></div>
+This confirmed the rule was working correctly.</p>
+<hr />
+<h2 id="phase-9-troubleshooting-and-issue-resolution">Phase 9 — Troubleshooting and Issue Resolution</h2>
+<h3 id="issue-1-logstash-unable-to-read-syslog">Issue 1 — Logstash Unable to Read Syslog</h3>
+<p><strong>Error:</strong> <code>Permission denied /var/log/syslog</code></p>
+<p><strong>Root Cause:</strong> Logstash user was not a member of the ADM group.</p>
+<p><strong>Verification:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>ls<span class="w"> </span>-l<span class="w"> </span>/var/log/syslog
+</code></pre></div>
+<p>Output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>-rw-r----- syslog adm
+</code></pre></div>
+<strong>Solution:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>sudo<span class="w"> </span>usermod<span class="w"> </span>-aG<span class="w"> </span>adm<span class="w"> </span>logstash
+<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>logstash
+</code></pre></div>
+<p><strong>Result:</strong> Logstash successfully read syslog.</p>
+<hr />
+<h3 id="issue-2-events-not-appearing-in-wazuh">Issue 2 — Events Not Appearing in Wazuh</h3>
+<p><strong>Observation:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>syslog   → YES
+<a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>
+<a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a>logstash → YES
+<a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a>
+<a id="__codelineno-45-5" name="__codelineno-45-5" href="#__codelineno-45-5"></a>wazuh    → NO
+</code></pre></div>
+<strong>Investigation:</strong> Verified with <code>tail -f /tmp/firewall-events.log</code> — confirmed Logstash processing. Forwarding issue identified and corrected.</p>
+<hr />
+<h3 id="issue-3-logs-in-archivesjson-but-no-alerts">Issue 3 — Logs in archives.json but No Alerts</h3>
+<p><strong>Observation:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>archives.json = YES
+<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>
+<a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a>alerts.json   = NO
+</code></pre></div>
+<strong>Root Cause:</strong> Custom rule not matching.</p>
+<p><strong>Solution:</strong> Created Rule 100010.</p>
+<p><strong>Result:</strong> Alert generation successful.</p>
+<hr />
+<h3 id="issue-4-local_rulesxml-permission-denied">Issue 4 — local_rules.xml Permission Denied</h3>
+<p><strong>Error:</strong> <code>Could not open local_rules.xml — Permission denied</code></p>
+<p><strong>Verification:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>ls<span class="w"> </span>-l<span class="w"> </span>local_rules.xml
+</code></pre></div>
+<p>Observed: Incorrect ownership.</p>
+<p><strong>Solution:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>chown<span class="w"> </span>wazuh:wazuh<span class="w"> </span>/var/ossec/etc/rules/local_rules.xml
+</code></pre></div>
+<p><strong>Result:</strong> Rule file loaded successfully.</p>
+<hr />
+<h3 id="issue-5-rule-validation-failure">Issue 5 — Rule Validation Failure</h3>
+<p><strong>Investigation:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>/var/ossec/bin/wazuh-logtest
+</code></pre></div>
+<p><strong>Observation:</strong> Only Rule 4100 fired. Custom rule not firing.</p>
+<p><strong>Root Cause:</strong> Rule loading issue.</p>
+<p><strong>Solution:</strong> Fixed permissions and restarted Wazuh.</p>
+<p><strong>Result:</strong> Rule 100010 successfully triggered.</p>
+<hr />
+<h2 id="phase-10-dashboard-validation">Phase 10 — Dashboard Validation</h2>
+<p>After rule deployment, alerts started appearing inside the Wazuh Dashboard.</p>
+<p>Index used: <code>wazuh-alerts-*</code></p>
+<h3 id="observed-fields">Observed Fields</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>rule.id          = 100010
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>
+<a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a>rule.description = UFW Firewall Blocked Connection
+<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a>
+<a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a>rule.level       = 7
+<a id="__codelineno-50-6" name="__codelineno-50-6" href="#__codelineno-50-6"></a>
+<a id="__codelineno-50-7" name="__codelineno-50-7" href="#__codelineno-50-7"></a>data.srcip
+<a id="__codelineno-50-8" name="__codelineno-50-8" href="#__codelineno-50-8"></a>
+<a id="__codelineno-50-9" name="__codelineno-50-9" href="#__codelineno-50-9"></a>data.dstip
+<a id="__codelineno-50-10" name="__codelineno-50-10" href="#__codelineno-50-10"></a>
+<a id="__codelineno-50-11" name="__codelineno-50-11" href="#__codelineno-50-11"></a>data.protocol
+<a id="__codelineno-50-12" name="__codelineno-50-12" href="#__codelineno-50-12"></a>
+<a id="__codelineno-50-13" name="__codelineno-50-13" href="#__codelineno-50-13"></a>data.action
+<a id="__codelineno-50-14" name="__codelineno-50-14" href="#__codelineno-50-14"></a>
+<a id="__codelineno-50-15" name="__codelineno-50-15" href="#__codelineno-50-15"></a>tenant
+<a id="__codelineno-50-16" name="__codelineno-50-16" href="#__codelineno-50-16"></a>
+<a id="__codelineno-50-17" name="__codelineno-50-17" href="#__codelineno-50-17"></a>non_agent_id
+<a id="__codelineno-50-18" name="__codelineno-50-18" href="#__codelineno-50-18"></a>
+<a id="__codelineno-50-19" name="__codelineno-50-19" href="#__codelineno-50-19"></a>source_platform
+</code></pre></div>
+<h3 id="result">Result</h3>
+<p>Dashboard displayed real-time firewall security alerts. This confirmed complete end-to-end integration:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>UFW Firewall
+<a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a>
+<a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a>↓
+<a id="__codelineno-51-4" name="__codelineno-51-4" href="#__codelineno-51-4"></a>
+<a id="__codelineno-51-5" name="__codelineno-51-5" href="#__codelineno-51-5"></a>/var/log/syslog
+<a id="__codelineno-51-6" name="__codelineno-51-6" href="#__codelineno-51-6"></a>
+<a id="__codelineno-51-7" name="__codelineno-51-7" href="#__codelineno-51-7"></a>↓
+<a id="__codelineno-51-8" name="__codelineno-51-8" href="#__codelineno-51-8"></a>
+<a id="__codelineno-51-9" name="__codelineno-51-9" href="#__codelineno-51-9"></a>Logstash
+<a id="__codelineno-51-10" name="__codelineno-51-10" href="#__codelineno-51-10"></a>
+<a id="__codelineno-51-11" name="__codelineno-51-11" href="#__codelineno-51-11"></a>↓
+<a id="__codelineno-51-12" name="__codelineno-51-12" href="#__codelineno-51-12"></a>
+<a id="__codelineno-51-13" name="__codelineno-51-13" href="#__codelineno-51-13"></a>Event Enrichment
+<a id="__codelineno-51-14" name="__codelineno-51-14" href="#__codelineno-51-14"></a>
+<a id="__codelineno-51-15" name="__codelineno-51-15" href="#__codelineno-51-15"></a>↓
+<a id="__codelineno-51-16" name="__codelineno-51-16" href="#__codelineno-51-16"></a>
+<a id="__codelineno-51-17" name="__codelineno-51-17" href="#__codelineno-51-17"></a>Wazuh Manager
+<a id="__codelineno-51-18" name="__codelineno-51-18" href="#__codelineno-51-18"></a>
+<a id="__codelineno-51-19" name="__codelineno-51-19" href="#__codelineno-51-19"></a>↓
+<a id="__codelineno-51-20" name="__codelineno-51-20" href="#__codelineno-51-20"></a>
+<a id="__codelineno-51-21" name="__codelineno-51-21" href="#__codelineno-51-21"></a>archives.json
+<a id="__codelineno-51-22" name="__codelineno-51-22" href="#__codelineno-51-22"></a>
+<a id="__codelineno-51-23" name="__codelineno-51-23" href="#__codelineno-51-23"></a>↓
+<a id="__codelineno-51-24" name="__codelineno-51-24" href="#__codelineno-51-24"></a>
+<a id="__codelineno-51-25" name="__codelineno-51-25" href="#__codelineno-51-25"></a>Rule 100010
+<a id="__codelineno-51-26" name="__codelineno-51-26" href="#__codelineno-51-26"></a>
+<a id="__codelineno-51-27" name="__codelineno-51-27" href="#__codelineno-51-27"></a>↓
+<a id="__codelineno-51-28" name="__codelineno-51-28" href="#__codelineno-51-28"></a>
+<a id="__codelineno-51-29" name="__codelineno-51-29" href="#__codelineno-51-29"></a>alerts.json
+<a id="__codelineno-51-30" name="__codelineno-51-30" href="#__codelineno-51-30"></a>
+<a id="__codelineno-51-31" name="__codelineno-51-31" href="#__codelineno-51-31"></a>↓
+<a id="__codelineno-51-32" name="__codelineno-51-32" href="#__codelineno-51-32"></a>
+<a id="__codelineno-51-33" name="__codelineno-51-33" href="#__codelineno-51-33"></a>Wazuh Dashboard
+</code></pre></div>
+<img alt="firewall doc last" src="../../../../assets/images/POC%27s/Yaseen/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/firewall%20doc%20last.png" /></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.top", "navigation.tracking", "navigation.indexes", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2970 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Production implementation guide for multi-tenant Wazuh MSSP on single-node Docker">
+      
+      
+      
+      
+        <link rel="prev" href="../../POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/">
+      
+      
+        <link rel="next" href="../../POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>POC- Single Agent Multi-Group in Wazuh - Wazuh MSSP Multi-Tenant Implementation Guide</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../../stylesheets/responsive-nav.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#poc-single-agent-multi-group-in-wazuh" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-header__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Wazuh MSSP Multi-Tenant Implementation Guide
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              POC- Single Agent Multi-Group in Wazuh
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-nav__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    Wazuh MSSP Multi-Tenant Implementation Guide
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../01-Getting_started/Getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment & Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment & Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../02-index-template-filebeat/index_template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index Template & Filebeat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../04-agent-configuration/agent_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & Access
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Security & Access
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../06-rbac/rbac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RBAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../07-dls/dls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Document Level Security (DLS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../08-sso-entra/sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSO - Microsoft Entra ID
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster and Index Verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../10-reference/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC's
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    POC's
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GitHub_Webhook_to_Logstash/GitHub_Webhook_to_Logstash_POC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub_Webhook_to_Logstash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Wazuh%20Rules-as-Code%20Implementation%20Guide/Wazuh%20Rules-as-Code%20Implementation%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Rules-as-Code Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Objective
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-expected-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Expected Outcome
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-a-wazuh-dashboard-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part A: Wazuh Dashboard Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-create-the-baseline-linux-group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Create the baseline-linux group
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-create-the-tenanta-compliance-group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Create the tenantA-compliance group
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-assign-the-kibana-agent-to-both-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Assign the Kibana agent to both groups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-verify-multi-group-membership-in-the-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Verify multi-group membership in the Dashboard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-b-wazuh-manager-server-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part B: Wazuh Manager Server Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-access-the-wazuh-manager-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5: Access the Wazuh Manager container
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-6-verify-that-agent-001-belongs-to-both-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6: Verify that agent 001 belongs to both groups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-7-create-the-baseline-linux-group-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7: Create the baseline Linux group configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-8-create-the-tenant-a-compliance-group-configuration-the-below-is-basic-configyou-can-add-additional-paths-for-additional-log-collection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8: Create the Tenant A compliance group configuration - The below is basic config,you can add additional paths for additional log collection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-9-restart-the-wazuh-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 9: Restart the Wazuh Manager
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-c-kibana-agent-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part C: Kibana Agent Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-10-create-the-two-test-log-files-on-the-kibana-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 10: Create the two test log files on the Kibana agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-11-verify-that-both-group-configurations-reached-the-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 11: Verify that both group configurations reached the agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-d-detection-rule-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part D: Detection Rule Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-12-return-to-the-wazuh-manager-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 12: Return to the Wazuh Manager container
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-13-validate-and-activate-the-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 13: Validate and activate the rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-e-generate-test-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part E: Generate Test Events
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-14-generate-the-linux-baseline-event" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 14: Generate the Linux baseline event
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-15-generate-the-tenant-a-compliance-event" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 15: Generate the Tenant A compliance event
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-f-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part F: Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-16-validate-alerts-on-the-wazuh-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 16: Validate alerts on the Wazuh Manager
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-17-validate-alerts-in-the-wazuh-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 17: Validate alerts in the Wazuh Dashboard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#poc-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POC Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#business-use-case" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Business Use Case
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Windows Agent Deployment & Security Detection logs Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../NetFlowlogs_to_Logstash_and_Wazuh_Indexer/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetFlowlogs_to_Logstash_and_Wazuh_Indexer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/XDR%20Implementation%20Process/XDR%20Implementation%20Process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XDR Implementation Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Second%20use%20case%20of%20XDR/Second%20use%20case%20of%20XDR/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Second use case of XDR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Pipelines_and_Challenges/Pipelines_and_Challenges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipelines_and_Challenges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jira API → Logstash → Wazuh Integration for Non-Agent Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LOGSTASH PIPELINE WORKERS & BATCHSIZE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/GitHub_Logstash_Wazuh_NonAgent_Implementation/GitHub_Logstash_Wazuh_NonAgent_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Logstash Wazuh NonAgent Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MySQL_Log_Monitoring_Using_Wazuh_Agent/MySQL_Log_Monitoring_Using_Wazuh_Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MySQL_Log_Monitoring_Using_Wazuh_Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Wazuh_Agent_Log_Buffering_and_Resynchronization/Wazuh_Agent_Log_Buffering_and_Resynchronization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Agent_Log_Buffering_and_Resynchronization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Process%20to%20Monitor%20Filebeat%20Health/Implementation_Process_to_Monitor_Filebeat_Health/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor Filebeat Health
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20AWS%20CloudTrail%20%E2%86%92%20S3%20%E2%86%92%20SQS%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh/Implementation_Guide_AWS_CloudTrail_S3_SQS_Logstash_Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide AWS CloudTrail → S3 → SQS → Logstash → Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Prometheus/Prometheus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prometheus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/SOC%20Logstash%20Multi-Pipeline%20Architecture%20Implementation%20Guide/SOC_Logstash_Multi_Pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Multi-Pipeline Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/SOC%20Logstash%20Pipeline-to-Pipeline%20%28P2P%29%20Architecture%20Implementation%20Guide/SOC_Logstash_P2P/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Wazuh_Multi_Tenant_MSSP_Implementation/Wazuh_Multi_Tenant_MSSP_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Multi_Tenant_MSSP_Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/Wazuh%20Multi%20Node%20Runbook/Wazuh%20Multi%20Node%20Runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Multi Node Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Availability Log Ingestion Pipeline Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zero Downtime Group Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Objective
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-expected-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Expected Outcome
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-a-wazuh-dashboard-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part A: Wazuh Dashboard Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-create-the-baseline-linux-group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Create the baseline-linux group
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-create-the-tenanta-compliance-group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Create the tenantA-compliance group
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-assign-the-kibana-agent-to-both-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Assign the Kibana agent to both groups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-verify-multi-group-membership-in-the-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Verify multi-group membership in the Dashboard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-b-wazuh-manager-server-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part B: Wazuh Manager Server Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-access-the-wazuh-manager-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5: Access the Wazuh Manager container
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-6-verify-that-agent-001-belongs-to-both-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6: Verify that agent 001 belongs to both groups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-7-create-the-baseline-linux-group-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7: Create the baseline Linux group configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-8-create-the-tenant-a-compliance-group-configuration-the-below-is-basic-configyou-can-add-additional-paths-for-additional-log-collection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8: Create the Tenant A compliance group configuration - The below is basic config,you can add additional paths for additional log collection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-9-restart-the-wazuh-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 9: Restart the Wazuh Manager
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-c-kibana-agent-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part C: Kibana Agent Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-10-create-the-two-test-log-files-on-the-kibana-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 10: Create the two test log files on the Kibana agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-11-verify-that-both-group-configurations-reached-the-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 11: Verify that both group configurations reached the agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-d-detection-rule-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part D: Detection Rule Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-12-return-to-the-wazuh-manager-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 12: Return to the Wazuh Manager container
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-13-validate-and-activate-the-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 13: Validate and activate the rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-e-generate-test-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part E: Generate Test Events
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-14-generate-the-linux-baseline-event" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 14: Generate the Linux baseline event
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-15-generate-the-tenant-a-compliance-event" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 15: Generate the Tenant A compliance event
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-f-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part F: Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-16-validate-alerts-on-the-wazuh-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 16: Validate alerts on the Wazuh Manager
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-17-validate-alerts-in-the-wazuh-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 17: Validate alerts in the Wazuh Dashboard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#poc-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POC Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#business-use-case" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Business Use Case
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operating System Based Group Creation in Wazuh GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Objective
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-expected-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Expected Outcome
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-a-wazuh-dashboard-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part A: Wazuh Dashboard Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-create-the-baseline-linux-group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Create the baseline-linux group
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-create-the-tenanta-compliance-group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Create the tenantA-compliance group
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-assign-the-kibana-agent-to-both-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Assign the Kibana agent to both groups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-verify-multi-group-membership-in-the-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Verify multi-group membership in the Dashboard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-b-wazuh-manager-server-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part B: Wazuh Manager Server Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-access-the-wazuh-manager-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5: Access the Wazuh Manager container
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-6-verify-that-agent-001-belongs-to-both-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6: Verify that agent 001 belongs to both groups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-7-create-the-baseline-linux-group-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7: Create the baseline Linux group configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-8-create-the-tenant-a-compliance-group-configuration-the-below-is-basic-configyou-can-add-additional-paths-for-additional-log-collection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8: Create the Tenant A compliance group configuration - The below is basic config,you can add additional paths for additional log collection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-9-restart-the-wazuh-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 9: Restart the Wazuh Manager
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-c-kibana-agent-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part C: Kibana Agent Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-10-create-the-two-test-log-files-on-the-kibana-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 10: Create the two test log files on the Kibana agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-11-verify-that-both-group-configurations-reached-the-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 11: Verify that both group configurations reached the agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-d-detection-rule-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part D: Detection Rule Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-12-return-to-the-wazuh-manager-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 12: Return to the Wazuh Manager container
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-13-validate-and-activate-the-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 13: Validate and activate the rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-e-generate-test-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part E: Generate Test Events
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-14-generate-the-linux-baseline-event" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 14: Generate the Linux baseline event
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-15-generate-the-tenant-a-compliance-event" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 15: Generate the Tenant A compliance event
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-f-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part F: Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-16-validate-alerts-on-the-wazuh-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 16: Validate alerts on the Wazuh Manager
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-17-validate-alerts-in-the-wazuh-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 17: Validate alerts in the Wazuh Dashboard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#poc-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POC Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#business-use-case" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Business Use Case
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="poc-single-agent-multi-group-in-wazuh">POC: Single Agent Multi-Group in Wazuh</h1>
+<h2 id="1-objective">1. Objective</h2>
+<p>Demonstrate that one Wazuh agent can belong to multiple groups and receive layered monitoring policies.</p>
+<p>For this POC, the following agent is used:</p>
+<table>
+<thead>
+<tr>
+<th>Agent ID</th>
+<th>Agent Name</th>
+<th>Tenant</th>
+<th>Operating System</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>001</td>
+<td>Kibana</td>
+<td>tenantA</td>
+<td>Ubuntu 22.04.2 LTS</td>
+</tr>
+</tbody>
+</table>
+<p>The agent will be assigned to two groups:</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline-linux</td>
+<td>Applies common Linux baseline monitoring</td>
+</tr>
+<tr>
+<td>tenantA-compliance</td>
+<td>Applies Tenant A compliance-specific monitoring</td>
+</tr>
+</tbody>
+</table>
+<p>The final policy model is:</p>
+<p>Kibana Agent (001)<br />
+|<br />
++-- baseline-linux<br />
+| +-- Common Linux monitoring<br />
+|<br />
++-- tenantA-compliance<br />
++-- Tenant-specific compliance monitoring</p>
+<h2 id="2-expected-outcome">2. Expected Outcome</h2>
+<p>After completing this POC:</p>
+<ul>
+<li>The Kibana agent belongs to both groups.</li>
+<li>The baseline-linux group configures monitoring of one log file.</li>
+<li>The tenantA-compliance group configures monitoring of a second log file.</li>
+<li>The same agent collects both log sources.</li>
+<li>Two different Wazuh rules generate two alerts from the same agent.</li>
+<li>The alerts can be viewed in the Wazuh Dashboard.</li>
+</ul>
+<h2 id="part-a-wazuh-dashboard-steps">Part A: Wazuh Dashboard Steps</h2>
+<h2 id="step-1-create-the-baseline-linux-group">Step 1: Create the baseline-linux group</h2>
+<ul>
+<li>Log in to the Wazuh Dashboard.</li>
+<li>Navigate to:</li>
+</ul>
+<p>Sidebar -&gt; Agents Management → Groups</p>
+<ul>
+<li>Click <strong>Create group</strong>.</li>
+<li>Enter the group name:</li>
+</ul>
+<p>baseline-linux</p>
+<ul>
+<li>Click <strong>Create</strong>.</li>
+</ul>
+<p>This group represents the standard monitoring policy for Linux endpoints.</p>
+<h2 id="step-2-create-the-tenanta-compliance-group">Step 2: Create the tenantA-compliance group</h2>
+<ul>
+<li>Stay on:</li>
+</ul>
+<p>Agents Management → Groups</p>
+<ul>
+<li>Click <strong>Create group</strong>.</li>
+<li>Enter the group name:</li>
+</ul>
+<p>tenantA-compliance</p>
+<ul>
+<li>Click <strong>Create</strong>.</li>
+</ul>
+<p>This group represents additional monitoring required for Tenant A compliance requirements.</p>
+<h2 id="step-3-assign-the-kibana-agent-to-both-groups">Step 3: Assign the Kibana agent to both groups</h2>
+<ul>
+<li>Navigate to:</li>
+</ul>
+<p>Agents Management (From sidebar) → groups</p>
+<ul>
+<li>Search for the groups:</li>
+</ul>
+<p>baseline-linux &amp; tenantA - compliance</p>
+<ul>
+<li>
+<p>Open the baseline-linux group :</p>
+</li>
+<li>
+<p>- click on manage agents (on top right side)<br />
+   - Under the available agent section on left side,click on "Kibana" agent than click on "add selected items"</p>
+</li>
+<li>
+<p>Follow the same for the "tenantA-compliance" group<br />
+   and click on "apply changes"</p>
+</li>
+</ul>
+<h2 id="step-4-verify-multi-group-membership-in-the-dashboard">Step 4: Verify multi-group membership in the Dashboard</h2>
+<p>Open the Kibana agent details page and confirm that the agent is assigned to:</p>
+<p>default<br />
+baseline-linux<br />
+tenantA-compliance</p>
+<p>Take a screenshot. This is the primary UI evidence that one agent belongs to multiple groups.</p>
+<h2 id="part-b-wazuh-manager-server-steps">Part B: Wazuh Manager Server Steps</h2>
+<h2 id="step-5-access-the-wazuh-manager-container">Step 5: Access the Wazuh Manager container</h2>
+<p>Run the following command on the Docker host:</p>
+<p>docker exec -it single-node-wazuh.manager-1 bash</p>
+<h2 id="step-6-verify-that-agent-001-belongs-to-both-groups">Step 6: Verify that agent 001 belongs to both groups</h2>
+<p>Inside the Wazuh Manager container, run:</p>
+<p>/var/ossec/bin/agent_groups -s -i 001</p>
+<p>Expected output should include:</p>
+<p>baseline-linux<br />
+tenantA-compliance</p>
+<p>If either group is missing, add it using:</p>
+<p>/var/ossec/bin/agent_groups -a -i 001 -g baseline-linux<br />
+/var/ossec/bin/agent_groups -a -i 001 -g tenantA-compliance</p>
+<p>Verify again:</p>
+<p>/var/ossec/bin/agent_groups -s -i 001</p>
+<h2 id="step-7-create-the-baseline-linux-group-configuration">Step 7: Create the baseline Linux group configuration</h2>
+<p>Create the group configuration directory:</p>
+<p>mkdir -p /var/ossec/etc/shared/baseline-linux</p>
+<p>Create the group configuration file:</p>
+<p>vi /var/ossec/etc/shared/baseline-linux/agent.conf</p>
+<p>Add the following configuration:</p>
+<p>&lt;agent_config&gt;<br />
+&lt;localfile&gt;<br />
+&lt;location&gt;/var/log/wazuh-linux-baseline-poc.log&lt;/location&gt;<br />
+&lt;log_format&gt;syslog&lt;/log_format&gt;<br />
+&lt;/localfile&gt;<br />
+&lt;/agent_config&gt;</p>
+<p>Save and exit Vim:</p>
+<p>Esc<br />
+:wq<br />
+Enter</p>
+<p>Validate the XML:</p>
+<p>xmllint --noout /var/ossec/etc/shared/baseline-linux/agent.conf</p>
+<p>If the command returns no output, the XML is valid.</p>
+<p>This configuration represents the common Linux monitoring layer.</p>
+<h2 id="step-8-create-the-tenant-a-compliance-group-configuration-the-below-is-basic-configyou-can-add-additional-paths-for-additional-log-collection">Step 8: Create the Tenant A compliance group configuration - The below is basic config,you can add additional paths for additional log collection</h2>
+<p>Create the group configuration directory:</p>
+<p>mkdir -p /var/ossec/etc/shared/tenantA-compliance</p>
+<p>Create the group configuration file:</p>
+<p>vi /var/ossec/etc/shared/tenantA-compliance/agent.conf</p>
+<p>Add the following configuration:</p>
+<p>&lt;agent_config&gt;<br />
+&lt;localfile&gt;<br />
+&lt;location&gt;/var/log/wazuh-tenanta-compliance-poc.log&lt;/location&gt;<br />
+&lt;log_format&gt;syslog&lt;/log_format&gt;<br />
+&lt;/localfile&gt;<br />
+&lt;/agent_config&gt;</p>
+<p>Save and exit Vim:</p>
+<p>Esc<br />
+:wq<br />
+Enter</p>
+<p>Validate the XML:</p>
+<p>xmllint --noout /var/ossec/etc/shared/tenantA-compliance/agent.conf</p>
+<p>If the command returns no output, the XML is valid.</p>
+<p>This configuration represents the Tenant A compliance monitoring layer.</p>
+<h2 id="step-9-restart-the-wazuh-manager">Step 9: Restart the Wazuh Manager</h2>
+<p>Restart the Wazuh Manager so the group configurations are distributed:</p>
+<p>/var/ossec/bin/wazuh-control restart</p>
+<p>Wait approximately one minute for the agent to receive the updated group configurations.</p>
+<h2 id="part-c-kibana-agent-steps">Part C: Kibana Agent Steps</h2>
+<h2 id="step-10-create-the-two-test-log-files-on-the-kibana-agent">Step 10: Create the two test log files on the Kibana agent</h2>
+<p>Connect to the Kibana agent server:</p>
+<p>ssh &lt;username&gt;@<IP-address></p>
+<p>Create both log files:</p>
+<p>sudo touch /var/log/wazuh-linux-baseline-poc.log<br />
+sudo touch /var/log/wazuh-tenanta-compliance-poc.log</p>
+<p>Set readable permissions:</p>
+<p>sudo chmod 644 /var/log/wazuh-linux-baseline-poc.log<br />
+sudo chmod 644 /var/log/wazuh-tenanta-compliance-poc.log</p>
+<p>Restart the Wazuh agent:</p>
+<p>sudo systemctl restart wazuh-agent</p>
+<h2 id="step-11-verify-that-both-group-configurations-reached-the-agent">Step 11: Verify that both group configurations reached the agent</h2>
+<p>Run:</p>
+<p>sudo grep -Ei "wazuh-linux-baseline-poc.log|wazuh-tenanta-compliance-poc.log" /var/ossec/logs/ossec.log</p>
+<p>Expected output:</p>
+<p>Analyzing file: '/var/log/wazuh-linux-baseline-poc.log'<br />
+Analyzing file: '/var/log/wazuh-tenanta-compliance-poc.log'</p>
+<p>This proves that the same agent received monitoring configuration from both groups.</p>
+<h2 id="part-d-detection-rule-configuration">Part D: Detection Rule Configuration</h2>
+<h2 id="step-12-return-to-the-wazuh-manager-container">Step 12: Return to the Wazuh Manager container</h2>
+<p>Run this on the Docker host:</p>
+<p>docker exec -it single-node-wazuh.manager-1 bash</p>
+<p>Back up the existing local rules file:</p>
+<p>cp /var/ossec/etc/rules/local_rules.xml /var/ossec/etc/rules/local_rules.xml.backup-multigroup-poc</p>
+<p>Edit the local rules file:</p>
+<p>vi /var/ossec/etc/rules/local_rules.xml</p>
+<p>Add the following two rules inside the existing &lt;group&gt; section:</p>
+<p>&lt;rule id="100503" level="6"&gt;<br />
+&lt;match&gt;LINUX_BASELINE_POC_EVENT&lt;/match&gt;<br />
+&lt;description&gt;POC Layer 1: Linux baseline monitoring event detected&lt;/description&gt;<br />
+&lt;group&gt;group_poc,linux_baseline,&lt;/group&gt;<br />
+&lt;/rule&gt;<br />
+<br/>&lt;rule id="100504" level="9"&gt;<br />
+&lt;match&gt;TENANTA_COMPLIANCE_POC_EVENT&lt;/match&gt;<br />
+&lt;description&gt;POC Layer 2: Tenant A compliance monitoring event detected&lt;/description&gt;<br />
+&lt;group&gt;group_poc,tenanta_compliance,&lt;/group&gt;<br />
+&lt;/rule&gt;</p>
+<p>Do not create a second &lt;group&gt; root element if one already exists in local_rules.xml. Add the rules inside the existing group block.</p>
+<h2 id="step-13-validate-and-activate-the-rules">Step 13: Validate and activate the rules</h2>
+<p>Validate the Wazuh ruleset:</p>
+<p>/var/ossec/bin/wazuh-analysisd -t</p>
+<p>Expected result:</p>
+<p>Configuration passed</p>
+<p>Restart the Wazuh Manager:</p>
+<p>/var/ossec/bin/wazuh-control restart</p>
+<h2 id="part-e-generate-test-events">Part E: Generate Test Events</h2>
+<h2 id="step-14-generate-the-linux-baseline-event">Step 14: Generate the Linux baseline event</h2>
+<p>On the Kibana agent, run:</p>
+<p>echo "\$(date '+%b %d %H:%M:%S') \$(hostname) LINUX_BASELINE_POC_EVENT common-linux-baseline-test" | sudo tee -a /var/log/wazuh-linux-baseline-poc.log</p>
+<h2 id="step-15-generate-the-tenant-a-compliance-event">Step 15: Generate the Tenant A compliance event</h2>
+<p>On the same Kibana agent, run:</p>
+<p>echo "\$(date '+%b %d %H:%M:%S') \$(hostname) TENANTA_COMPLIANCE_POC_EVENT tenantA-compliance-test" | sudo tee -a /var/log/wazuh-tenanta-compliance-poc.log</p>
+<h2 id="part-f-validation">Part F: Validation</h2>
+<h2 id="step-16-validate-alerts-on-the-wazuh-manager">Step 16: Validate alerts on the Wazuh Manager</h2>
+<p>Inside the Wazuh Manager container, run:</p>
+<p>grep -E "LINUX_BASELINE_POC_EVENT|TENANTA_COMPLIANCE_POC_EVENT" /var/ossec/logs/alerts/alerts.json | tail -10</p>
+<p>Expected result:</p>
+<table>
+<thead>
+<tr>
+<th>Rule ID</th>
+<th>Alert Description</th>
+<th>Agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100503</td>
+<td>POC Layer 1: Linux baseline monitoring event detected</td>
+<td>Kibana</td>
+</tr>
+<tr>
+<td>100504</td>
+<td>POC Layer 2: Tenant A compliance monitoring event detected</td>
+<td>Kibana</td>
+</tr>
+</tbody>
+</table>
+<p>Both alerts should contain:</p>
+<p>agent.id: 001<br />
+agent.name: Kibana<br />
+agent.labels.tenant: tenantA</p>
+<h2 id="step-17-validate-alerts-in-the-wazuh-dashboard">Step 17: Validate alerts in the Wazuh Dashboard</h2>
+<p>Open:</p>
+<p>Threat Hunting → Discover</p>
+<p>Select the Tenant A data view:</p>
+<p>wazuh-tenanta-alerts-*</p>
+<p>Set the time range to:</p>
+<p>Last 15 minutes</p>
+<p>Search for:</p>
+<p>rule.id: (100503 OR 100504)</p>
+<p>Expected result: two alerts from the same Kibana agent.</p>
+<h2 id="poc-success-criteria">POC Success Criteria</h2>
+<p>The POC is successful when all the following are true:</p>
+<table>
+<thead>
+<tr>
+<th>Validation</th>
+<th>Expected Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Group assignment</td>
+<td>Kibana belongs to both baseline-linux and tenantA-compliance</td>
+</tr>
+<tr>
+<td>Baseline configuration</td>
+<td>Kibana monitors /var/log/wazuh-linux-baseline-poc.log</td>
+</tr>
+<tr>
+<td>Compliance configuration</td>
+<td>Kibana monitors /var/log/wazuh-tenanta-compliance-poc.log</td>
+</tr>
+<tr>
+<td>Baseline alert</td>
+<td>Rule 100503 is triggered</td>
+</tr>
+<tr>
+<td>Compliance alert</td>
+<td>Rule 100504 is triggered</td>
+</tr>
+<tr>
+<td>Dashboard evidence</td>
+<td>Both alerts are visible for Kibana in Tenant A's alert index</td>
+</tr>
+</tbody>
+</table>
+<h2 id="business-use-case">Business Use Case</h2>
+<p>This POC represents a real MSSP deployment model where a single endpoint requires multiple policy layers.</p>
+<p>For example, a production Linux payment server can receive:</p>
+<p>Linux baseline policy<br />
++ Tenant-specific policy<br />
++ PCI compliance policy<br />
++ Production policy<br />
++ Critical asset policy</p>
+<p>Instead of creating one large group for every possible combination, reusable policy layers can be applied through multiple groups. This reduces duplicate configuration, improves maintainability, and allows targeted policy changes without affecting unrelated endpoints.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.top", "navigation.tracking", "navigation.indexes", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2616 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Production implementation guide for multi-tenant Wazuh MSSP on single-node Docker">
+      
+      
+      
+      
+        <link rel="prev" href="../../Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/">
+      
+      
+        <link rel="next" href="../../../Sai%20Krishna/XDR%20Implementation%20Process/XDR%20Implementation%20Process/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>NetFlowlogs_to_Logstash_and_Wazuh_Indexer - Wazuh MSSP Multi-Tenant Implementation Guide</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../../stylesheets/responsive-nav.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#poc-netflow-pipeline-2-to-logstash-and-wazuh-indexer" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-header__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Wazuh MSSP Multi-Tenant Implementation Guide
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              NetFlowlogs_to_Logstash_and_Wazuh_Indexer
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-nav__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    Wazuh MSSP Multi-Tenant Implementation Guide
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../01-Getting_started/Getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment & Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment & Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../02-index-template-filebeat/index_template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index Template & Filebeat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../04-agent-configuration/agent_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & Access
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Security & Access
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../06-rbac/rbac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RBAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../07-dls/dls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Document Level Security (DLS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../08-sso-entra/sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSO - Microsoft Entra ID
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster and Index Verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../10-reference/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC's
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    POC's
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GitHub_Webhook_to_Logstash/GitHub_Webhook_to_Logstash_POC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub_Webhook_to_Logstash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Wazuh%20Rules-as-Code%20Implementation%20Guide/Wazuh%20Rules-as-Code%20Implementation%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Rules-as-Code Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Windows Agent Deployment & Security Detection logs Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetFlowlogs_to_Logstash_and_Wazuh_Indexer
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetFlowlogs_to_Logstash_and_Wazuh_Indexer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Objective
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-expected-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Expected Outcome
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-environment-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Environment Details
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/XDR%20Implementation%20Process/XDR%20Implementation%20Process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XDR Implementation Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Second%20use%20case%20of%20XDR/Second%20use%20case%20of%20XDR/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Second use case of XDR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Pipelines_and_Challenges/Pipelines_and_Challenges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipelines_and_Challenges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jira API → Logstash → Wazuh Integration for Non-Agent Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LOGSTASH PIPELINE WORKERS & BATCHSIZE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/GitHub_Logstash_Wazuh_NonAgent_Implementation/GitHub_Logstash_Wazuh_NonAgent_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Logstash Wazuh NonAgent Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MySQL_Log_Monitoring_Using_Wazuh_Agent/MySQL_Log_Monitoring_Using_Wazuh_Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MySQL_Log_Monitoring_Using_Wazuh_Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Wazuh_Agent_Log_Buffering_and_Resynchronization/Wazuh_Agent_Log_Buffering_and_Resynchronization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Agent_Log_Buffering_and_Resynchronization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Process%20to%20Monitor%20Filebeat%20Health/Implementation_Process_to_Monitor_Filebeat_Health/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor Filebeat Health
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Implementation%20Guide%20AWS%20CloudTrail%20%E2%86%92%20S3%20%E2%86%92%20SQS%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh/Implementation_Guide_AWS_CloudTrail_S3_SQS_Logstash_Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide AWS CloudTrail → S3 → SQS → Logstash → Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Sai%20Krishna/Prometheus/Prometheus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prometheus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/SOC%20Logstash%20Multi-Pipeline%20Architecture%20Implementation%20Guide/SOC_Logstash_Multi_Pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Multi-Pipeline Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/SOC%20Logstash%20Pipeline-to-Pipeline%20%28P2P%29%20Architecture%20Implementation%20Guide/SOC_Logstash_P2P/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Wazuh_Multi_Tenant_MSSP_Implementation/Wazuh_Multi_Tenant_MSSP_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Multi_Tenant_MSSP_Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/Wazuh%20Multi%20Node%20Runbook/Wazuh%20Multi%20Node%20Runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Multi Node Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Availability Log Ingestion Pipeline Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zero Downtime Group Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operating System Based Group Creation in Wazuh GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Objective
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-expected-outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Expected Outcome
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-environment-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Environment Details
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="poc-netflow-pipeline-2-to-logstash-and-wazuh-indexer">POC: NetFlow Pipeline 2 to Logstash and Wazuh Indexer</h1>
+<h2 id="1-objective">1. Objective</h2>
+<p>Demonstrate collection of NetFlow telemetry, conversion of collected flow records to NDJSON, ingestion through Logstash, storage in Wazuh Indexer, alert generation through OpenSearch Alerting, and storage of alert history in a separate index.</p>
+<p>This POC is designed for high-volume network telemetry, where raw flow records and actionable alerts are stored separately.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Network Traffic
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>        ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>NetFlow Exporter
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>nfcapd Collector
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>nfdump Flow Files
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>JSON / NDJSON Conversion
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        ↓
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>Logstash Pipeline 1
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        ↓
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>Wazuh Indexer — netflow-logs-*
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        ↓
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>OpenSearch Alerting Monitor
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        ↓
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>Trigger
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>        ↓
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>Custom Webhook Channel
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>        ↓
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>Logstash Pipeline 2 — Port 8082 -&gt; Indexer -netflow alerts
+</code></pre></div>
+<hr />
+<h2 id="2-expected-outcome">2. Expected Outcome</h2>
+<p>After completing this POC:</p>
+<ol>
+<li>NetFlow records are collected by <code>nfcapd</code>.</li>
+<li>A collected flow file is converted to NDJSON format.</li>
+<li>Logstash ingests the NetFlow records and enriches them with common metadata.</li>
+<li>Raw flow telemetry is indexed in <code>netflow-logs-*</code>.</li>
+<li>An OpenSearch monitor detects NetFlow activity.</li>
+<li>The monitor sends an alert payload to Logstash Pipeline 2.</li>
+<li>Logstash stores alert records in <code>netflow-alerts-history</code>.</li>
+<li>Raw flow records and alert history are visible in Wazuh Dashboard.</li>
+</ol>
+<hr />
+<h2 id="3-environment-details">3. Environment Details</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NetFlow Exporter / Collector</td>
+<td><code>&lt;IP-address&gt;</code></td>
+</tr>
+<tr>
+<td>Logstash Server</td>
+<td><code>&lt;IP-address&gt;</code></td>
+</tr>
+<tr>
+<td>Wazuh Indexer</td>
+<td><code>&lt;IP-address&gt;:9200</code></td>
+</tr>
+<tr>
+<td>NetFlow Collector Port</td>
+<td>UDP <code>2055</code></td>
+</tr>
+<tr>
+<td>Alert Webhook Receiver</td>
+<td>TCP <code>8082</code></td>
+</tr>
+<tr>
+<td>Raw Flow Index</td>
+<td><code>netflow-logs-*</code></td>
+</tr>
+<tr>
+<td>Alert History Index</td>
+<td><code>netflow-alerts-history</code></td>
+</tr>
+<tr>
+<td>Indexer User</td>
+<td><code>admin</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Replace IP addresses, usernames, passwords, and index names according to the client environment. Do not expose credentials in screenshots or client-facing documents.</p>
+</blockquote>
+<hr />
+<h1 id="part-a-netflow-collector-and-exporter-setup">Part A: NetFlow Collector and Exporter Setup</h1>
+<h2 id="step-1-install-netflow-collection-tools">Step 1: Install NetFlow collection tools</h2>
+<p>Connect to the NetFlow collector server:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ssh<span class="w"> </span>&lt;username&gt;@&lt;IP-address&gt;
+</code></pre></div>
+<p>Update package metadata and install the required tools:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>nfdump<span class="w"> </span>jq<span class="w"> </span>curl
+</code></pre></div>
+<p>Verify installation:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>nfdump<span class="w"> </span>-V
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>nfcapd<span class="w"> </span>-V
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>jq<span class="w"> </span>--version
+</code></pre></div>
+<hr />
+<h2 id="step-2-verify-the-netflow-collector-is-listening">Step 2: Verify the NetFlow collector is listening</h2>
+<p>Check whether UDP port <code>2055</code> is already in use:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo<span class="w"> </span>ss<span class="w"> </span>-ulpn<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="m">2055</span>
+</code></pre></div>
+<p>Expected example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>udp   UNCONN 0 0 0.0.0.0:2055 0.0.0.0:* users:((&quot;nfcapd&quot;,pid=&lt;PID&gt;,fd=&lt;FD&gt;))
+</code></pre></div>
+<p>If <code>nfcapd</code> is already listening, do not start a second collector. Identify the existing process:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ps<span class="w"> </span>-fp<span class="w"> </span>&lt;PID&gt;
+</code></pre></div>
+<p>If UDP port <code>2055</code> is free, create a storage directory and start the collector:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/data/netflow
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>sudo<span class="w"> </span>nfcapd<span class="w"> </span>-D<span class="w"> </span>-l<span class="w"> </span>/data/netflow<span class="w"> </span>-p<span class="w"> </span><span class="m">2055</span>
+</code></pre></div>
+<p>Verify that the collector is now listening:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>sudo<span class="w"> </span>ss<span class="w"> </span>-ulpn<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="m">2055</span>
+</code></pre></div>
+<blockquote>
+<p>The NetFlow exporter must be configured separately to send NetFlow records to <code>&lt;IP-address&gt;:2055/UDP</code>. In this POC, the collector receives those exported records.</p>
+</blockquote>
+<hr />
+<h2 id="step-3-generate-safe-test-traffic">Step 3: Generate safe test traffic</h2>
+<p>Generate basic outbound traffic from the exporter/collector environment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>curl<span class="w"> </span>-I<span class="w"> </span>https://github.com
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>curl<span class="w"> </span>-I<span class="w"> </span>https://www.google.com
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>ping<span class="w"> </span>-c<span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="m">8</span>.8.8.8
+</code></pre></div>
+<p>Wait for the collector to rotate and write a flow file.</p>
+<p>Locate the latest flow files. Use the directory where <code>nfcapd</code> is actually writing data:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sudo<span class="w"> </span>ls<span class="w"> </span>-ltr<span class="w"> </span>/data/netflow<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail
+</code></pre></div>
+<p>If an existing collector is writing to the default directory, use:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>sudo<span class="w"> </span>ls<span class="w"> </span>-ltr<span class="w"> </span>/var/cache/nfdump<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail
+</code></pre></div>
+<p>Expected filename format:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>nfcapd.YYYYMMDDHHMM
+</code></pre></div>
+<hr />
+<h1 id="part-b-convert-netflow-data-to-ndjson">Part B: Convert NetFlow Data to NDJSON</h1>
+<h2 id="step-4-convert-the-latest-flow-file-to-json">Step 4: Convert the latest flow file to JSON</h2>
+<p>Set the actual collected flow file path:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nv">FLOW_FILE</span><span class="o">=</span><span class="s2">&quot;/data/netflow/nfcapd.YYYYMMDDHHMM&quot;</span>
+</code></pre></div>
+<p>If your collector uses the default directory:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nv">FLOW_FILE</span><span class="o">=</span><span class="s2">&quot;/var/cache/nfdump/nfcapd.YYYYMMDDHHMM&quot;</span>
+</code></pre></div>
+<p>Convert the flow file to JSON:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>sudo<span class="w"> </span>nfdump<span class="w"> </span>-r<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FLOW_FILE</span><span class="s2">&quot;</span><span class="w"> </span>-o<span class="w"> </span>json<span class="w"> </span>&gt;<span class="w"> </span>/tmp/netflow.json
+</code></pre></div>
+<p>Verify that JSON was generated:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>head<span class="w"> </span>-20<span class="w"> </span>/tmp/netflow.json
+</code></pre></div>
+<hr />
+<h2 id="step-5-convert-json-to-ndjson">Step 5: Convert JSON to NDJSON</h2>
+<p>Logstash file input processes one JSON event per line. Convert the JSON array into NDJSON:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>jq<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;.[]&#39;</span><span class="w"> </span>/tmp/netflow.json<span class="w"> </span>&gt;<span class="w"> </span>/tmp/netflow.ndjson
+</code></pre></div>
+<p>Verify the output:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>head<span class="w"> </span>-1<span class="w"> </span>/tmp/netflow.ndjson
+</code></pre></div>
+<p>Expected result: one complete JSON object per line.</p>
+<p>Check the number of flow records:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>wc<span class="w"> </span>-l<span class="w"> </span>/tmp/netflow.ndjson
+</code></pre></div>
+<hr />
+<h2 id="step-6-transfer-the-ndjson-file-to-logstash">Step 6: Transfer the NDJSON file to Logstash</h2>
+<p>Copy the NDJSON file to the Logstash server:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>scp<span class="w"> </span>/tmp/netflow.ndjson<span class="w"> </span>&lt;logstash-user&gt;@&lt;IP-address&gt;:/tmp/netflow.ndjson
+</code></pre></div>
+<p>On the Logstash server, verify the file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>ssh<span class="w"> </span>&lt;logstash-user&gt;@&lt;IP-address&gt;
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>wc<span class="w"> </span>-l<span class="w"> </span>/tmp/netflow.ndjson
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>head<span class="w"> </span>-1<span class="w"> </span>/tmp/netflow.ndjson
+</code></pre></div>
+<hr />
+<h1 id="part-c-configure-logstash-pipeline-1-netflow-ingestion">Part C: Configure Logstash Pipeline 1 — NetFlow Ingestion</h1>
+<h2 id="step-7-verify-required-logstash-plugins">Step 7: Verify required Logstash plugins</h2>
+<p>On the Logstash server, verify the File input and OpenSearch output plugins:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>sudo<span class="w"> </span>/usr/share/logstash/bin/logstash-plugin<span class="w"> </span>list<span class="w"> </span>--verbose<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-E<span class="w"> </span><span class="s2">&quot;logstash-input-file|logstash-output-opensearch|logstash-filter-mutate&quot;</span>
+</code></pre></div>
+<p>Expected plugins:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>logstash-input-file
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>logstash-output-opensearch
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>logstash-filter-mutate
+</code></pre></div>
+<p>If the OpenSearch output plugin is missing, install it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>sudo<span class="w"> </span>/usr/share/logstash/bin/logstash-plugin<span class="w"> </span>install<span class="w"> </span>logstash-output-opensearch
+</code></pre></div>
+<p>Restart Logstash after plugin installation:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>logstash
+</code></pre></div>
+<hr />
+<h2 id="step-8-create-the-netflow-ingestion-pipeline">Step 8: Create the NetFlow ingestion pipeline</h2>
+<p>Create the pipeline configuration file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/logstash/conf.d/netflow.conf
+</code></pre></div>
+<p>Paste the following configuration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>input {
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>  file {
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>    path =&gt; &quot;/tmp/netflow.ndjson&quot;
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>    start_position =&gt; &quot;beginning&quot;
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>    sincedb_path =&gt; &quot;/dev/null&quot;
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>    codec =&gt; json
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>  }
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>}
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a>
+<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a>filter {
+<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a>  mutate {
+<a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a>    add_field =&gt; {
+<a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a>      &quot;source_platform&quot; =&gt; &quot;netflow&quot;
+<a id="__codelineno-27-14" name="__codelineno-27-14" href="#__codelineno-27-14"></a>      &quot;event_category&quot;  =&gt; &quot;network_telemetry&quot;
+<a id="__codelineno-27-15" name="__codelineno-27-15" href="#__codelineno-27-15"></a>      &quot;environment&quot;     =&gt; &quot;poc&quot;
+<a id="__codelineno-27-16" name="__codelineno-27-16" href="#__codelineno-27-16"></a>      &quot;tenant&quot;          =&gt; &quot;NON-AGENT-TENANT&quot;
+<a id="__codelineno-27-17" name="__codelineno-27-17" href="#__codelineno-27-17"></a>    }
+<a id="__codelineno-27-18" name="__codelineno-27-18" href="#__codelineno-27-18"></a>  }
+<a id="__codelineno-27-19" name="__codelineno-27-19" href="#__codelineno-27-19"></a>
+<a id="__codelineno-27-20" name="__codelineno-27-20" href="#__codelineno-27-20"></a>  mutate {
+<a id="__codelineno-27-21" name="__codelineno-27-21" href="#__codelineno-27-21"></a>    replace =&gt; {
+<a id="__codelineno-27-22" name="__codelineno-27-22" href="#__codelineno-27-22"></a>      &quot;message&quot; =&gt; &quot;NetFlow src=%{src4_addr}:%{src_port} dst=%{dst4_addr}:%{dst_port} bytes=%{in_bytes} packets=%{in_packets}&quot;
+<a id="__codelineno-27-23" name="__codelineno-27-23" href="#__codelineno-27-23"></a>    }
+<a id="__codelineno-27-24" name="__codelineno-27-24" href="#__codelineno-27-24"></a>  }
+<a id="__codelineno-27-25" name="__codelineno-27-25" href="#__codelineno-27-25"></a>}
+<a id="__codelineno-27-26" name="__codelineno-27-26" href="#__codelineno-27-26"></a>
+<a id="__codelineno-27-27" name="__codelineno-27-27" href="#__codelineno-27-27"></a>output {
+<a id="__codelineno-27-28" name="__codelineno-27-28" href="#__codelineno-27-28"></a>  file {
+<a id="__codelineno-27-29" name="__codelineno-27-29" href="#__codelineno-27-29"></a>    path =&gt; &quot;/tmp/netflow-events.log&quot;
+<a id="__codelineno-27-30" name="__codelineno-27-30" href="#__codelineno-27-30"></a>    codec =&gt; rubydebug
+<a id="__codelineno-27-31" name="__codelineno-27-31" href="#__codelineno-27-31"></a>  }
+<a id="__codelineno-27-32" name="__codelineno-27-32" href="#__codelineno-27-32"></a>
+<a id="__codelineno-27-33" name="__codelineno-27-33" href="#__codelineno-27-33"></a>  opensearch {
+<a id="__codelineno-27-34" name="__codelineno-27-34" href="#__codelineno-27-34"></a>    hosts =&gt; [&quot;https://&lt;IP-address&gt;:9200&quot;]
+<a id="__codelineno-27-35" name="__codelineno-27-35" href="#__codelineno-27-35"></a>    user =&gt; &quot;admin&quot;
+<a id="__codelineno-27-36" name="__codelineno-27-36" href="#__codelineno-27-36"></a>    password =&gt; &quot;&lt;INDEXER_PASSWORD&gt;&quot;
+<a id="__codelineno-27-37" name="__codelineno-27-37" href="#__codelineno-27-37"></a>    index =&gt; &quot;netflow-logs-%{+YYYY.MM.dd}&quot;
+<a id="__codelineno-27-38" name="__codelineno-27-38" href="#__codelineno-27-38"></a>    ssl =&gt; true
+<a id="__codelineno-27-39" name="__codelineno-27-39" href="#__codelineno-27-39"></a>    ssl_certificate_verification =&gt; false
+<a id="__codelineno-27-40" name="__codelineno-27-40" href="#__codelineno-27-40"></a>  }
+<a id="__codelineno-27-41" name="__codelineno-27-41" href="#__codelineno-27-41"></a>}
+</code></pre></div>
+<p>Save and exit:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>Ctrl + O → Enter → Ctrl + X
+</code></pre></div>
+<blockquote>
+<p><code>sincedb_path =&gt; "/dev/null"</code> is appropriate for this POC because it forces Logstash to read the copied test file from the beginning each time the pipeline starts. Do not use this setting for a production continuous-ingestion design.</p>
+</blockquote>
+<hr />
+<h1 id="part-d-configure-logstash-pipeline-2-alert-webhook-receiver">Part D: Configure Logstash Pipeline 2 — Alert Webhook Receiver</h1>
+<h2 id="step-9-create-the-alert-receiver-pipeline">Step 9: Create the alert receiver pipeline</h2>
+<p>Create the pipeline configuration file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/logstash/conf.d/netflow-alerts.conf
+</code></pre></div>
+<p>Paste the following configuration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>input {
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>  http {
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>    host =&gt; &quot;0.0.0.0&quot;
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>    port =&gt; 8082
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>    codec =&gt; json
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>  }
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a>}
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a>filter {
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a>  mutate {
+<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a>    add_field =&gt; {
+<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a>      &quot;alert_source&quot;    =&gt; &quot;opensearch-alerting&quot;
+<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a>      &quot;source_platform&quot; =&gt; &quot;netflow&quot;
+<a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a>      &quot;event_category&quot;  =&gt; &quot;network_alert&quot;
+<a id="__codelineno-30-15" name="__codelineno-30-15" href="#__codelineno-30-15"></a>      &quot;environment&quot;     =&gt; &quot;poc&quot;
+<a id="__codelineno-30-16" name="__codelineno-30-16" href="#__codelineno-30-16"></a>      &quot;tenant&quot;          =&gt; &quot;NON-AGENT-TENANT&quot;
+<a id="__codelineno-30-17" name="__codelineno-30-17" href="#__codelineno-30-17"></a>    }
+<a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a>  }
+<a id="__codelineno-30-19" name="__codelineno-30-19" href="#__codelineno-30-19"></a>
+<a id="__codelineno-30-20" name="__codelineno-30-20" href="#__codelineno-30-20"></a>  mutate {
+<a id="__codelineno-30-21" name="__codelineno-30-21" href="#__codelineno-30-21"></a>    replace =&gt; {
+<a id="__codelineno-30-22" name="__codelineno-30-22" href="#__codelineno-30-22"></a>      &quot;message&quot; =&gt; &quot;NetFlow Alert: %{[monitor_name]} - %{[trigger_name]}&quot;
+<a id="__codelineno-30-23" name="__codelineno-30-23" href="#__codelineno-30-23"></a>    }
+<a id="__codelineno-30-24" name="__codelineno-30-24" href="#__codelineno-30-24"></a>  }
+<a id="__codelineno-30-25" name="__codelineno-30-25" href="#__codelineno-30-25"></a>}
+<a id="__codelineno-30-26" name="__codelineno-30-26" href="#__codelineno-30-26"></a>
+<a id="__codelineno-30-27" name="__codelineno-30-27" href="#__codelineno-30-27"></a>output {
+<a id="__codelineno-30-28" name="__codelineno-30-28" href="#__codelineno-30-28"></a>  file {
+<a id="__codelineno-30-29" name="__codelineno-30-29" href="#__codelineno-30-29"></a>    path =&gt; &quot;/tmp/netflow-alerts.log&quot;
+<a id="__codelineno-30-30" name="__codelineno-30-30" href="#__codelineno-30-30"></a>    codec =&gt; rubydebug
+<a id="__codelineno-30-31" name="__codelineno-30-31" href="#__codelineno-30-31"></a>  }
+<a id="__codelineno-30-32" name="__codelineno-30-32" href="#__codelineno-30-32"></a>
+<a id="__codelineno-30-33" name="__codelineno-30-33" href="#__codelineno-30-33"></a>  opensearch {
+<a id="__codelineno-30-34" name="__codelineno-30-34" href="#__codelineno-30-34"></a>    hosts =&gt; [&quot;https://&lt;IP-address&gt;:9200&quot;]
+<a id="__codelineno-30-35" name="__codelineno-30-35" href="#__codelineno-30-35"></a>    user =&gt; &quot;admin&quot;
+<a id="__codelineno-30-36" name="__codelineno-30-36" href="#__codelineno-30-36"></a>    password =&gt; &quot;&lt;INDEXER_PASSWORD&gt;&quot;
+<a id="__codelineno-30-37" name="__codelineno-30-37" href="#__codelineno-30-37"></a>    index =&gt; &quot;netflow-alerts-history&quot;
+<a id="__codelineno-30-38" name="__codelineno-30-38" href="#__codelineno-30-38"></a>    ssl =&gt; true
+<a id="__codelineno-30-39" name="__codelineno-30-39" href="#__codelineno-30-39"></a>    ssl_certificate_verification =&gt; false
+<a id="__codelineno-30-40" name="__codelineno-30-40" href="#__codelineno-30-40"></a>  }
+<a id="__codelineno-30-41" name="__codelineno-30-41" href="#__codelineno-30-41"></a>}
+</code></pre></div>
+<p>Save and exit.</p>
+<hr />
+<h2 id="step-10-register-both-logstash-pipelines">Step 10: Register both Logstash pipelines</h2>
+<p>Back up the existing pipeline configuration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>sudo<span class="w"> </span>cp<span class="w"> </span>/etc/logstash/pipelines.yml<span class="w"> </span>/etc/logstash/pipelines.yml.backup-netflow-poc
+</code></pre></div>
+<p>Edit the Logstash pipeline registration file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/logstash/pipelines.yml
+</code></pre></div>
+<p>Add the following entries:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">pipeline.id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">netflow-ingestion</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">  </span><span class="nt">path.config</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/etc/logstash/conf.d/netflow.conf&quot;</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">pipeline.id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">netflow-alerts</span>
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">  </span><span class="nt">path.config</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/etc/logstash/conf.d/netflow-alerts.conf&quot;</span>
+</code></pre></div>
+<p>Save the file.</p>
+<hr />
+<h2 id="step-11-validate-and-start-the-logstash-pipelines">Step 11: Validate and start the Logstash pipelines</h2>
+<p>Validate the configuration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>sudo<span class="w"> </span>/usr/share/logstash/bin/logstash<span class="w"> </span>--path.settings<span class="w"> </span>/etc/logstash<span class="w"> </span>-t
+</code></pre></div>
+<p>Expected result:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>Configuration OK
+</code></pre></div>
+<p>Restart Logstash:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>logstash
+</code></pre></div>
+<p>Verify service status:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>logstash<span class="w"> </span>--no-pager
+</code></pre></div>
+<p>Verify that the alert webhook receiver is listening:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>sudo<span class="w"> </span>ss<span class="w"> </span>-tlnp<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="m">8082</span>
+</code></pre></div>
+<p>Expected result:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>LISTEN ... *:8082 ... java
+</code></pre></div>
+<p>Check that both pipelines started:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>sudo<span class="w"> </span>grep<span class="w"> </span>-E<span class="w"> </span><span class="s2">&quot;netflow-ingestion|netflow-alerts&quot;</span><span class="w"> </span>/var/log/logstash/logstash-plain.log<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-20
+</code></pre></div>
+<hr />
+<h1 id="part-e-validate-raw-netflow-ingestion">Part E: Validate Raw NetFlow Ingestion</h1>
+<h2 id="step-12-verify-local-logstash-event-output">Step 12: Verify local Logstash event output</h2>
+<p>On the Logstash server:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">20</span><span class="w"> </span>/tmp/netflow-events.log
+</code></pre></div>
+<p>Expected fields include:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>src4_addr
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>src_port
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>dst4_addr
+<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a>dst_port
+<a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a>in_bytes
+<a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a>in_packets
+<a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a>source_platform
+<a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a>event_category
+</code></pre></div>
+<hr />
+<h2 id="step-13-verify-the-netflow-index">Step 13: Verify the NetFlow index</h2>
+<p>From the Logstash server or an authorized administration host:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>admin:&lt;INDEXER_PASSWORD&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="s2">&quot;https://&lt;IP_address&gt;:9200/_cat/indices?v&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>netflow
+</code></pre></div>
+<p>Expected index:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>netflow-logs-YYYY.MM.DD
+</code></pre></div>
+<p>Verify document count:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>admin:&lt;INDEXER_PASSWORD&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="s2">&quot;https://&lt;IP-address&gt;:9200/netflow-logs-*/_count?pretty&quot;</span>
+</code></pre></div>
+<hr />
+<h1 id="part-f-wazuh-dashboard-ui-data-view-and-raw-flow-validation">Part F: Wazuh Dashboard UI — Data View and Raw Flow Validation</h1>
+<h2 id="step-14-create-the-raw-netflow-data-view">Step 14: Create the raw NetFlow data view</h2>
+<ol>
+<li>Log in to Wazuh Dashboard.</li>
+<li>Navigate to:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>Dashboard Management → Index patterns - create index pattern
+</code></pre></div>
+<ol>
+<li>Define the index pattern</li>
+<li>Enter the data view name:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>netflow-logs-*
+</code></pre></div>
+<ol>
+<li>Select:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>@timestamp
+</code></pre></div>
+<p>as the time field.
+6. Click <strong>create index pattern</strong>.</p>
+<hr />
+<h2 id="step-15-view-raw-netflow-telemetry">Step 15: View raw NetFlow telemetry</h2>
+<ol>
+<li>Navigate to:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>Discover
+</code></pre></div>
+<ol>
+<li>Select the data view:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>netflow-logs-*
+</code></pre></div>
+<ol>
+<li>Set the time range to:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>Last 24 hours
+</code></pre></div>
+<ol>
+<li>search these fields in the table:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>src4_addr
+<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a>src_port
+<a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a>dst4_addr
+<a id="__codelineno-52-4" name="__codelineno-52-4" href="#__codelineno-52-4"></a>dst_port
+<a id="__codelineno-52-5" name="__codelineno-52-5" href="#__codelineno-52-5"></a>in_bytes
+<a id="__codelineno-52-6" name="__codelineno-52-6" href="#__codelineno-52-6"></a>in_packets
+<a id="__codelineno-52-7" name="__codelineno-52-7" href="#__codelineno-52-7"></a>message
+</code></pre></div>
+<p>This confirms that raw NetFlow telemetry is indexed and searchable.</p>
+<hr />
+<h1 id="part-g-wazuh-dashboard-ui-create-monitor-and-trigger">Part G: Wazuh Dashboard UI — Create Monitor and Trigger</h1>
+<h2 id="step-16-create-the-netflow-activity-monitor">Step 16: Create the NetFlow activity monitor</h2>
+<ol>
+<li>Navigate to:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>Explore-&gt;Alerting → Monitors
+</code></pre></div>
+<ol>
+<li>Click <strong>Create monitor</strong>.</li>
+<li>Select:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>Per query monitor
+</code></pre></div>
+<ol>
+<li>Configure the monitor:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Monitor name</td>
+<td><code>NetFlow Activity Monitor</code></td>
+</tr>
+<tr>
+<td>Defining method</td>
+<td>Visual editor</td>
+</tr>
+<tr>
+<td>Schedule</td>
+<td>Every 1 minute</td>
+</tr>
+<tr>
+<td>Index</td>
+<td><code>netflow-logs-*</code></td>
+</tr>
+<tr>
+<td>Time field</td>
+<td><code>@timestamp</code></td>
+</tr>
+<tr>
+<td>Query</td>
+<td>Match all</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>Save the monitor configuration.</li>
+</ol>
+<hr />
+<h2 id="step-17-create-the-monitor-trigger">Step 17: Create the monitor trigger</h2>
+<ol>
+<li>Click <strong>Add trigger</strong>.</li>
+<li>Configure:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Trigger name</td>
+<td><code>NetFlow Test Trigger</code></td>
+</tr>
+<tr>
+<td>Severity</td>
+<td><code>3</code></td>
+</tr>
+<tr>
+<td>Trigger condition</td>
+<td>Count is above</td>
+</tr>
+<tr>
+<td>Value</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td>Metric</td>
+<td>Count of documents</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>Save the trigger.</li>
+</ol>
+<p>This POC trigger activates when one or more NetFlow records are found during the monitor evaluation period.</p>
+<hr />
+<h1 id="part-h-wazuh-dashboard-ui-webhook-channel-and-action">Part H: Wazuh Dashboard UI — Webhook Channel and Action</h1>
+<h2 id="step-18-create-the-webhook-notification-channel">Step 18: Create the webhook notification channel</h2>
+<ol>
+<li>Navigate to:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>Notifications → Channels
+</code></pre></div>
+<ol>
+<li>Click <strong>Create channel</strong>.</li>
+<li>Select:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>Custom webhook
+</code></pre></div>
+<ol>
+<li>Configure:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Channel name</td>
+<td><code>netflow-alert-webhook</code></td>
+</tr>
+<tr>
+<td>Host</td>
+<td><code>&lt;IP-address&gt;</code></td>
+</tr>
+<tr>
+<td>Port</td>
+<td><code>8082</code></td>
+</tr>
+<tr>
+<td>Path</td>
+<td><code>/</code></td>
+</tr>
+<tr>
+<td>Method</td>
+<td><code>POST</code></td>
+</tr>
+<tr>
+<td>Header</td>
+<td><code>Content-Type: application/json</code></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>Save the channel.</li>
+</ol>
+<blockquote>
+<p>Confirm that the Wazuh Indexer can reach <code>&lt;IP-address&gt;:8082</code>. For production, secure this endpoint with TLS, authentication, and network restrictions.</p>
+</blockquote>
+<hr />
+<h2 id="step-19-add-the-monitor-action">Step 19: Add the monitor action</h2>
+<ol>
+<li>Open the <code>NetFlow Activity Monitor</code>.</li>
+<li>Open the <code>NetFlow Test Trigger</code>.</li>
+<li>Under <strong>Actions</strong>, click <strong>Add action</strong>.</li>
+<li>Configure:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Action name</td>
+<td><code>Send NetFlow Alert to Logstash</code></td>
+</tr>
+<tr>
+<td>Channel</td>
+<td><code>netflow-alert-webhook</code></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>Use this message body:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a><span class="p">{</span>
+<a id="__codelineno-57-2" name="__codelineno-57-2" href="#__codelineno-57-2"></a><span class="w">  </span><span class="nt">&quot;monitor_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{{ctx.monitor.name}}&quot;</span><span class="p">,</span>
+<a id="__codelineno-57-3" name="__codelineno-57-3" href="#__codelineno-57-3"></a><span class="w">  </span><span class="nt">&quot;trigger_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{{ctx.trigger.name}}&quot;</span><span class="p">,</span>
+<a id="__codelineno-57-4" name="__codelineno-57-4" href="#__codelineno-57-4"></a><span class="w">  </span><span class="nt">&quot;severity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{{ctx.trigger.severity}}&quot;</span><span class="p">,</span>
+<a id="__codelineno-57-5" name="__codelineno-57-5" href="#__codelineno-57-5"></a><span class="w">  </span><span class="nt">&quot;period_start&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{{ctx.periodStart}}&quot;</span><span class="p">,</span>
+<a id="__codelineno-57-6" name="__codelineno-57-6" href="#__codelineno-57-6"></a><span class="w">  </span><span class="nt">&quot;period_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{{ctx.periodEnd}}&quot;</span><span class="p">,</span>
+<a id="__codelineno-57-7" name="__codelineno-57-7" href="#__codelineno-57-7"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NetFlow monitor triggered&quot;</span>
+<a id="__codelineno-57-8" name="__codelineno-57-8" href="#__codelineno-57-8"></a><span class="p">}</span>
+</code></pre></div>
+<ol>
+<li>Save the action and trigger.</li>
+</ol>
+<hr />
+<h1 id="part-i-validate-alert-receiver-and-alert-history">Part I: Validate Alert Receiver and Alert History</h1>
+<h2 id="step-20-test-the-alert-receiver-manually">Step 20: Test the alert receiver manually</h2>
+<p>On the Logstash server, run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8082<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-58-3" name="__codelineno-58-3" href="#__codelineno-58-3"></a>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-58-4" name="__codelineno-58-4" href="#__codelineno-58-4"></a><span class="s1">  &quot;monitor_name&quot;: &quot;NetFlow Test&quot;,</span>
+<a id="__codelineno-58-5" name="__codelineno-58-5" href="#__codelineno-58-5"></a><span class="s1">  &quot;trigger_name&quot;: &quot;Manual Test&quot;,</span>
+<a id="__codelineno-58-6" name="__codelineno-58-6" href="#__codelineno-58-6"></a><span class="s1">  &quot;severity&quot;: &quot;3&quot;</span>
+<a id="__codelineno-58-7" name="__codelineno-58-7" href="#__codelineno-58-7"></a><span class="s1">}&#39;</span>
+</code></pre></div>
+<p>Expected response:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>ok
+</code></pre></div>
+<p>Verify that Logstash received the alert:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">20</span><span class="w"> </span>/tmp/netflow-alerts.log
+</code></pre></div>
+<hr />
+<h2 id="step-21-verify-alert-history-indexing">Step 21: Verify alert-history indexing</h2>
+<p>Verify the document count:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>admin:&lt;INDEXER_PASSWORD&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a><span class="s2">&quot;https://&lt;IP-address&gt;:9200/netflow-alerts-history/_count?pretty&quot;</span>
+</code></pre></div>
+<p>View recent alert documents:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>admin:&lt;INDEXER_PASSWORD&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a><span class="s2">&quot;https://&lt;IP-address&gt;:9200/netflow-alerts-history/_search?pretty&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-62-3" name="__codelineno-62-3" href="#__codelineno-62-3"></a>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-62-4" name="__codelineno-62-4" href="#__codelineno-62-4"></a>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-62-5" name="__codelineno-62-5" href="#__codelineno-62-5"></a><span class="s1">  &quot;size&quot;: 10,</span>
+<a id="__codelineno-62-6" name="__codelineno-62-6" href="#__codelineno-62-6"></a><span class="s1">  &quot;sort&quot;: [</span>
+<a id="__codelineno-62-7" name="__codelineno-62-7" href="#__codelineno-62-7"></a><span class="s1">    {</span>
+<a id="__codelineno-62-8" name="__codelineno-62-8" href="#__codelineno-62-8"></a><span class="s1">      &quot;@timestamp&quot;: {</span>
+<a id="__codelineno-62-9" name="__codelineno-62-9" href="#__codelineno-62-9"></a><span class="s1">        &quot;order&quot;: &quot;desc&quot;</span>
+<a id="__codelineno-62-10" name="__codelineno-62-10" href="#__codelineno-62-10"></a><span class="s1">      }</span>
+<a id="__codelineno-62-11" name="__codelineno-62-11" href="#__codelineno-62-11"></a><span class="s1">    }</span>
+<a id="__codelineno-62-12" name="__codelineno-62-12" href="#__codelineno-62-12"></a><span class="s1">  ]</span>
+<a id="__codelineno-62-13" name="__codelineno-62-13" href="#__codelineno-62-13"></a><span class="s1">}&#39;</span>
+</code></pre></div>
+<hr />
+<h2 id="step-22-create-the-alert-history-data-view">Step 22: Create the alert-history data view</h2>
+<ol>
+<li>Navigate to:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>Dashboard Management → Index Patterns-&gt;create index pattern
+</code></pre></div>
+<ol>
+<li>Click <strong>Create index pattern</strong>.</li>
+<li>Define index pattern:Enter:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>netflow-alerts-history
+</code></pre></div>
+<ol>
+<li>Select:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>@timestamp
+</code></pre></div>
+<p>as the time field.
+5. Click <strong>Create index pattern</strong>.</p>
+<p>Open <strong>Discover</strong>, select <code>netflow-alerts-history</code>, and verify the alert event.</p>
+<hr />
+<h1 id="part-j-final-end-to-end-demonstration">Part J: Final End-to-End Demonstration</h1>
+<h2 id="step-23-generate-new-traffic-and-ingest-a-fresh-flow-file">Step 23: Generate new traffic and ingest a fresh flow file</h2>
+<ol>
+<li>Generate test traffic again on the exporter or collector:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a>curl<span class="w"> </span>-I<span class="w"> </span>https://github.com
+<a id="__codelineno-66-2" name="__codelineno-66-2" href="#__codelineno-66-2"></a>ping<span class="w"> </span>-c<span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="m">8</span>.8.8.8
+</code></pre></div>
+<ol>
+<li>Wait for a new flow file.</li>
+<li>Convert the new flow file to JSON and NDJSON.</li>
+<li>Copy the new NDJSON file to <code>/tmp/netflow.ndjson</code> on the Logstash server.</li>
+<li>Restart Logstash to force the POC file input pipeline to read the file again:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>logstash
+</code></pre></div>
+<ol>
+<li>Wait for the monitor schedule to run.</li>
+</ol>
+<hr />
+<h2 id="step-24-verify-the-complete-flow">Step 24: Verify the complete flow</h2>
+<p>Verify raw events:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">20</span><span class="w"> </span>/tmp/netflow-events.log
+</code></pre></div>
+<p>Verify alert webhook events:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">20</span><span class="w"> </span>/tmp/netflow-alerts.log
+</code></pre></div>
+<p>Verify raw NetFlow records in Dashboard:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a>Discover → netflow-logs-*
+</code></pre></div>
+<p>Verify alert records in Dashboard:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a>Discover → netflow-alerts-history
+</code></pre></div>
+<hr />
+<h1 id="poc-success-criteria">POC Success Criteria</h1>
+<table>
+<thead>
+<tr>
+<th>Validation</th>
+<th>Expected Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Collector</td>
+<td><code>nfcapd</code> listens on UDP port <code>2055</code></td>
+</tr>
+<tr>
+<td>Flow capture</td>
+<td>A flow file is created by the collector</td>
+</tr>
+<tr>
+<td>Conversion</td>
+<td>The flow file is converted to valid NDJSON</td>
+</tr>
+<tr>
+<td>Pipeline 1</td>
+<td>Logstash reads <code>/tmp/netflow.ndjson</code></td>
+</tr>
+<tr>
+<td>Raw index</td>
+<td>NetFlow records are stored in <code>netflow-logs-*</code></td>
+</tr>
+<tr>
+<td>Dashboard</td>
+<td>Raw flows are visible in <code>netflow-logs-*</code> data view</td>
+</tr>
+<tr>
+<td>Monitor</td>
+<td>NetFlow monitor triggers when flow records exist</td>
+</tr>
+<tr>
+<td>Pipeline 2</td>
+<td>Alert payload reaches Logstash on port <code>8082</code></td>
+</tr>
+<tr>
+<td>Alert index</td>
+<td>Alert records are stored in <code>netflow-alerts-history</code></td>
+</tr>
+<tr>
+<td>Final proof</td>
+<td>Raw flows and alerts are visible in separate Dashboard data views</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="troubleshooting">Troubleshooting</h1>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Validation and Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UDP port <code>2055</code> is already in use</td>
+<td>Run <code>sudo ss -ulpn \| grep 2055</code>; reuse the existing <code>nfcapd</code> process instead of starting another collector.</td>
+</tr>
+<tr>
+<td>No flow file is created</td>
+<td>Confirm that the exporter sends NetFlow to <code>&lt;IP-address&gt;:2055/UDP</code>; generate traffic and wait for flow-file rotation.</td>
+</tr>
+<tr>
+<td>Logstash configuration validation fails</td>
+<td>Run <code>sudo /usr/share/logstash/bin/logstash --path.settings /etc/logstash -t</code> and correct the reported pipeline syntax error.</td>
+</tr>
+<tr>
+<td>Logstash <code>path.data</code> is locked</td>
+<td>Do not run a second Logstash process. Stop manual processes, (sudo systemctl stop logstash)use validation mode only, then restart through <code>systemctl</code>.</td>
+</tr>
+<tr>
+<td>Dead-letter queue permission error</td>
+<td>Run <code>sudo chown -R logstash:logstash /var/lib/logstash/dead_letter_queue/netflow-alerts</code>, remove stale lock files only after confirming Logstash is stopped, then restart the service.</td>
+</tr>
+<tr>
+<td>Port <code>8082</code> is not listening</td>
+<td>Run <code>sudo systemctl status logstash --no-pager</code> and <code>sudo grep netflow-alerts /var/log/logstash/logstash-plain.log</code>.</td>
+</tr>
+<tr>
+<td>Monitor count is zero</td>
+<td>Confirm new documents exist in <code>netflow-logs-*</code>; widen the monitor lookback period or ingest fresh NetFlow records.</td>
+</tr>
+<tr>
+<td>Alert history is empty</td>
+<td>Test the receiver manually with <code>curl</code>, then verify the webhook channel host, port, path, and Indexer-to-Logstash network connectivity.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="business-use-case">Business Use Case</h1>
+<p>This POC demonstrates a scalable architecture for handling high-volume network telemetry separately from actionable alerts.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>Network Traffic
+<a id="__codelineno-72-2" name="__codelineno-72-2" href="#__codelineno-72-2"></a>        ↓
+<a id="__codelineno-72-3" name="__codelineno-72-3" href="#__codelineno-72-3"></a>NetFlow Exporter
+<a id="__codelineno-72-4" name="__codelineno-72-4" href="#__codelineno-72-4"></a>        ↓
+<a id="__codelineno-72-5" name="__codelineno-72-5" href="#__codelineno-72-5"></a>nfcapd Collector
+<a id="__codelineno-72-6" name="__codelineno-72-6" href="#__codelineno-72-6"></a>        ↓
+<a id="__codelineno-72-7" name="__codelineno-72-7" href="#__codelineno-72-7"></a>nfdump Flow Files
+<a id="__codelineno-72-8" name="__codelineno-72-8" href="#__codelineno-72-8"></a>        ↓
+<a id="__codelineno-72-9" name="__codelineno-72-9" href="#__codelineno-72-9"></a>JSON / NDJSON Conversion
+<a id="__codelineno-72-10" name="__codelineno-72-10" href="#__codelineno-72-10"></a>        ↓
+<a id="__codelineno-72-11" name="__codelineno-72-11" href="#__codelineno-72-11"></a>Logstash Pipeline 1
+<a id="__codelineno-72-12" name="__codelineno-72-12" href="#__codelineno-72-12"></a>        ↓
+<a id="__codelineno-72-13" name="__codelineno-72-13" href="#__codelineno-72-13"></a>Wazuh Indexer — netflow-logs-*
+<a id="__codelineno-72-14" name="__codelineno-72-14" href="#__codelineno-72-14"></a>        ↓
+<a id="__codelineno-72-15" name="__codelineno-72-15" href="#__codelineno-72-15"></a>OpenSearch Alerting Monitor
+<a id="__codelineno-72-16" name="__codelineno-72-16" href="#__codelineno-72-16"></a>        ↓
+<a id="__codelineno-72-17" name="__codelineno-72-17" href="#__codelineno-72-17"></a>Trigger
+<a id="__codelineno-72-18" name="__codelineno-72-18" href="#__codelineno-72-18"></a>        ↓
+<a id="__codelineno-72-19" name="__codelineno-72-19" href="#__codelineno-72-19"></a>Custom Webhook Channel
+<a id="__codelineno-72-20" name="__codelineno-72-20" href="#__codelineno-72-20"></a>        ↓
+<a id="__codelineno-72-21" name="__codelineno-72-21" href="#__codelineno-72-21"></a>Logstash Pipeline 2 — Port 8082 -&gt; Indexer -netflow alerts
+</code></pre></div>
+<p>Typical use cases include:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a>Unexpected outbound traffic
+<a id="__codelineno-73-2" name="__codelineno-73-2" href="#__codelineno-73-2"></a>Large data-transfer detection
+<a id="__codelineno-73-3" name="__codelineno-73-3" href="#__codelineno-73-3"></a>Unusual source-to-destination communication
+<a id="__codelineno-73-4" name="__codelineno-73-4" href="#__codelineno-73-4"></a>New external destination monitoring
+<a id="__codelineno-73-5" name="__codelineno-73-5" href="#__codelineno-73-5"></a>High packet-volume detection
+<a id="__codelineno-73-6" name="__codelineno-73-6" href="#__codelineno-73-6"></a>Potential data-exfiltration investigation
+<a id="__codelineno-73-7" name="__codelineno-73-7" href="#__codelineno-73-7"></a>Network traffic baselining
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.top", "navigation.tracking", "navigation.indexes", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

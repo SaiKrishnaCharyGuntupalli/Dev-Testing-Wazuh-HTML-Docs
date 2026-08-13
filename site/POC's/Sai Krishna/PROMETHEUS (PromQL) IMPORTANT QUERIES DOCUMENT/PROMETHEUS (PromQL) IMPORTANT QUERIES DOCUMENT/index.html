@@ -1,0 +1,4095 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Production implementation guide for multi-tenant Wazuh MSSP on single-node Docker">
+      
+      
+      
+      
+        <link rel="prev" href="../../Second%20use%20case%20of%20XDR/Second%20use%20case%20of%20XDR/">
+      
+      
+        <link rel="next" href="../../Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT - Wazuh MSSP Multi-Tenant Implementation Guide</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../../stylesheets/responsive-nav.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-cpu-queries" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-header__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Wazuh MSSP Multi-Tenant Implementation Guide
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-nav__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    Wazuh MSSP Multi-Tenant Implementation Guide
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../01-Getting_started/Getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment & Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment & Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../02-index-template-filebeat/index_template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index Template & Filebeat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../03-agent-deployment/agent_deplyment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../04-agent-configuration/agent_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & Access
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Security & Access
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../06-rbac/rbac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RBAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../07-dls/dls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Document Level Security (DLS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../08-sso-entra/sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSO - Microsoft Entra ID
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../09-Cluster%20and%20Index%20Verification/Cluster%20and%20Index%20Verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster and Index Verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../10-reference/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC's
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    POC's
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/GitHub_Webhook_to_Logstash/GitHub_Webhook_to_Logstash_POC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub_Webhook_to_Logstash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Rules-as-Code%20Implementation%20Guide/Wazuh%20Rules-as-Code%20Implementation%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Rules-as-Code Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Windows Agent Deployment & Security Detection logs Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetFlowlogs_to_Logstash_and_Wazuh_Indexer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../XDR%20Implementation%20Process/XDR%20Implementation%20Process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XDR Implementation Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Second%20use%20case%20of%20XDR/Second%20use%20case%20of%20XDR/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Second use case of XDR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-cpu-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. CPU QUERIES
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. CPU QUERIES">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-total-cpu-cores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Total CPU Cores
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1 Total CPU Cores">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-cpu-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 CPU Usage %
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.2 CPU Usage %">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-cpu-idle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 CPU Idle %
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.3 CPU Idle %">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-memory-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. MEMORY QUERIES
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. MEMORY QUERIES">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-total-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Total Memory
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.1 Total Memory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-available-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Available Memory
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2 Available Memory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-used-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Used Memory %
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.3 Used Memory %">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-disk-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. DISK QUERIES
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. DISK QUERIES">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-total-disk-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Total Disk Space
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 Total Disk Space">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-available-disk-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Available Disk Space
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.2 Available Disk Space">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-used-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Used Disk %
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.3 Used Disk %">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-network-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. NETWORK QUERIES
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. NETWORK QUERIES">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-incoming-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Incoming Traffic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 Incoming Traffic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-outgoing-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Outgoing Traffic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 Outgoing Traffic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-important-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. IMPORTANT FUNCTIONS
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. IMPORTANT FUNCTIONS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 rate()
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.1 rate()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Example:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-sum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 sum()
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.2 sum()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Example:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-avg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 avg()
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.3 avg()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-example_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Example:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-count" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 count()
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.4 count()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-example_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Example:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-time-based-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. TIME-BASED QUERIES
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. TIME-BASED QUERIES">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-last-5-minutes-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Last 5 Minutes Data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1 Last 5 Minutes Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-specific-time-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Specific Time Data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2 Specific Time Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-historical-range" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Historical Range
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.3 Historical Range">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-bonus-very-useful" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. BONUS (VERY USEFUL)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. BONUS (VERY USEFUL)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#system-load" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Load
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disk-read-speed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disk Read Speed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disk-write-speed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disk Write Speed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Pipelines_and_Challenges/Pipelines_and_Challenges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipelines_and_Challenges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jira API → Logstash → Wazuh Integration for Non-Agent Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LOGSTASH PIPELINE WORKERS & BATCHSIZE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/GitHub_Logstash_Wazuh_NonAgent_Implementation/GitHub_Logstash_Wazuh_NonAgent_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Logstash Wazuh NonAgent Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/MySQL_Log_Monitoring_Using_Wazuh_Agent/MySQL_Log_Monitoring_Using_Wazuh_Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MySQL_Log_Monitoring_Using_Wazuh_Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Agent_Log_Buffering_and_Resynchronization/Wazuh_Agent_Log_Buffering_and_Resynchronization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Agent_Log_Buffering_and_Resynchronization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Implementation%20Process%20to%20Monitor%20Filebeat%20Health/Implementation_Process_to_Monitor_Filebeat_Health/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor Filebeat Health
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Implementation%20Guide%20AWS%20CloudTrail%20%E2%86%92%20S3%20%E2%86%92%20SQS%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh/Implementation_Guide_AWS_CloudTrail_S3_SQS_Logstash_Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide AWS CloudTrail → S3 → SQS → Logstash → Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Prometheus/Prometheus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prometheus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/SOC%20Logstash%20Multi-Pipeline%20Architecture%20Implementation%20Guide/SOC_Logstash_Multi_Pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Multi-Pipeline Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/SOC%20Logstash%20Pipeline-to-Pipeline%20%28P2P%29%20Architecture%20Implementation%20Guide/SOC_Logstash_P2P/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Multi_Tenant_MSSP_Implementation/Wazuh_Multi_Tenant_MSSP_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Multi_Tenant_MSSP_Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/Wazuh%20Multi%20Node%20Runbook/Wazuh%20Multi%20Node%20Runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Multi Node Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Availability Log Ingestion Pipeline Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zero Downtime Group Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operating System Based Group Creation in Wazuh GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-cpu-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. CPU QUERIES
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. CPU QUERIES">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-total-cpu-cores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Total CPU Cores
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1 Total CPU Cores">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-cpu-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 CPU Usage %
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.2 CPU Usage %">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-cpu-idle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 CPU Idle %
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.3 CPU Idle %">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-memory-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. MEMORY QUERIES
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. MEMORY QUERIES">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-total-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Total Memory
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.1 Total Memory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-available-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Available Memory
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2 Available Memory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-used-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Used Memory %
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.3 Used Memory %">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-disk-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. DISK QUERIES
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. DISK QUERIES">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-total-disk-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Total Disk Space
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 Total Disk Space">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-available-disk-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Available Disk Space
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.2 Available Disk Space">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-used-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Used Disk %
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.3 Used Disk %">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-network-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. NETWORK QUERIES
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. NETWORK QUERIES">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-incoming-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Incoming Traffic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 Incoming Traffic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-outgoing-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Outgoing Traffic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 Outgoing Traffic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-important-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. IMPORTANT FUNCTIONS
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. IMPORTANT FUNCTIONS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 rate()
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.1 rate()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Example:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-sum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 sum()
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.2 sum()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Example:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-avg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 avg()
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.3 avg()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-example_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Example:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-count" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 count()
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.4 count()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-example_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Example:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-time-based-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. TIME-BASED QUERIES
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. TIME-BASED QUERIES">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-last-5-minutes-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Last 5 Minutes Data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1 Last 5 Minutes Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-specific-time-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Specific Time Data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2 Specific Time Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-historical-range" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Historical Range
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.3 Historical Range">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meaning_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meaning:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-bonus-very-useful" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. BONUS (VERY USEFUL)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. BONUS (VERY USEFUL)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#system-load" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Load
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disk-read-speed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disk Read Speed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disk-write-speed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disk Write Speed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT</h1>
+
+<h3 id="1-cpu-queries">1. CPU QUERIES</h3>
+<h4 id="11-total-cpu-cores">1.1 Total CPU Cores</h4>
+<h5 id="query">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>count(node_cpu_seconds_total{mode=&quot;idle&quot;})
+</code></pre></div>
+<h5 id="meaning">Meaning:</h5>
+<p>Total number of CPU cores in the system</p>
+<h5 id="explanation">Explanation:</h5>
+<ul>
+<li><code>node_cpu_seconds_total</code> → CPU metric per core</li>
+<li><code>{mode="idle"}</code> → select one metric per CPU</li>
+<li><code>count()</code> → counts number of CPUs</li>
+</ul>
+<h5 id="expected-output">Expected Output:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>4
+</code></pre></div>
+<p>System has 4 CPU cores</p>
+<hr />
+<h4 id="12-cpu-usage">1.2 CPU Usage %</h4>
+<h5 id="query_1">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>100 - (avg(rate(node_cpu_seconds_total{mode=&quot;idle&quot;}[1m])) * 100)
+</code></pre></div>
+<h5 id="meaning_1">Meaning:</h5>
+<p>Percentage of CPU being used</p>
+<h5 id="explanation_1">Explanation:</h5>
+<ul>
+<li><code>mode="idle"</code> → CPU idle time</li>
+<li><code>rate(...[1m])</code> → idle change per second</li>
+<li><code>avg()</code> → average across CPUs</li>
+<li><code>100 -</code> → convert idle → usage</li>
+</ul>
+<h5 id="expected-output_1">Expected Output:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>65.2
+</code></pre></div>
+<p>CPU is 65% utilized</p>
+<hr />
+<h4 id="13-cpu-idle">1.3 CPU Idle %</h4>
+<h5 id="query_2">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>avg(rate(node_cpu_seconds_total{mode=&quot;idle&quot;}[1m])) * 100
+</code></pre></div>
+<h5 id="meaning_2">Meaning:</h5>
+<p>Percentage of CPU idle time</p>
+<h5 id="expected-output_2">Expected Output:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>34.8
+</code></pre></div>
+<hr />
+<h3 id="2-memory-queries">2. MEMORY QUERIES</h3>
+<h4 id="21-total-memory">2.1 Total Memory</h4>
+<h5 id="query_3">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>node_memory_MemTotal_bytes
+</code></pre></div>
+<h5 id="meaning_3">Meaning:</h5>
+<p>Total RAM in bytes</p>
+<h5 id="explanation_2">Explanation:</h5>
+<ul>
+<li>Direct metric from Node Exporter</li>
+</ul>
+<h5 id="expected-output_3">Expected Output:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>16777216000
+</code></pre></div>
+<p>~16 GB</p>
+<hr />
+<h4 id="22-available-memory">2.2 Available Memory</h4>
+<h5 id="query_4">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>node_memory_MemAvailable_bytes
+</code></pre></div>
+<h5 id="meaning_4">Meaning:</h5>
+<p>Free memory available for use</p>
+<h5 id="expected-output_4">Expected Output:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>4000000000
+</code></pre></div>
+<p>~4 GB free</p>
+<hr />
+<h4 id="23-used-memory">2.3 Used Memory %</h4>
+<h5 id="query_5">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+</code></pre></div>
+<h5 id="meaning_5">Meaning:</h5>
+<p>Percentage of used memory</p>
+<h5 id="explanation_3">Explanation:</h5>
+<ul>
+<li><code>MemAvailable / MemTotal</code> → free ratio</li>
+<li><code>1 -</code> → used ratio</li>
+</ul>
+<h5 id="expected-output_5">Expected Output:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>75.0
+</code></pre></div>
+<p>75% memory used</p>
+<hr />
+<h3 id="3-disk-queries">3. DISK QUERIES</h3>
+<h4 id="31-total-disk-space">3.1 Total Disk Space</h4>
+<h5 id="query_6">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>sum(node_filesystem_size_bytes{fstype!=&quot;tmpfs&quot;})
+</code></pre></div>
+<h5 id="meaning_6">Meaning:</h5>
+<p>Total disk size</p>
+<h5 id="explanation_4">Explanation:</h5>
+<ul>
+<li><code>sum()</code> → total across disks</li>
+<li><code>fstype!="tmpfs"</code> → ignore temporary filesystems</li>
+</ul>
+<h5 id="expected-output_6">Expected Output:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>500000000000
+</code></pre></div>
+<p>~500 GB</p>
+<hr />
+<h4 id="32-available-disk-space">3.2 Available Disk Space</h4>
+<h5 id="query_7">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>sum(node_filesystem_avail_bytes{fstype!=&quot;tmpfs&quot;})
+</code></pre></div>
+<h5 id="meaning_7">Meaning:</h5>
+<p>Available disk space</p>
+<hr />
+<h4 id="33-used-disk">3.3 Used Disk %</h4>
+<h5 id="query_8">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>(1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100
+</code></pre></div>
+<h5 id="meaning_8">Meaning:</h5>
+<p>Disk usage percentage</p>
+<h5 id="expected-output_7">Expected Output:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>80.5
+</code></pre></div>
+<hr />
+<h3 id="4-network-queries">4. NETWORK QUERIES</h3>
+<h4 id="41-incoming-traffic">4.1 Incoming Traffic</h4>
+<h5 id="query_9">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>rate(node_network_receive_bytes_total[1m])
+</code></pre></div>
+<h5 id="meaning_9">Meaning:</h5>
+<p>Incoming network traffic per second</p>
+<h5 id="explanation_5">Explanation:</h5>
+<ul>
+<li><code>receive_bytes_total</code> → total received data</li>
+<li><code>rate()</code> → converts to per second</li>
+</ul>
+<h5 id="expected-output_8">Expected Output:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>125000
+</code></pre></div>
+<p>~125 KB/sec</p>
+<hr />
+<h4 id="42-outgoing-traffic">4.2 Outgoing Traffic</h4>
+<h5 id="query_10">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>rate(node_network_transmit_bytes_total[1m])
+</code></pre></div>
+<h5 id="meaning_10">Meaning:</h5>
+<p>Outgoing traffic per second</p>
+<hr />
+<h3 id="5-important-functions">5. IMPORTANT FUNCTIONS</h3>
+<h4 id="51-rate">5.1 rate()</h4>
+<h5 id="query-example">Query Example:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>rate(node_network_receive_bytes_total[1m])
+</code></pre></div>
+<h5 id="meaning_11">Meaning:</h5>
+<p>Calculates per-second change</p>
+<h5 id="use">Use:</h5>
+<ul>
+<li>Network speed</li>
+<li>Disk I/O</li>
+<li>CPU changes</li>
+</ul>
+<hr />
+<h4 id="52-sum">5.2 sum()</h4>
+<h5 id="query-example_1">Query Example:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>sum(node_filesystem_size_bytes)
+</code></pre></div>
+<h5 id="meaning_12">Meaning:</h5>
+<p>Adds all values</p>
+<h5 id="use_1">Use:</h5>
+<ul>
+<li>Total disk</li>
+<li>Total traffic</li>
+</ul>
+<hr />
+<h4 id="53-avg">5.3 avg()</h4>
+<h5 id="query-example_2">Query Example:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>avg(rate(node_cpu_seconds_total[1m]))
+</code></pre></div>
+<h5 id="meaning_13">Meaning:</h5>
+<p>Average value</p>
+<h5 id="use_2">Use:</h5>
+<ul>
+<li>CPU average across cores</li>
+</ul>
+<hr />
+<h4 id="54-count">5.4 count()</h4>
+<h5 id="query-example_3">Query Example:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>count(node_cpu_seconds_total{mode=&quot;idle&quot;})
+</code></pre></div>
+<h5 id="meaning_14">Meaning:</h5>
+<p>Counts number of elements</p>
+<h5 id="use_3">Use:</h5>
+<ul>
+<li>CPU cores</li>
+<li>Instances</li>
+</ul>
+<hr />
+<h3 id="6-time-based-queries">6. TIME-BASED QUERIES</h3>
+<h4 id="61-last-5-minutes-data">6.1 Last 5 Minutes Data</h4>
+<h5 id="query_11">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>rate(node_cpu_seconds_total[5m])
+</code></pre></div>
+<h5 id="meaning_15">Meaning:</h5>
+<p>Uses last 5 minutes data</p>
+<hr />
+<h4 id="62-specific-time-data">6.2 Specific Time Data</h4>
+<h5 id="query_12">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>node_memory_MemAvailable_bytes @ 1712400000
+</code></pre></div>
+<h5 id="meaning_16">Meaning:</h5>
+<p>Fetch data at exact timestamp</p>
+<h5 id="explanation_6">Explanation:</h5>
+<ul>
+<li><code>@</code> → specific time</li>
+</ul>
+<hr />
+<h4 id="63-historical-range">6.3 Historical Range</h4>
+<h5 id="query_13">Query:</h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>node_cpu_seconds_total[1h]
+</code></pre></div>
+<h5 id="meaning_17">Meaning:</h5>
+<p>Returns data for last 1 hour</p>
+<hr />
+<h3 id="7-bonus-very-useful">7. BONUS (VERY USEFUL)</h3>
+<h4 id="system-load">System Load</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>node_load1
+</code></pre></div>
+<p>System load</p>
+<h4 id="disk-read-speed">Disk Read Speed</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>rate(node_disk_read_bytes_total[1m])
+</code></pre></div>
+<h4 id="disk-write-speed">Disk Write Speed</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>rate(node_disk_written_bytes_total[1m])
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.top", "navigation.tracking", "navigation.indexes", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
