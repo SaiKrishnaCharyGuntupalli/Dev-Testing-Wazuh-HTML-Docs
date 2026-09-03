@@ -11,10 +11,8 @@
       
       
       
-        <link rel="prev" href="../../POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/">
+        <link rel="prev" href="../../Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/">
       
-      
-        <link rel="next" href="../../NetFlowlogs_to_Logstash_and_Wazuh_Indexer/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/">
       
       
         
@@ -25,7 +23,7 @@
     
     
       
-        <title>Wazuh Windows Agent Deployment & Security Detection logs Generation - Wazuh MSSP Multi-Tenant Implementation Guide</title>
+        <title>SOC Client Onboarding - Wazuh MSSP Multi-Tenant Implementation Guide</title>
       
     
     
@@ -78,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#wazuh-windows-agent-deployment-and-security-detection-poc" class="md-skip">
+        <a href="#soc-client-onboarding-plan" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Wazuh Windows Agent Deployment & Security Detection logs Generation
+              SOC Client Onboarding
             
           </span>
         </div>
@@ -866,37 +864,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Wazuh Windows Agent Deployment & Security Detection logs Generation
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/" class="md-nav__link">
         
   
   
@@ -912,202 +883,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#1-poc-objective" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. POC Objective
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-prerequisites" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Prerequisites
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-step-1-access-the-wazuh-dashboard" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Step 1 - Access the Wazuh Dashboard
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-step-2-install-the-wazuh-agent-on-windows" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Step 2 - Install the Wazuh Agent on Windows
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-step-3-start-and-validate-the-wazuh-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Step 3 - Start and Validate the Wazuh Agent
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-step-4-enable-required-windows-audit-policies" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. Step 4 - Enable Required Windows Audit Policies
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#7-step-5-validate-failed-logon-detection" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7. Step 5 - Validate Failed Logon Detection
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#8-step-6-validate-local-user-and-administrator-group-monitoring" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8. Step 6 - Validate Local User and Administrator Group Monitoring
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#9-step-7-validate-process-creation-and-scheduled-task-detection" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        9. Step 7 - Validate Process Creation and Scheduled Task Detection
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#10-step-8-validate-powershell-command-line-visibility" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        10. Step 8 - Validate PowerShell Command-Line Visibility
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#11-step-9-validate-file-integrity-monitoring" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        11. Step 9 - Validate File Integrity Monitoring
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#12-step-10-validate-registry-persistence-monitoring" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        12. Step 10 - Validate Registry Persistence Monitoring
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#13-step-11-monitor-alerts-from-the-wazuh-manager" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        13. Step 11 - Monitor Alerts from the Wazuh Manager
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#14-step-12-validate-alerts-in-the-wazuh-dashboard" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        14. Step 12 - Validate Alerts in the Wazuh Dashboard
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#15-expected-poc-outcome" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        15. Expected POC Outcome
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#16-poc-conclusion" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        16. POC Conclusion
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1845,10 +1620,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../SOC_Client_Onboarding_Extension_Plan/SOC_Client_Onboarding_Extension_Plan/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Client Onboarding
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1864,6 +1666,197 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PURPOSE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#real-customer-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        REAL CUSTOMER SERVICES
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="REAL CUSTOMER SERVICES">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-pre-requisite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Pre-requisite
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-tenant-registrationorganization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Tenant Registration/Organization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-begin-platform-mssp-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Begin Platform (MSSP) Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-rbac-permission-user-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. RBAC Permission &amp; User Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-resource-ownership-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Resource Ownership &amp; Mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-rules-decoders-cdb-lists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Rules, Decoders &amp; CDB Lists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-agent-level-access-group-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Agent-Level Access &amp; Group Mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-index-dashboard-tenant-isolation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Index, Dashboard &amp; Tenant Isolation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-rbac-isolation-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. RBAC &amp; Isolation Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-wazuh-grouping-benefits-in-client-onboarding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Wazuh Grouping Benefits in Client Onboarding
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-standardized-soc-client-onboarding-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. STANDARDIZED SOC CLIENT ONBOARDING PROCESS
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-onboarding-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. ONBOARDING CHECKLIST
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-grouping-assessment-and-recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. GROUPING ASSESSMENT AND RECOMMENDATIONS
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1903,10 +1896,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-poc-objective" class="md-nav__link">
+  <a href="#purpose" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. POC Objective
+        PURPOSE
       
     </span>
   </a>
@@ -1914,10 +1907,137 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-prerequisites" class="md-nav__link">
+  <a href="#real-customer-services" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Prerequisites
+        REAL CUSTOMER SERVICES
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="REAL CUSTOMER SERVICES">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-pre-requisite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Pre-requisite
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-tenant-registrationorganization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Tenant Registration/Organization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-begin-platform-mssp-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Begin Platform (MSSP) Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-rbac-permission-user-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. RBAC Permission &amp; User Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-resource-ownership-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Resource Ownership &amp; Mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-rules-decoders-cdb-lists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Rules, Decoders &amp; CDB Lists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-agent-level-access-group-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Agent-Level Access &amp; Group Mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-index-dashboard-tenant-isolation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Index, Dashboard &amp; Tenant Isolation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-rbac-isolation-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. RBAC &amp; Isolation Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-wazuh-grouping-benefits-in-client-onboarding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Wazuh Grouping Benefits in Client Onboarding
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-standardized-soc-client-onboarding-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. STANDARDIZED SOC CLIENT ONBOARDING PROCESS
       
     </span>
   </a>
@@ -1925,10 +2045,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-step-1-access-the-wazuh-dashboard" class="md-nav__link">
+  <a href="#2-onboarding-checklist" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Step 1 - Access the Wazuh Dashboard
+        2. ONBOARDING CHECKLIST
       
     </span>
   </a>
@@ -1936,142 +2056,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-step-2-install-the-wazuh-agent-on-windows" class="md-nav__link">
+  <a href="#3-grouping-assessment-and-recommendations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Step 2 - Install the Wazuh Agent on Windows
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-step-3-start-and-validate-the-wazuh-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Step 3 - Start and Validate the Wazuh Agent
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-step-4-enable-required-windows-audit-policies" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. Step 4 - Enable Required Windows Audit Policies
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#7-step-5-validate-failed-logon-detection" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7. Step 5 - Validate Failed Logon Detection
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#8-step-6-validate-local-user-and-administrator-group-monitoring" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8. Step 6 - Validate Local User and Administrator Group Monitoring
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#9-step-7-validate-process-creation-and-scheduled-task-detection" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        9. Step 7 - Validate Process Creation and Scheduled Task Detection
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#10-step-8-validate-powershell-command-line-visibility" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        10. Step 8 - Validate PowerShell Command-Line Visibility
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#11-step-9-validate-file-integrity-monitoring" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        11. Step 9 - Validate File Integrity Monitoring
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#12-step-10-validate-registry-persistence-monitoring" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        12. Step 10 - Validate Registry Persistence Monitoring
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#13-step-11-monitor-alerts-from-the-wazuh-manager" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        13. Step 11 - Monitor Alerts from the Wazuh Manager
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#14-step-12-validate-alerts-in-the-wazuh-dashboard" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        14. Step 12 - Validate Alerts in the Wazuh Dashboard
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#15-expected-poc-outcome" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        15. Expected POC Outcome
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#16-poc-conclusion" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        16. POC Conclusion
+        3. GROUPING ASSESSMENT AND RECOMMENDATIONS
       
     </span>
   </a>
@@ -2095,390 +2083,190 @@
 
 
 
-<h1 id="wazuh-windows-agent-deployment-and-security-detection-poc">Wazuh Windows Agent Deployment and Security Detection POC</h1>
-<h2 id="1-poc-objective">1. POC Objective</h2>
-<p>This Proof of Concept validates that a Windows endpoint can be onboarded into Wazuh and that security-relevant activity on the endpoint is detected and displayed to the SOC team.</p>
-<p>The end-to-end flow is:</p>
-<p>Windows Endpoint<br />
-→ Wazuh Agent<br />
-→ Wazuh Manager<br />
-→ Wazuh Alert Rules<br />
-→ Filebeat<br />
-→ Wazuh Indexer<br />
-→ Wazuh Dashboard / SOC Analyst</p>
-<p>The POC validates:</p>
-<ul>
-<li>Successful Windows Wazuh Agent installation and registration.</li>
-<li>Collection of Windows Security and System telemetry.</li>
-<li>Detection of authentication failures, account changes, administrator-group changes, scheduled tasks, file modifications, and registry persistence activity.</li>
-<li>Alert generation in the Wazuh Manager.</li>
-<li>Visibility of alerts in the Wazuh Dashboard.</li>
-</ul>
-<h2 id="2-prerequisites">2. Prerequisites</h2>
+<h1 id="soc-client-onboarding-plan">SOC CLIENT ONBOARDING PLAN</h1>
+<h2 id="purpose">PURPOSE</h2>
+<p>Define a standardized onboarding process for SOC client integrations and evaluate the value of grouping in the onboarding lifecycle.</p>
+<hr />
+<h2 id="real-customer-services">REAL CUSTOMER SERVICES</h2>
+<h3 id="1-pre-requisite">1. Pre-requisite</h3>
+<p>a. Number of endpoints</p>
+<p>b. Type of endpoints: Linux, Windows, Mac, Docker, VMs, Cloud logs: Azure logs, GCP logs, AWS, Database logs, Server, Application logs.</p>
+<p>c. Data volume expectations</p>
+<p>d. Networking requirement for accessing the endpoints (public with protected access/private)</p>
+<p>e. Subscription/Licensing limits (TBD)</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;i. Wazuh Indexer Indices</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;ii. RBAC roles/default</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;iii. Dashboards</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;iv. Wazuh groups</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;v. wazuh/Logstash routes preference</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;vi. Decoders logics/Alert rules</p>
+<p>f. Retention policy: standard (defined by CISO/custom as per the client requirement)</p>
+<p>g. Tenant name</p>
+<p>h. Customer ID</p>
+<p>i. Region</p>
+<p>j. Compliance requirements</p>
+<p>k. Backup strategy</p>
+<p>l. Dedicated SOC platform/sharable SOC platform</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;i. Inform sharable platform guidelines/limitations</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;ii. In terms of complete isolation (share the isolation scope)</p>
+<p>m. Check SSO requirement for platform access</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;i. If SSO requested (provide RBACK role details)</p>
+<p>n. Access privileges for RBAC</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;i. Users/members data collection to access the platform</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;ii. User wise role assignments (role assignment)</p>
+<p>o. SIEM (TBD)</p>
+<p>p. SOAR (TBD)</p>
+<p>q. Ticketing system (TBD)</p>
+<p>r. Point of contact/Contact details</p>
+<p>s. Agreement of start date/ Total agreement period/Tenure</p>
+<p>t. Alert reporting style (Email or slack or platform)</p>
+<p>u. Report selection (On demand/frequency based)</p>
+<p>v. Onboarding confirmation/Access handover</p>
+<p>w. Maintenance/support (TBD)</p>
+<p><strong>Current selection: Windows</strong></p>
+<p>i. Regular/Default monitoring service applicable [OS level, security level, Terminal, etc]</p>
+<p>ii. Optional (On-Client request): Sysmon, External firewall, Active response, etc.</p>
+<h3 id="2-tenant-registrationorganization">2. Tenant Registration/Organization</h3>
+<p>a. Application: Tenant register with all the details collected above</p>
+<p>b. Enroll a new Tenant as per above information collected from the client</p>
+<p>c. Prepare backend engineering checklist or raise a ticket</p>
+<p>d. Send request/ticket to backend Engineering team to setup</p>
+<h3 id="3-begin-platform-mssp-setup">3. Begin Platform (MSSP) Setup</h3>
+<p>a. Template Creation</p>
+<p>b. Tenant specific Index creation</p>
+<p>c. Update Filebeat configuration to accommodate alerts routing</p>
+<p>d. Endpoint/Agent/Non-agent deployment</p>
+<p>e. Verify connectivity</p>
+<p>f. Confirm agent health</p>
+<p>g. RBAC</p>
+<p>h. Index patterns creation</p>
+<p>i. Platform validations</p>
+<h3 id="4-rbac-permission-user-matrix">4. RBAC Permission &amp; User Matrix</h3>
+<p>a. User/member details</p>
+<p>b. User-wise role assignment</p>
+<p>c. User/team-wise permitted actions</p>
+<p>d. User/team-wise resource access scope</p>
+<p>e. Permission approval/owner</p>
+<h3 id="5-resource-ownership-mapping">5. Resource Ownership &amp; Mapping</h3>
+<p>a. Tenant-to-resource mapping</p>
+<p>b. Team-to-resource mapping</p>
+<p>c. Resource ownership for agents, rules, decoders, and lists</p>
+<p>d. Cross-tenant resource isolation requirements</p>
+<h3 id="6-rules-decoders-cdb-lists">6. Rules, Decoders &amp; CDB Lists</h3>
+<p>a. Custom rule file names and ownership</p>
+<p>b. Custom decoder file names and ownership</p>
+<p>c. CDB list names and ownership</p>
+<p>d. Read/write/modify permissions for each resource</p>
+<p>e. Resource-level access requirements</p>
+<h3 id="7-agent-level-access-group-mapping">7. Agent-Level Access &amp; Group Mapping</h3>
+<p>a. Agent ID and hostname mapping</p>
+<p>b. Agent-to-tenant mapping</p>
+<p>c. Agent-to-group mapping</p>
+<p>d. Individual agent access requirements</p>
+<p>e. Agent group-level access requirements</p>
+<p>f. Multiple-group membership requirements</p>
+<h3 id="8-index-dashboard-tenant-isolation">8. Index, Dashboard &amp; Tenant Isolation</h3>
+<p>a. Tenant-specific index requirements</p>
+<p>b. Index pattern mapping</p>
+<p>c. Dashboard access mapping</p>
+<p>d. Cross-tenant index/data visibility restrictions</p>
+<p>e. Define complete isolation scope for shared SOC platform</p>
+<h3 id="9-rbac-isolation-validation">9. RBAC &amp; Isolation Validation</h3>
+<p>a. Low-privilege test account</p>
+<p>b. Allowed-access validation</p>
+<p>c. Denied-access validation</p>
+<p>d. Cross-tenant access validation</p>
+<p>e. Rule/decoder/list access validation</p>
+<p>f. Agent/group access validation</p>
+<p>g. Final RBAC approval and access handover</p>
+<h3 id="10-wazuh-grouping-benefits-in-client-onboarding">10. Wazuh Grouping Benefits in Client Onboarding</h3>
+<p>a. Centralized agent configuration management.</p>
+<p>b. Bulk deployment of agent.conf to multiple endpoints</p>
+<p>c. Faster onboarding of new agents.</p>
+<p>d. Grouping by operating system, environment, and application.</p>
+<p>e. Simplified configuration updates and maintenance.</p>
+<p>f. Supports multiple group membership for a single agent.</p>
+<hr />
+<h2 id="1-standardized-soc-client-onboarding-process">1. STANDARDIZED SOC CLIENT ONBOARDING PROCESS</h2>
+<p><strong>A. Agent Enrollment:</strong> Validate client requirements, onboard endpoints, verify connectivity, confirm agent health.</p>
+<p><strong>B. Template Creation:</strong> Create standard log templates, naming conventions, field mappings, parsing rules.</p>
+<p><strong>C. Index Creation:</strong> Create Elasticsearch/Kibana indexes, retention policies, lifecycle management and validation.</p>
+<p><strong>D. Filebeat Changes at Manager Level:</strong> Configure Filebeat centrally, update modules, validate forwarding and monitoring.</p>
+<p><strong>E. RBAC:</strong> Define SOC analyst, engineer and admin roles; implement least-privilege access and approval workflow.</p>
+<hr />
+<h2 id="2-onboarding-checklist">2. ONBOARDING CHECKLIST</h2>
 <table>
 <thead>
 <tr>
-<th>Component</th>
-<th>Requirement</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Wazuh Dashboard</td>
-<td>Accessible at <https://\<IP-address>>   or any available wazuh server</td>
-</tr>
-<tr>
-<td>Wazuh Manager</td>
-<td>Running and reachable from the Windows endpoint</td>
-</tr>
-<tr>
-<td>Windows endpoint</td>
-<td>Local Administrator access available</td>
-</tr>
-<tr>
-<td>Network</td>
-<td>Windows endpoint can reach Wazuh Manager on TCP port 1514 and TCP port 1515</td>
-</tr>
-<tr>
-<td>Wazuh Docker deployment</td>
-<td>Manager container name: single-node-wazuh.manager-1</td>
-</tr>
-<tr>
-<td>Test environment</td>
-<td>Perform all tests only on an approved lab or non-production Windows endpoint</td>
-</tr>
-</tbody>
-</table>
-<p>Note: The Wazuh Dashboard may show a browser certificate warning when it uses a self-signed certificate. Confirm the certificate with the Wazuh administrator before proceeding.</p>
-<h2 id="3-step-1-access-the-wazuh-dashboard">3. Step 1 - Access the Wazuh Dashboard</h2>
-<ul>
-<li>Open a browser.</li>
-<li>Navigate to:</li>
-</ul>
-<p><https://\<IP-address>></p>
-<ul>
-<li>Log in using the Wazuh Dashboard credentials.</li>
-<li>Navigate to:</li>
-</ul>
-<p>Agents → Deploy new agent → Windows</p>
-<ul>
-<li>Confirm that the manager IP address shown in the deployment command is:</li>
-</ul>
-<p><IP-address></p>
-<p><strong>Expected result:</strong> The Dashboard is accessible and ready to receive the Windows agent.<br />
-When you click on windows, and add the details such as<br />
-1.server IP address:&lt;manager_ip&gt;<br />
-2.agent name:&lt;agnet _name&gt;<br />
-Then the appropriate commands will be shown execute those accordingly<br />
-as shown below</p>
-<h2 id="4-step-2-install-the-wazuh-agent-on-windows">4. Step 2 - Install the Wazuh Agent on Windows</h2>
-<p><strong>Where:</strong> Windows endpoint<br />
-<strong>Run as:</strong> PowerShell Administrator<br />
-<strong>Purpose:</strong> Download and install the Wazuh Agent, then configure it to communicate with the Wazuh Manager.<br />
-<br/></p>
-<p>Open <strong>PowerShell as Administrator</strong> and run:</p>
-<p>Invoke-WebRequest -Uri "<a href="https://packages.wazuh.com/4.x/windows/wazuh-agent-4.14.4-1.msi">https://packages.wazuh.com/4.x/windows/wazuh-agent-4.14.4-1.msi</a>" `<br />
--OutFile "\$env:TEMP\wazuh-agent-4.14.4-1.msi"<br />
-<br/>msiexec.exe /i "\$env:TEMP\wazuh-agent-4.14.4-1.msi" /q `<br />
-WAZUH_MANAGER="<IP-address>" `<br />
-WAZUH_AGENT_NAME="\$env:COMPUTERNAME"</p>
-<p><strong>What this does:</strong></p>
-<ul>
-<li>Downloads the Wazuh Windows Agent installer.</li>
-<li>Installs the agent silently.</li>
-<li>Configures the agent to communicate with the Wazuh Manager at <IP-address>.</li>
-<li>Uses the Windows computer name as the Wazuh Agent name.</li>
-</ul>
-<p><strong>Expected result:</strong> The Wazuh Agent is installed on the Windows endpoint.</p>
-<h2 id="5-step-3-start-and-validate-the-wazuh-agent">5. Step 3 - Start and Validate the Wazuh Agent</h2>
-<p><strong>Where:</strong> Windows endpoint<br />
-<strong>Run as:</strong> PowerShell Administrator<br />
-<strong>Purpose:</strong> Start the Wazuh service and confirm that it is running.</p>
-<p>Run:</p>
-<p>Start-Service WazuhSvc<br />
-Get-Service -Name WazuhSvc</p>
-<p>If the service is already running, PowerShell may show that it has already been started. This is normal.</p>
-<p>To verify the agent connection logs, run:</p>
-<p>Get-Content "C:\Program Files (x86)\ossec-agent\ossec.log" -Tail 50</p>
-<p><strong>Expected result:</strong></p>
-<p>Status : Running</p>
-<p>Then return to the Wazuh Dashboard:</p>
-<p>Agents → Agents</p>
-<p>The Windows endpoint should appear as <strong>Active</strong>.</p>
-<h2 id="6-step-4-enable-required-windows-audit-policies">6. Step 4 - Enable Required Windows Audit Policies</h2>
-<p><strong>Where:</strong> Windows endpoint<br />
-<strong>Run as:</strong> Command Prompt Administrator<br />
-<strong>Purpose:</strong> Enable Windows logging required for Wazuh to detect authentication, account-management, group-management, and process-creation activity.</p>
-<p>Open <strong>Command Prompt as Administrator</strong> and run:</p>
-<p>auditpol /set /subcategory:"Logon" /success:enable /failure:enable<br />
-auditpol /set /subcategory:"User Account Management" /success:enable /failure:enable<br />
-auditpol /set /subcategory:"Security Group Management" /success:enable /failure:enable<br />
-auditpol /set /subcategory:"Process Creation" /success:enable /failure:enable</p>
-<p>Enable command-line capture for process creation events:</p>
-<p>reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Audit" /v ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 1 /f</p>
-<p>Verify the audit configuration:</p>
-<p>auditpol /get /category:*</p>
-<p><strong>What this does:</strong></p>
-<ul>
-<li>Enables failed and successful logon logging.</li>
-<li>Enables local user account creation and deletion logging.</li>
-<li>Enables administrator-group membership change logging.</li>
-<li>Enables process creation logging, including command-line arguments.</li>
-</ul>
-<p><strong>Expected result:</strong> Windows begins generating Security Event Logs that Wazuh can collect and analyze.</p>
-<h2 id="7-step-5-validate-failed-logon-detection">7. Step 5 - Validate Failed Logon Detection</h2>
-<p><strong>Where:</strong> Windows endpoint and a separate approved test machine<br />
-<strong>Purpose:</strong> Generate Windows failed authentication events and validate that Wazuh detects them.</p>
-<p>Use a controlled test account that does not exist or enter an intentionally incorrect password when connecting to the Windows endpoint from a separate machine.</p>
-<p>For example, from another Windows test machine:</p>
-<p>net use \\WINDOWS-ENDPOINT-IP\IPC\$ /user:fakeadmin WrongPassword123!</p>
-<p>Replace WINDOWS-ENDPOINT-IP with the IP address of the monitored Windows endpoint.</p>
-<p>Repeat the command several times.</p>
-<p>On the monitored Windows endpoint, validate that failed logon events were generated:</p>
-<p>Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4625} -MaxEvents 10</p>
-<p><strong>What this does:</strong></p>
-<ul>
-<li>Generates Windows Event ID 4625, which represents a failed logon.</li>
-<li>Sends the event to the Wazuh Manager through the Wazuh Agent.</li>
-<li>Allows Wazuh to generate authentication-failure alerts and, depending on rules and thresholds, brute-force correlation alerts.</li>
-</ul>
-<p><strong>Expected result:</strong> Authentication failure alerts appear in the Wazuh Dashboard.</p>
-<h2 id="8-step-6-validate-local-user-and-administrator-group-monitoring">8. Step 6 - Validate Local User and Administrator Group Monitoring</h2>
-<p><strong>Where:</strong> Windows endpoint<br />
-<strong>Run as:</strong> Command Prompt Administrator<br />
-<strong>Purpose:</strong> Simulate a common attacker technique: creating a local account and adding it to the Administrators group.</p>
-<p>Run:</p>
-<p>net user wazuh_test_user Password123! /add<br />
-net localgroup Administrators wazuh_test_user /add<br />
-net localgroup Administrators wazuh_test_user /delete<br />
-net user wazuh_test_user /delete</p>
-<p><strong>What this does:</strong></p>
-<ul>
-<li>Creates a temporary local user.</li>
-<li>Adds the user to the local Administrators group.</li>
-<li>Removes the user from the Administrators group.</li>
-<li>Deletes the temporary user.</li>
-</ul>
-<p><strong>Expected Windows events:</strong></p>
-<table>
-<thead>
-<tr>
+<th>Step</th>
 <th>Activity</th>
-<th>Typical Windows Event ID</th>
+<th>Owner</th>
+<th>Status</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Local user created</td>
-<td>4720</td>
+<td>Requirement Review</td>
+<td>Collect client scope and log sources</td>
+<td>SOC/PM</td>
+<td>Pending</td>
 </tr>
 <tr>
-<td>User added to local Administrators group</td>
-<td>4732</td>
+<td>Agent Enrollment</td>
+<td>Deploy and validate agents</td>
+<td>Engineering</td>
+<td></td>
 </tr>
 <tr>
-<td>User removed from local Administrators group</td>
-<td>4733</td>
+<td>Template Creation</td>
+<td>Create log templates</td>
+<td>Engineering</td>
+<td></td>
 </tr>
 <tr>
-<td>Local user deleted</td>
-<td>4726</td>
+<td>Index Creation</td>
+<td>Configure indexes</td>
+<td>Platform Team</td>
+<td></td>
+</tr>
+<tr>
+<td>Filebeat Changes</td>
+<td>Manager-level updates</td>
+<td>Platform Team</td>
+<td></td>
+</tr>
+<tr>
+<td>RBAC Setup</td>
+<td>Role provisioning</td>
+<td>Security Admin</td>
+<td></td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>End-to-end testing</td>
+<td>SOC Team</td>
+<td></td>
+</tr>
+<tr>
+<td>Go-Live</td>
+<td>Production sign-off</td>
+<td>Customer &amp; SOC</td>
+<td></td>
 </tr>
 </tbody>
 </table>
-<p><strong>Expected result:</strong> Wazuh generates account-management and privileged-group modification alerts.</p>
-<h2 id="9-step-7-validate-process-creation-and-scheduled-task-detection">9. Step 7 - Validate Process Creation and Scheduled Task Detection</h2>
-<p><strong>Where:</strong> Windows endpoint<br />
-<strong>Run as:</strong> Command Prompt Administrator<br />
-<strong>Purpose:</strong> Simulate scheduled-task persistence, a technique commonly used by attackers to run programs automatically.</p>
-<p>Create a harmless scheduled task:</p>
-<p>schtasks /create /tn "WazuhTestTask" /tr "cmd.exe /c echo WazuhPOC" /sc ONSTART /f</p>
-<p>Verify that the task exists:</p>
-<p>schtasks /query /tn "WazuhTestTask"</p>
-<p>Remove the task after validation:</p>
-<p>schtasks /delete /tn "WazuhTestTask" /f</p>
-<p><strong>What this does:</strong></p>
+<hr />
+<h2 id="3-grouping-assessment-and-recommendations">3. GROUPING ASSESSMENT AND RECOMMENDATIONS</h2>
+<p>Potential benefits of implementing grouping:</p>
 <ul>
-<li>Creates a harmless scheduled task that runs at system startup.</li>
-<li>Generates Windows Task Scheduler and process-related telemetry.</li>
-<li>Allows Wazuh to identify possible persistence-related activity.</li>
+<li>Standardized onboarding packages for similar clients.</li>
+<li>Reduced manual configuration effort through reusable templates.</li>
+<li>Easier RBAC management by applying permissions to groups rather than individuals.</li>
+<li>Simplified Filebeat and agent deployment management.</li>
+<li>Improved scalability and auditability.</li>
 </ul>
-<p><strong>Expected result:</strong> Wazuh generates scheduled-task or process-creation alerts, depending on the enabled Wazuh rules and telemetry source.</p>
-<h2 id="10-step-8-validate-powershell-command-line-visibility">10. Step 8 - Validate PowerShell Command-Line Visibility</h2>
-<p><strong>Where:</strong> Windows endpoint<br />
-<strong>Run as:</strong> PowerShell Administrator<br />
-<strong>Purpose:</strong> Confirm that Wazuh can receive process execution telemetry, including PowerShell command lines.</p>
-<p>Run this harmless command:</p>
-<p>powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Write-Output 'Wazuh PowerShell POC Test'"</p>
-<p>Then verify process creation events locally:</p>
-<p>Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4688} -MaxEvents 10</p>
-<p><strong>What this does:</strong></p>
-<ul>
-<li>Generates a Windows process creation event.</li>
-<li>Confirms that command-line auditing is enabled.</li>
-<li>Helps validate Wazuh visibility into PowerShell activity.</li>
-</ul>
-<p><strong>Expected result:</strong> A process-creation event is visible in Windows Security logs and can be searched in Wazuh.</p>
-<p>Note: A generic PowerShell command does not always generate a high-severity Wazuh alert. Detection severity depends on the command, Wazuh ruleset, Sysmon configuration, and any custom detection rules.</p>
-<h2 id="11-step-9-validate-file-integrity-monitoring">11. Step 9 - Validate File Integrity Monitoring</h2>
-<p><strong>Where:</strong> Windows endpoint<br />
-<strong>Run as:</strong> PowerShell Administrator<br />
-<strong>Purpose:</strong> Confirm that Wazuh detects monitored file changes.</p>
-<p>Before running this test, ensure the selected directory is included in the Wazuh Agent File Integrity Monitoring configuration.</p>
-<p>Create a dedicated test directory:</p>
-<p>New-Item -Path "C:\WazuhFIMTest" -ItemType Directory -Force</p>
-<p>Create a test file:</p>
-<p>New-Item -Path "C:\WazuhFIMTest\wazuh_test.txt" -ItemType File -Force</p>
-<p>Modify the file:</p>
-<p>Add-Content -Path "C:\WazuhFIMTest\wazuh_test.txt" -Value "Wazuh FIM validation test"</p>
-<p>Delete the file:</p>
-<p>Remove-Item -Path "C:\WazuhFIMTest\wazuh_test.txt" -Force</p>
-<p><strong>What this does:</strong></p>
-<ul>
-<li>Creates, modifies, and deletes a test file.</li>
-<li>Validates whether Wazuh File Integrity Monitoring detects file activity in the configured directory.</li>
-</ul>
-<p><strong>Expected result:</strong> Wazuh generates file-added, file-modified, and file-deleted events.</p>
-<p>Important: C:\WazuhFIMTest must be added to the Wazuh Agent &lt;syscheck&gt; configuration before this test. Otherwise, Wazuh will not monitor the directory.</p>
-<h2 id="12-step-10-validate-registry-persistence-monitoring">12. Step 10 - Validate Registry Persistence Monitoring</h2>
-<p><strong>Where:</strong> Windows endpoint<br />
-<strong>Run as:</strong> Command Prompt Administrator<br />
-<strong>Purpose:</strong> Simulate a common persistence technique by creating a Windows Run registry key.</p>
-<p>Create a harmless Run key:</p>
-<p>reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v WazuhPOCTest /t REG_SZ /d "cmd.exe /c echo WazuhPOC" /f</p>
-<p>Verify the key:</p>
-<p>reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v WazuhPOCTest</p>
-<p>Remove the key after validation:</p>
-<p>reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v WazuhPOCTest /f</p>
-<p><strong>What this does:</strong></p>
-<ul>
-<li>Adds a program to the Windows startup Run key.</li>
-<li>Simulates a persistence method used by attackers.</li>
-<li>Validates Wazuh registry monitoring or event-based detection.</li>
-</ul>
-<p><strong>Expected result:</strong> Wazuh generates a registry modification or persistence-related alert if registry monitoring, Sysmon, or relevant custom rules are enabled.</p>
-<h2 id="13-step-11-monitor-alerts-from-the-wazuh-manager">13. Step 11 - Monitor Alerts from the Wazuh Manager</h2>
-<p><strong>Where:</strong> Wazuh Manager host<br />
-<strong>Purpose:</strong> View alerts directly from the Wazuh Manager container while the Windows tests are running.</p>
-<p>Run this command on the Wazuh Docker host:</p>
-<p>docker exec -it single-node-wazuh.manager-1 sh -c '<br />
-tail -F /var/ossec/logs/alerts/alerts.json | python3 -c "<br />
-import sys<br />
-import json<br />
-<br/>for line in sys.stdin:<br />
-try:<br />
-event = json.loads(line)<br />
-rule = event.get(\"rule\", {})<br />
-agent = event.get(\"agent\", {})<br />
-level = int(rule.get(\"level\", 0))<br />
-<br/>if level &gt;= 3:<br />
-print(<br />
-\"Agent: {} | Rule: {} | Level: {} | Description: {}\".format(<br />
-agent.get(\"name\", \"unknown\"),<br />
-rule.get(\"id\", \"unknown\"),<br />
-level,<br />
-rule.get(\"description\", \"\")<br />
-)<br />
-)<br />
-except Exception:<br />
-pass<br />
-"<br />
-'</p>
-<p><strong>What this does:</strong></p>
-<ul>
-<li>Reads the live Wazuh alert stream.</li>
-<li>Displays the agent name, rule ID, severity level, and alert description.</li>
-<li>Confirms that the Wazuh Manager is receiving and processing endpoint events.</li>
-</ul>
-<p><strong>Expected result:</strong> Alerts appear in the terminal while tests are executed on the Windows endpoint.</p>
-<h2 id="14-step-12-validate-alerts-in-the-wazuh-dashboard">14. Step 12 - Validate Alerts in the Wazuh Dashboard</h2>
-<p><strong>Where:</strong> Wazuh Dashboard<br />
-<strong>Purpose:</strong> Confirm that alerts are indexed and visible to SOC analysts.</p>
-<ul>
-<li>Open the Wazuh Dashboard.</li>
-<li>Navigate to:</li>
-</ul>
-<p>Sidebar - Explore -Discover</p>
-<p>and also for clear logs that is being created</p>
-<ul>
-<li>Filter using the Windows agent name.</li>
-<li>Search for the following terms:</li>
-</ul>
-<p>wazuh_test_user<br />
-WazuhTestTask<br />
-WazuhPOCTest<br />
-4625<br />
-4720<br />
-4732<br />
-4726<br />
-4688</p>
-<p><strong>Expected result:</strong> The SOC analyst can view endpoint events, alert severity, affected agent, timestamp, rule description, and event details.</p>
-<h2 id="15-expected-poc-outcome">15. Expected POC Outcome</h2>
-<p>The POC is successful when the following is confirmed:</p>
-<table>
-<thead>
-<tr>
-<th>Validation Area</th>
-<th>Success Criteria</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Agent onboarding</td>
-<td>Windows agent appears as Active in Wazuh Dashboard</td>
-</tr>
-<tr>
-<td>Log collection</td>
-<td>Windows Security events are received by Wazuh</td>
-</tr>
-<tr>
-<td>Authentication monitoring</td>
-<td>Failed logon events are visible</td>
-</tr>
-<tr>
-<td>Account monitoring</td>
-<td>User creation and deletion events are visible</td>
-</tr>
-<tr>
-<td>Privilege monitoring</td>
-<td>Administrator-group changes are visible</td>
-</tr>
-<tr>
-<td>Process monitoring</td>
-<td>PowerShell and scheduled-task activity is visible</td>
-</tr>
-<tr>
-<td>File monitoring</td>
-<td>FIM detects file creation, modification, and deletion</td>
-</tr>
-<tr>
-<td>Registry monitoring</td>
-<td>Run-key modification is visible when configured</td>
-</tr>
-<tr>
-<td>SOC visibility</td>
-<td>Alerts are searchable in Wazuh Dashboard</td>
-</tr>
-</tbody>
-</table>
-<h2 id="16-poc-conclusion">16. POC Conclusion</h2>
-<p>This POC demonstrates that the Windows endpoint is successfully integrated into the Wazuh SIEM platform.</p>
-<p>It confirms that:</p>
-<ul>
-<li>The Wazuh Agent collects endpoint security telemetry.</li>
-<li>The Wazuh Manager analyzes that telemetry using detection rules.</li>
-<li>Security events are converted into alerts.</li>
-<li>Alerts are sent to the Wazuh Indexer.</li>
-<li>SOC analysts can investigate alerts through the Wazuh Dashboard.</li>
-</ul>
-<p>The final operational flow is:</p>
-<p>Windows Activity<br />
-→ Wazuh Agent Collection<br />
-→ Wazuh Manager Analysis<br />
-→ Wazuh Alert Generation<br />
-→ Indexer Storage<br />
-→ Dashboard Visibility<br />
-→ SOC Investigation</p>
+<p><strong>Recommendation:</strong> Implement grouping for clients with similar log sources, compliance requirements, and onboarding patterns. This can reduce deployment effort, improve consistency, and accelerate onboarding time while maintaining governance.</p>
+<hr />
 
 
 
