@@ -82,3 +82,6 @@ nav:
       - Microsoft 365 to Wazuh Integration Complete Imp and Config: POC's/Yaseen/Microsoft 365 to Wazuh Integration Complete Imp and Config\Microsoft_365_to_Wazuh_Integration_Complete_Implementation_and_Configuration.md
       - Non Wazuh SOC Onboarding and Implementation Guide: POC's/Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide.md
       - SOC Client Onboarding: POC's/Junaid/SOC_Client_Onboarding_Extension_Plan/SOC_Client_Onboarding_Extension_Plan.md
+      - Implementation Process to Monitor AWS CloudTrail: POC's/Sai Krishna/Implementation_Process_to_Monitor_AWS_CloudTrail_Health/Implementation_Process_to_Monitor_AWS_CloudTrail_Health.md
+      - Implementation Process to Monitor Azure EventHub: POC's/Sai Krishna/Implementation_Process_to_Monitor_Azure_EventHub_Health/Implementation_Process_to_Monitor_Azure_EventHub_Health.md
+      - Implementation Process to Monitor Office 365: POC's/Sai Krishna/Implementation_Process_to_Monitor_Office_365_Health/Implementation_Process_to_Monitor_Office_365_Health.md
