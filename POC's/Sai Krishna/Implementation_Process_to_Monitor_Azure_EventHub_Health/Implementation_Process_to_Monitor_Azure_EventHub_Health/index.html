@@ -1,0 +1,4111 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Production implementation guide for multi-tenant Wazuh MSSP on single-node Docker">
+      
+      
+      
+      
+        <link rel="prev" href="../../Implementation_Process_to_Monitor_AWS_CloudTrail_Health/Implementation_Process_to_Monitor_AWS_CloudTrail_Health/">
+      
+      
+        <link rel="next" href="../../Implementation_Process_to_Monitor_Office_365_Health/Implementation_Process_to_Monitor_Office_365_Health/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Implementation Process to Monitor Azure EventHub - Wazuh MSSP Multi-Tenant Implementation Guide</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../../stylesheets/responsive-nav.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#implementation-process-to-monitor-azure-eventhub-health" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-header__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Wazuh MSSP Multi-Tenant Implementation Guide
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Implementation Process to Monitor Azure EventHub
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Wazuh MSSP Multi-Tenant Implementation Guide" class="md-nav__button md-logo" aria-label="Wazuh MSSP Multi-Tenant Implementation Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12h7c-.53 4.11-3.28 7.78-7 8.92zH5V6.3l7-3.11M12 1 3 5v6c0 5.55 3.84 10.73 9 12 5.16-1.27 9-6.45 9-12V5z"/></svg>
+
+    </a>
+    Wazuh MSSP Multi-Tenant Implementation Guide
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../01-Getting_started/Getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment & Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment & Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../02-index-template-filebeat/index_template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index Template & Filebeat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../03-agent-deployment/agent_deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../04-agent-configuration/agent_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & Access
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Security & Access
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../06-rbac/rbac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RBAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../07-dls/dls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Document Level Security (DLS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../08-sso-entra/sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSO - Microsoft Entra ID
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../09-cluster-index-verification/cluster-index-verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster and Index Verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../10-reference/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC's
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    POC's
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/GitHub_Webhook_to_Logstash/GitHub_Webhook_to_Logstash_POC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub_Webhook_to_Logstash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Rules-as-Code%20Implementation%20Guide/Wazuh%20Rules-as-Code%20Implementation%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Rules-as-Code Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/Wazuh%20Windows%20Agent%20Deployment%20%26%20Security%20Detection%20logs%20Generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Windows Agent Deployment & Security Detection logs Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/NetFlowlogs_to_Logstash_and_Wazuh_Indexer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetFlowlogs_to_Logstash_and_Wazuh_Indexer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../XDR%20Implementation%20Process/XDR%20Implementation%20Process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XDR Implementation Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Second%20use%20case%20of%20XDR/Second%20use%20case%20of%20XDR/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Second use case of XDR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/PROMETHEUS%20%28PromQL%29%20IMPORTANT%20QUERIES%20DOCUMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PROMETHEUS (PromQL) IMPORTANT QUERIES DOCUMENT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/Implementation%20Guide%20Azure%20Activity%20Logs%20%E2%86%92%20Event%20Hub%20%E2%86%92%20Logstash%E2%86%92%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide Azure Activity Logs → Event Hub → Logstash→ Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Pipelines_and_Challenges/Pipelines_and_Challenges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipelines_and_Challenges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/Jira%20API%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jira API → Logstash → Wazuh Integration for Non-Agent Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/LOGSTASH%20PIPELINE%20WORKERS%20%26%20BATCHSIZE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LOGSTASH PIPELINE WORKERS & BATCHSIZE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/Nginx%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent%20Log%20Monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nginx → Logstash → Wazuh Integration for Non-Agent Log Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/Firewall%20%28UFW%29%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh%20Integration%20for%20Non-Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall (UFW) → Logstash → Wazuh Integration for Non-Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/GitHub_Logstash_Wazuh_NonAgent_Implementation/GitHub_Logstash_Wazuh_NonAgent_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Logstash Wazuh NonAgent Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/MySQL_Log_Monitoring_Using_Wazuh_Agent/MySQL_Log_Monitoring_Using_Wazuh_Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MySQL_Log_Monitoring_Using_Wazuh_Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Agent_Log_Buffering_and_Resynchronization/Wazuh_Agent_Log_Buffering_and_Resynchronization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Agent_Log_Buffering_and_Resynchronization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Implementation%20Process%20to%20Monitor%20Filebeat%20Health/Implementation_Process_to_Monitor_Filebeat_Health/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor Filebeat Health
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Implementation%20Guide%20AWS%20CloudTrail%20%E2%86%92%20S3%20%E2%86%92%20SQS%20%E2%86%92%20Logstash%20%E2%86%92%20Wazuh/Implementation_Guide_AWS_CloudTrail_S3_SQS_Logstash_Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Guide AWS CloudTrail → S3 → SQS → Logstash → Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Prometheus/Prometheus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prometheus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/SOC%20Logstash%20Multi-Pipeline%20Architecture%20Implementation%20Guide/SOC_Logstash_Multi_Pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Multi-Pipeline Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/SOC%20Logstash%20Pipeline-to-Pipeline%20%28P2P%29%20Architecture%20Implementation%20Guide/SOC_Logstash_P2P/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Logstash Pipeline-to-Pipeline (P2P) Architecture Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Wazuh_Multi_Tenant_MSSP_Implementation/Wazuh_Multi_Tenant_MSSP_Implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh_Multi_Tenant_MSSP_Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/Wazuh%20Multi%20Node%20Runbook/Wazuh%20Multi%20Node%20Runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wazuh Multi Node Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Vineeth/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/High%20Availability%20Log%20Ingestion%20Pipeline%20Deployment%20Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    High Availability Log Ingestion Pipeline Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/POC_Zero_Downtime_Group_Configuration_Deployment_in_Wazuh_HA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zero Downtime Group Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/POC-%20Single%20Agent%20Multi-Group%20in%20Wazuh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC- Single Agent Multi-Group in Wazuh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/POC-01_Operating_System_Based_Group_Creation_in_Wazuh_GitHub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operating System Based Group Creation in Wazuh GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Yaseen/Microsoft%20365%20to%20Wazuh%20Integration%20Complete%20Imp%20and%20Config/Microsoft_365_to_Wazuh_Integration_Complete_Implementation_and_Configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Microsoft 365 to Wazuh Integration Complete Imp and Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/Non_Wazuh_SOC_Onboarding_and_Implementation_Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Wazuh SOC Onboarding and Implementation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Junaid/SOC_Client_Onboarding_Extension_Plan/SOC_Client_Onboarding_Extension_Plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOC Client Onboarding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Implementation_Process_to_Monitor_AWS_CloudTrail_Health/Implementation_Process_to_Monitor_AWS_CloudTrail_Health/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor AWS CloudTrail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor Azure EventHub
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor Azure EventHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-you-are-building" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. WHAT YOU ARE BUILDING
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-core-idea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. CORE IDEA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-step-1-install-dependencies-on-logstash-vm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. STEP 1 — INSTALL DEPENDENCIES ON LOGSTASH VM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-step-2-create-working-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. STEP 2 — CREATE WORKING DIRECTORY
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-step-3-create-the-python-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. STEP 3 — CREATE THE PYTHON SCRIPT
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. STEP 3 — CREATE THE PYTHON SCRIPT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-full-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Full Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-why-following-values-are-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Why Following Values Are Needed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-identity-permission-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Identity + Permission Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-where-to-get-each-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Where to Get Each Value
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.4 Where to Get Each Value">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#azure-tenant-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AZURE TENANT ID
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AZURE TENANT ID">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where-to-find" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to Find:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-id-client-secret-important" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLIENT ID + CLIENT SECRET (IMPORTANT)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-app-registration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create App Registration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#after-creation-you-will-get" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        After Creation You Will Get:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="After Creation You Will Get:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#client-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLIENT ID
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tenant-id-again" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TENANT ID (again)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-client-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create CLIENT SECRET
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subscription-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SUBSCRIPTION ID
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SUBSCRIPTION ID">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RESOURCE GROUP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#event-hub-namespace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EVENT HUB NAMESPACE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#very-important-step-most-people-miss-this" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VERY IMPORTANT STEP (Most People Miss This)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="VERY IMPORTANT STEP (Most People Miss This)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#give-permission-to-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Give Permission to App
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-reader-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Reader Role?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-final-mapping-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 Final Mapping Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56-simple-mental-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 Simple Mental Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#57-test-index-creation-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.7 Test Index Creation First
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#58-test-document-insert-manually" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.8 Test Document Insert Manually
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#59-verify-document-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.9 Verify Document Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-step-4-make-script-executable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. STEP 4 — MAKE SCRIPT EXECUTABLE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-step-5-run-manually-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. STEP 5 — RUN MANUALLY TEST
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. STEP 5 — RUN MANUALLY TEST">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#expected-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-step-6-verify-in-wazuh-indexer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. STEP 6 — VERIFY IN WAZUH INDEXER
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-step-7-automate-every-1-minute-cron" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. STEP 7 — AUTOMATE EVERY 1 MINUTE (CRON)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. STEP 7 — AUTOMATE EVERY 1 MINUTE (CRON)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#91-create-a-log-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.1 Create a Log File
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9.1 Create a Log File">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#92-find-python-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.2 Find Python Location
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9.2 Find Python Location">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#93-test-using-full-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.3 Test Using Full Path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#94-open-crontab" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.4 Open Crontab
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#95-add-cron-entry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.5 Add Cron Entry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#96-understanding-the-cron-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.6 Understanding the Cron Syntax
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#97-understanding-the-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.7 Understanding the Command
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#98-verify-cron-is-installed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.8 Verify Cron Is Installed
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9.8 Verify Cron Is Installed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#99-wait-2-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.9 Wait 2 Minutes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#910-verify-new-documents-are-arriving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.10 Verify New Documents Are Arriving
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9.10 Verify New Documents Are Arriving">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#911-verify-latest-status-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.11 Verify Latest Status Document
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-for-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. FOR VISUALIZATION
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. FOR VISUALIZATION">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#101-create-new-vega-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.1 Create New Vega Visualization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#102-paste-this-complete-vega-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.2 Paste This Complete Vega Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#103-click-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.3 Click Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#104-save" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.4 Save
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Implementation_Process_to_Monitor_Office_365_Health/Implementation_Process_to_Monitor_Office_365_Health/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Process to Monitor Office 365
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-you-are-building" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. WHAT YOU ARE BUILDING
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-core-idea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. CORE IDEA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-step-1-install-dependencies-on-logstash-vm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. STEP 1 — INSTALL DEPENDENCIES ON LOGSTASH VM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-step-2-create-working-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. STEP 2 — CREATE WORKING DIRECTORY
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-step-3-create-the-python-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. STEP 3 — CREATE THE PYTHON SCRIPT
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. STEP 3 — CREATE THE PYTHON SCRIPT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-full-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Full Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-why-following-values-are-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Why Following Values Are Needed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-identity-permission-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Identity + Permission Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-where-to-get-each-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Where to Get Each Value
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.4 Where to Get Each Value">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#azure-tenant-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AZURE TENANT ID
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AZURE TENANT ID">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where-to-find" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to Find:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-id-client-secret-important" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLIENT ID + CLIENT SECRET (IMPORTANT)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-app-registration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create App Registration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#after-creation-you-will-get" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        After Creation You Will Get:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="After Creation You Will Get:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#client-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLIENT ID
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tenant-id-again" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TENANT ID (again)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-client-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create CLIENT SECRET
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subscription-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SUBSCRIPTION ID
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SUBSCRIPTION ID">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RESOURCE GROUP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#event-hub-namespace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EVENT HUB NAMESPACE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#very-important-step-most-people-miss-this" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VERY IMPORTANT STEP (Most People Miss This)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="VERY IMPORTANT STEP (Most People Miss This)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#give-permission-to-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Give Permission to App
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-reader-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Reader Role?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-final-mapping-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 Final Mapping Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56-simple-mental-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 Simple Mental Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#57-test-index-creation-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.7 Test Index Creation First
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#58-test-document-insert-manually" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.8 Test Document Insert Manually
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#59-verify-document-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.9 Verify Document Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-step-4-make-script-executable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. STEP 4 — MAKE SCRIPT EXECUTABLE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-step-5-run-manually-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. STEP 5 — RUN MANUALLY TEST
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. STEP 5 — RUN MANUALLY TEST">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#expected-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-step-6-verify-in-wazuh-indexer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. STEP 6 — VERIFY IN WAZUH INDEXER
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-step-7-automate-every-1-minute-cron" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. STEP 7 — AUTOMATE EVERY 1 MINUTE (CRON)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. STEP 7 — AUTOMATE EVERY 1 MINUTE (CRON)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#91-create-a-log-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.1 Create a Log File
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9.1 Create a Log File">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#92-find-python-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.2 Find Python Location
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9.2 Find Python Location">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#93-test-using-full-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.3 Test Using Full Path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#94-open-crontab" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.4 Open Crontab
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#95-add-cron-entry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.5 Add Cron Entry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#96-understanding-the-cron-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.6 Understanding the Cron Syntax
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#97-understanding-the-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.7 Understanding the Command
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#98-verify-cron-is-installed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.8 Verify Cron Is Installed
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9.8 Verify Cron Is Installed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#99-wait-2-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.9 Wait 2 Minutes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#910-verify-new-documents-are-arriving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.10 Verify New Documents Are Arriving
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9.10 Verify New Documents Are Arriving">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#911-verify-latest-status-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.11 Verify Latest Status Document
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-for-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. FOR VISUALIZATION
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. FOR VISUALIZATION">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#101-create-new-vega-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.1 Create New Vega Visualization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#102-paste-this-complete-vega-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.2 Paste This Complete Vega Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#103-click-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.3 Click Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#104-save" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.4 Save
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="implementation-process-to-monitor-azure-eventhub-health">IMPLEMENTATION PROCESS TO MONITOR AZURE EVENTHUB HEALTH</h1>
+<h2 id="prerequisites">Prerequisites</h2>
+<p><strong>Access &amp; Environment</strong> </p>
+<ul>
+<li>
+<p>Logstash VM with sudo/root access, internet connectivity, and Python 3 + pip installed </p>
+</li>
+<li>
+<p>Wazuh Indexer (OpenSearch) already deployed and reachable from the Logstash VM (host, port 9200), with valid username/password credentials </p>
+</li>
+<li>
+<p>Network/firewall ports open between the Logstash VM and the Wazuh Indexer </p>
+</li>
+</ul>
+<p><strong>Azure-Side Access</strong> </p>
+<ul>
+<li>
+<p>An active Azure subscription with Owner/Contributor (or equivalent) rights to create an App Registration and assign roles </p>
+</li>
+<li>
+<p>An existing Event Hub Namespace already deployed (the script only monitors it, doesn't create it) </p>
+</li>
+<li>
+<p>Permission to create a Service Principal (App Registration) in Microsoft Entra ID </p>
+</li>
+<li>
+<p>Ability to assign the Reader role on the Resource Group (via Access Control/IAM) to that App Registration </p>
+</li>
+</ul>
+<p><strong>Values to Have Ready Before Running the Script</strong> </p>
+<ul>
+<li>
+<p>Azure Tenant ID </p>
+</li>
+<li>
+<p>Client ID + Client Secret (from the App Registration) </p>
+</li>
+<li>
+<p>Subscription ID </p>
+</li>
+<li>
+<p>Resource Group name </p>
+</li>
+<li>
+<p>Event Hub Namespace name </p>
+</li>
+</ul>
+<p><strong>Tooling</strong></p>
+<ul>
+<li>
+<p>curl available for manual OpenSearch index/document testing </p>
+</li>
+<li>
+<p>cron access on the VM for scheduling automation </p>
+</li>
+<li>
+<p>Wazuh dashboard access with permission to create Vega visualizations </p>
+</li>
+</ul>
+<h2 id="1-what-you-are-building">1. WHAT YOU ARE BUILDING</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Azure Event Hub Health Monitor (NEW)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>▼
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Python Script (runs on Logstash VM)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>▼
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>Wazuh Indexer (azure-health-* index)
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>▼
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>Vega Dashboard + VSOC UI
+</code></pre></div>
+<p>This runs <strong>independently of Azure Activity Logs</strong>, so it solves your "idle vs active" problem.</p>
+<hr />
+<h2 id="2-core-idea">2. CORE IDEA</h2>
+<p>We will NOT depend on:</p>
+<ul>
+<li>Azure Activity Logs (because they may be empty)</li>
+</ul>
+<p>We WILL depend on:</p>
+<ul>
+<li>Azure Event Hub Metrics API (actual service health)</li>
+</ul>
+<hr />
+<h2 id="3-step-1-install-dependencies-on-logstash-vm">3. STEP 1 — INSTALL DEPENDENCIES ON LOGSTASH VM</h2>
+<p>Run this on your Logstash VM:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3<span class="w"> </span>python3-pip
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>pip3<span class="w"> </span>install<span class="w"> </span>requests
+</code></pre></div>
+<hr />
+<h2 id="4-step-2-create-working-directory">4. STEP 2 — CREATE WORKING DIRECTORY</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/opt/azure-health-monitor
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span>/opt/azure-health-monitor
+</code></pre></div>
+<hr />
+<h2 id="5-step-3-create-the-python-script">5. STEP 3 — CREATE THE PYTHON SCRIPT</h2>
+<p>Create file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>azure_eventhub_health.py
+</code></pre></div>
+<p>Paste this FULL script</p>
+<h3 id="51-full-script">5.1 Full Script</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span><span class="p">,</span> <span class="n">timedelta</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">urllib3</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">urllib3</span><span class="o">.</span><span class="n">disable_warnings</span><span class="p">()</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="c1"># =========================</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1"># CONFIG (EDIT THIS)</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="c1"># =========================</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="n">AZURE_TENANT_ID</span> <span class="o">=</span> <span class="s2">&quot;your-tenant-id&quot;</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="n">AZURE_CLIENT_ID</span> <span class="o">=</span> <span class="s2">&quot;your-client-id&quot;</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="n">AZURE_CLIENT_SECRET</span> <span class="o">=</span> <span class="s2">&quot;your-client-secret&quot;</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="n">SUBSCRIPTION_ID</span> <span class="o">=</span> <span class="s2">&quot;your-subscription-id&quot;</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="n">RESOURCE_GROUP</span> <span class="o">=</span> <span class="s2">&quot;your-resource-group&quot;</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="n">NAMESPACE</span> <span class="o">=</span> <span class="s2">&quot;your-eventhub-namespace&quot;</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="c1"># Wazuh Indexer (OpenSearch)</span>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="n">OPENSEARCH_HOST</span> <span class="o">=</span> <span class="s2">&quot;https://xx.xx.xx.xx:9200&quot;</span>
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="n">INDEX_NAME</span> <span class="o">=</span> <span class="s2">&quot;azure-health-status&quot;</span>
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="c1"># Threshold</span>
+<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="c1"># IDLE_THRESHOLD_MINUTES = 5</span>
+<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>
+<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="c1"># =========================</span>
+<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="c1"># GET AZURE ACCESS TOKEN</span>
+<a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="c1"># =========================</span>
+<a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>
+<a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_token</span><span class="p">():</span>
+<a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a>    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://login.microsoftonline.com/</span><span class="si">{</span><span class="n">AZURE_TENANT_ID</span><span class="si">}</span><span class="s2">/oauth2/v2.0/token&quot;</span>
+<a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a>
+<a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a>    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a>        <span class="s2">&quot;grant_type&quot;</span><span class="p">:</span> <span class="s2">&quot;client_credentials&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a>        <span class="s2">&quot;client_id&quot;</span><span class="p">:</span> <span class="n">AZURE_CLIENT_ID</span><span class="p">,</span>
+<a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a>        <span class="s2">&quot;client_secret&quot;</span><span class="p">:</span> <span class="n">AZURE_CLIENT_SECRET</span><span class="p">,</span>
+<a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a>        <span class="s2">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;https://management.azure.com/.default&quot;</span>
+<a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a>    <span class="p">}</span>
+<a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a>
+<a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a>    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a>    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span>
+<a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a>
+<a id="__codelineno-4-46" name="__codelineno-4-46" href="#__codelineno-4-46"></a><span class="c1"># =========================</span>
+<a id="__codelineno-4-47" name="__codelineno-4-47" href="#__codelineno-4-47"></a><span class="c1"># GET EVENT HUB METRICS</span>
+<a id="__codelineno-4-48" name="__codelineno-4-48" href="#__codelineno-4-48"></a><span class="c1"># =========================</span>
+<a id="__codelineno-4-49" name="__codelineno-4-49" href="#__codelineno-4-49"></a>
+<a id="__codelineno-4-50" name="__codelineno-4-50" href="#__codelineno-4-50"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_eventhub_metrics</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+<a id="__codelineno-4-51" name="__codelineno-4-51" href="#__codelineno-4-51"></a>    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://management.azure.com/subscriptions/</span><span class="si">{</span><span class="n">SUBSCRIPTION_ID</span><span class="si">}</span><span class="s2">/resourceGroups/</span><span class="si">{</span><span class="n">RESOURCE_GROUP</span><span class="si">}</span><span class="s2">/providers/Microsoft.EventHub/namespaces/</span><span class="si">{</span><span class="n">NAMESPACE</span><span class="si">}</span><span class="s2">/providers/microsoft.insights/metrics?api-version=2018-01-01&quot;</span>
+<a id="__codelineno-4-52" name="__codelineno-4-52" href="#__codelineno-4-52"></a>
+<a id="__codelineno-4-53" name="__codelineno-4-53" href="#__codelineno-4-53"></a>    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+<a id="__codelineno-4-54" name="__codelineno-4-54" href="#__codelineno-4-54"></a>
+<a id="__codelineno-4-55" name="__codelineno-4-55" href="#__codelineno-4-55"></a>    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-4-56" name="__codelineno-4-56" href="#__codelineno-4-56"></a>        <span class="s2">&quot;metricnames&quot;</span><span class="p">:</span> <span class="s2">&quot;IncomingMessages,ActiveConnections&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-57" name="__codelineno-4-57" href="#__codelineno-4-57"></a>        <span class="s2">&quot;interval&quot;</span><span class="p">:</span> <span class="s2">&quot;PT5M&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-58" name="__codelineno-4-58" href="#__codelineno-4-58"></a>        <span class="s2">&quot;aggregation&quot;</span><span class="p">:</span> <span class="s2">&quot;Total&quot;</span>
+<a id="__codelineno-4-59" name="__codelineno-4-59" href="#__codelineno-4-59"></a>    <span class="p">}</span>
+<a id="__codelineno-4-60" name="__codelineno-4-60" href="#__codelineno-4-60"></a>
+<a id="__codelineno-4-61" name="__codelineno-4-61" href="#__codelineno-4-61"></a>    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+<a id="__codelineno-4-62" name="__codelineno-4-62" href="#__codelineno-4-62"></a>
+<a id="__codelineno-4-63" name="__codelineno-4-63" href="#__codelineno-4-63"></a>    <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+<a id="__codelineno-4-64" name="__codelineno-4-64" href="#__codelineno-4-64"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-4-65" name="__codelineno-4-65" href="#__codelineno-4-65"></a>
+<a id="__codelineno-4-66" name="__codelineno-4-66" href="#__codelineno-4-66"></a>    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<a id="__codelineno-4-67" name="__codelineno-4-67" href="#__codelineno-4-67"></a>
+<a id="__codelineno-4-68" name="__codelineno-4-68" href="#__codelineno-4-68"></a><span class="c1"># =========================</span>
+<a id="__codelineno-4-69" name="__codelineno-4-69" href="#__codelineno-4-69"></a><span class="c1"># CHECK STATUS LOGIC</span>
+<a id="__codelineno-4-70" name="__codelineno-4-70" href="#__codelineno-4-70"></a><span class="c1"># =========================</span>
+<a id="__codelineno-4-71" name="__codelineno-4-71" href="#__codelineno-4-71"></a>
+<a id="__codelineno-4-72" name="__codelineno-4-72" href="#__codelineno-4-72"></a><span class="k">def</span><span class="w"> </span><span class="nf">evaluate_status</span><span class="p">(</span><span class="n">metrics</span><span class="p">):</span>
+<a id="__codelineno-4-73" name="__codelineno-4-73" href="#__codelineno-4-73"></a>
+<a id="__codelineno-4-74" name="__codelineno-4-74" href="#__codelineno-4-74"></a>    <span class="k">if</span> <span class="n">metrics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-4-75" name="__codelineno-4-75" href="#__codelineno-4-75"></a>        <span class="k">return</span> <span class="s2">&quot;Inactive&quot;</span><span class="p">,</span> <span class="s2">&quot;No response from Azure API&quot;</span>
+<a id="__codelineno-4-76" name="__codelineno-4-76" href="#__codelineno-4-76"></a>
+<a id="__codelineno-4-77" name="__codelineno-4-77" href="#__codelineno-4-77"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-4-78" name="__codelineno-4-78" href="#__codelineno-4-78"></a>        <span class="n">series</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;timeseries&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+<a id="__codelineno-4-79" name="__codelineno-4-79" href="#__codelineno-4-79"></a>
+<a id="__codelineno-4-80" name="__codelineno-4-80" href="#__codelineno-4-80"></a>        <span class="n">latest</span> <span class="o">=</span> <span class="n">series</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<a id="__codelineno-4-81" name="__codelineno-4-81" href="#__codelineno-4-81"></a>
+<a id="__codelineno-4-82" name="__codelineno-4-82" href="#__codelineno-4-82"></a>        <span class="n">incoming</span> <span class="o">=</span> <span class="n">latest</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;total&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-4-83" name="__codelineno-4-83" href="#__codelineno-4-83"></a>
+<a id="__codelineno-4-84" name="__codelineno-4-84" href="#__codelineno-4-84"></a>        <span class="k">if</span> <span class="n">incoming</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-4-85" name="__codelineno-4-85" href="#__codelineno-4-85"></a>            <span class="n">incoming</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-4-86" name="__codelineno-4-86" href="#__codelineno-4-86"></a>
+<a id="__codelineno-4-87" name="__codelineno-4-87" href="#__codelineno-4-87"></a>        <span class="k">if</span> <span class="n">incoming</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-4-88" name="__codelineno-4-88" href="#__codelineno-4-88"></a>            <span class="k">return</span> <span class="s2">&quot;Active&quot;</span><span class="p">,</span> <span class="s2">&quot;Events are flowing&quot;</span>
+<a id="__codelineno-4-89" name="__codelineno-4-89" href="#__codelineno-4-89"></a>
+<a id="__codelineno-4-90" name="__codelineno-4-90" href="#__codelineno-4-90"></a>        <span class="k">return</span> <span class="s2">&quot;Idle&quot;</span><span class="p">,</span> <span class="s2">&quot;No events but service is running&quot;</span>
+<a id="__codelineno-4-91" name="__codelineno-4-91" href="#__codelineno-4-91"></a>
+<a id="__codelineno-4-92" name="__codelineno-4-92" href="#__codelineno-4-92"></a>    <span class="k">except</span><span class="p">:</span>
+<a id="__codelineno-4-93" name="__codelineno-4-93" href="#__codelineno-4-93"></a>        <span class="k">return</span> <span class="s2">&quot;Inactive&quot;</span><span class="p">,</span> <span class="s2">&quot;Error while parsing metrics&quot;</span>
+<a id="__codelineno-4-94" name="__codelineno-4-94" href="#__codelineno-4-94"></a>
+<a id="__codelineno-4-95" name="__codelineno-4-95" href="#__codelineno-4-95"></a><span class="c1"># =========================</span>
+<a id="__codelineno-4-96" name="__codelineno-4-96" href="#__codelineno-4-96"></a><span class="c1"># SEND TO OPENSEARCH</span>
+<a id="__codelineno-4-97" name="__codelineno-4-97" href="#__codelineno-4-97"></a><span class="c1"># =========================</span>
+<a id="__codelineno-4-98" name="__codelineno-4-98" href="#__codelineno-4-98"></a>
+<a id="__codelineno-4-99" name="__codelineno-4-99" href="#__codelineno-4-99"></a><span class="k">def</span><span class="w"> </span><span class="nf">send_to_opensearch</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+<a id="__codelineno-4-100" name="__codelineno-4-100" href="#__codelineno-4-100"></a>
+<a id="__codelineno-4-101" name="__codelineno-4-101" href="#__codelineno-4-101"></a>    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">OPENSEARCH_HOST</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">INDEX_NAME</span><span class="si">}</span><span class="s2">/_doc&quot;</span>
+<a id="__codelineno-4-102" name="__codelineno-4-102" href="#__codelineno-4-102"></a>
+<a id="__codelineno-4-103" name="__codelineno-4-103" href="#__codelineno-4-103"></a>    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-4-104" name="__codelineno-4-104" href="#__codelineno-4-104"></a>        <span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span>
+<a id="__codelineno-4-105" name="__codelineno-4-105" href="#__codelineno-4-105"></a>    <span class="p">}</span>
+<a id="__codelineno-4-106" name="__codelineno-4-106" href="#__codelineno-4-106"></a>
+<a id="__codelineno-4-107" name="__codelineno-4-107" href="#__codelineno-4-107"></a>    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+<a id="__codelineno-4-108" name="__codelineno-4-108" href="#__codelineno-4-108"></a>        <span class="n">url</span><span class="p">,</span>
+<a id="__codelineno-4-109" name="__codelineno-4-109" href="#__codelineno-4-109"></a>        <span class="n">auth</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">),</span>
+<a id="__codelineno-4-110" name="__codelineno-4-110" href="#__codelineno-4-110"></a>        <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+<a id="__codelineno-4-111" name="__codelineno-4-111" href="#__codelineno-4-111"></a>        <span class="n">json</span><span class="o">=</span><span class="n">doc</span><span class="p">,</span>
+<a id="__codelineno-4-112" name="__codelineno-4-112" href="#__codelineno-4-112"></a>        <span class="n">verify</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-4-113" name="__codelineno-4-113" href="#__codelineno-4-113"></a>    <span class="p">)</span>
+<a id="__codelineno-4-114" name="__codelineno-4-114" href="#__codelineno-4-114"></a>
+<a id="__codelineno-4-115" name="__codelineno-4-115" href="#__codelineno-4-115"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Response:&quot;</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<a id="__codelineno-4-116" name="__codelineno-4-116" href="#__codelineno-4-116"></a>
+<a id="__codelineno-4-117" name="__codelineno-4-117" href="#__codelineno-4-117"></a>    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span>
+<a id="__codelineno-4-118" name="__codelineno-4-118" href="#__codelineno-4-118"></a>
+<a id="__codelineno-4-119" name="__codelineno-4-119" href="#__codelineno-4-119"></a><span class="c1"># =========================</span>
+<a id="__codelineno-4-120" name="__codelineno-4-120" href="#__codelineno-4-120"></a><span class="c1"># MAIN</span>
+<a id="__codelineno-4-121" name="__codelineno-4-121" href="#__codelineno-4-121"></a><span class="c1"># =========================</span>
+<a id="__codelineno-4-122" name="__codelineno-4-122" href="#__codelineno-4-122"></a>
+<a id="__codelineno-4-123" name="__codelineno-4-123" href="#__codelineno-4-123"></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<a id="__codelineno-4-124" name="__codelineno-4-124" href="#__codelineno-4-124"></a>
+<a id="__codelineno-4-125" name="__codelineno-4-125" href="#__codelineno-4-125"></a>    <span class="n">token</span> <span class="o">=</span> <span class="n">get_token</span><span class="p">()</span>
+<a id="__codelineno-4-126" name="__codelineno-4-126" href="#__codelineno-4-126"></a>    <span class="n">metrics</span> <span class="o">=</span> <span class="n">get_eventhub_metrics</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+<a id="__codelineno-4-127" name="__codelineno-4-127" href="#__codelineno-4-127"></a>
+<a id="__codelineno-4-128" name="__codelineno-4-128" href="#__codelineno-4-128"></a>    <span class="n">status</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="n">evaluate_status</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+<a id="__codelineno-4-129" name="__codelineno-4-129" href="#__codelineno-4-129"></a>
+<a id="__codelineno-4-130" name="__codelineno-4-130" href="#__codelineno-4-130"></a>    <span class="n">doc</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-4-131" name="__codelineno-4-131" href="#__codelineno-4-131"></a>        <span class="s2">&quot;@timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+<a id="__codelineno-4-132" name="__codelineno-4-132" href="#__codelineno-4-132"></a>        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;azure_eventhub_health&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-133" name="__codelineno-4-133" href="#__codelineno-4-133"></a>        <span class="s2">&quot;service&quot;</span><span class="p">:</span> <span class="n">NAMESPACE</span><span class="p">,</span>
+<a id="__codelineno-4-134" name="__codelineno-4-134" href="#__codelineno-4-134"></a>        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">status</span><span class="p">,</span>
+<a id="__codelineno-4-135" name="__codelineno-4-135" href="#__codelineno-4-135"></a>        <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="n">reason</span>
+<a id="__codelineno-4-136" name="__codelineno-4-136" href="#__codelineno-4-136"></a>    <span class="p">}</span>
+<a id="__codelineno-4-137" name="__codelineno-4-137" href="#__codelineno-4-137"></a>
+<a id="__codelineno-4-138" name="__codelineno-4-138" href="#__codelineno-4-138"></a>    <span class="n">code</span> <span class="o">=</span> <span class="n">send_to_opensearch</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+<a id="__codelineno-4-139" name="__codelineno-4-139" href="#__codelineno-4-139"></a>
+<a id="__codelineno-4-140" name="__codelineno-4-140" href="#__codelineno-4-140"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Status:&quot;</span><span class="p">,</span> <span class="n">status</span><span class="p">)</span>
+<a id="__codelineno-4-141" name="__codelineno-4-141" href="#__codelineno-4-141"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reason:&quot;</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span>
+<a id="__codelineno-4-142" name="__codelineno-4-142" href="#__codelineno-4-142"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;OpenSearch response:&quot;</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
+<a id="__codelineno-4-143" name="__codelineno-4-143" href="#__codelineno-4-143"></a>
+<a id="__codelineno-4-144" name="__codelineno-4-144" href="#__codelineno-4-144"></a>
+<a id="__codelineno-4-145" name="__codelineno-4-145" href="#__codelineno-4-145"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<a id="__codelineno-4-146" name="__codelineno-4-146" href="#__codelineno-4-146"></a>    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="52-why-following-values-are-needed">5.2 Why Following Values Are Needed</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">AZURE_TENANT_ID</span> <span class="o">=</span> <span class="s2">&quot;your-tenant-id&quot;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">AZURE_CLIENT_ID</span> <span class="o">=</span> <span class="s2">&quot;your-client-id&quot;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">AZURE_CLIENT_SECRET</span> <span class="o">=</span> <span class="s2">&quot;your-client-secret&quot;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">SUBSCRIPTION_ID</span> <span class="o">=</span> <span class="s2">&quot;your-subscription-id&quot;</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">RESOURCE_GROUP</span> <span class="o">=</span> <span class="s2">&quot;your-resource-group&quot;</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">NAMESPACE</span> <span class="o">=</span> <span class="s2">&quot;your-eventhub-namespace&quot;</span>
+</code></pre></div>
+<p>You are trying to do this:</p>
+<p>"Check Azure Event Hub health from outside Azure (your VM)"</p>
+<p>Azure will NOT allow random servers to query its infrastructure.</p>
+<p>So it requires:</p>
+<h3 id="53-identity-permission-model">5.3 Identity + Permission Model</h3>
+<p>Your VM must prove:</p>
+<ul>
+<li>"I am allowed to read Azure monitoring data"</li>
+</ul>
+<p>That is why we use:</p>
+<p>Service Principal (App Registration in Entra ID)</p>
+<p>This is what gives you:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tenant_id</code></td>
+<td>Which Azure directory</td>
+</tr>
+<tr>
+<td><code>client_id</code></td>
+<td>Which app is calling Azure</td>
+</tr>
+<tr>
+<td><code>client_secret</code></td>
+<td>Password of that app</td>
+</tr>
+<tr>
+<td><code>subscription_id</code></td>
+<td>Which Azure subscription</td>
+</tr>
+<tr>
+<td><code>resource_group</code></td>
+<td>Where Event Hub lives</td>
+</tr>
+<tr>
+<td><code>namespace</code></td>
+<td>Actual Event Hub service</td>
+</tr>
+</tbody>
+</table>
+<h3 id="54-where-to-get-each-value">5.4 Where to Get Each Value</h3>
+<p>Let's go step-by-step.</p>
+<h4 id="azure-tenant-id">AZURE TENANT ID</h4>
+<h5 id="where-to-find">Where to Find:</h5>
+<p>Azure Portal → Microsoft Entra ID → Overview</p>
+<p>You will see:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Tenant ID
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>72f988bf-86f1-41af-91ab-2d7cd011db47
+</code></pre></div>
+<h4 id="client-id-client-secret-important">CLIENT ID + CLIENT SECRET (IMPORTANT)</h4>
+<p>"If you have not created any application in Entra ID yet"</p>
+<p>Then you MUST create one. This is mandatory.</p>
+<h4 id="create-app-registration">Create App Registration</h4>
+<p>Go to:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Azure Portal
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>→ Microsoft Entra ID
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>→ App registrations
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>→ New registration
+</code></pre></div>
+<p>Fill:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Name</td>
+<td><code>azure-health-monitor</code></td>
+</tr>
+<tr>
+<td>Supported account types</td>
+<td>Single tenant</td>
+</tr>
+</tbody>
+</table>
+<p>Click <strong>Register</strong></p>
+<h4 id="after-creation-you-will-get">After Creation You Will Get:</h4>
+<h5 id="client-id">CLIENT ID</h5>
+<p>Inside:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>App registration → Overview
+</code></pre></div>
+<p>Copy:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Application (client) ID
+</code></pre></div>
+<h5 id="tenant-id-again">TENANT ID (again)</h5>
+<p>Same screen:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Directory (tenant) ID
+</code></pre></div>
+<h4 id="create-client-secret">Create CLIENT SECRET</h4>
+<p>Go to:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>App registration
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>→ Certificates &amp; secrets
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>→ Client secrets
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>→ New client secret
+</code></pre></div>
+<p>Copy:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>VALUE (NOT ID)
+</code></pre></div>
+<p>Important: You will only see it once.</p>
+<h4 id="subscription-id">SUBSCRIPTION ID</h4>
+<h5 id="where">Where:</h5>
+<p>Azure Portal → Subscriptions</p>
+<p>Click your subscription → You will see:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Subscription ID
+</code></pre></div>
+<h4 id="resource-group">RESOURCE GROUP</h4>
+<p>Go to:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Azure Portal
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>→ Resource groups
+</code></pre></div>
+<p>Find the one where Event Hub is deployed:</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>rg-log-pipeline-prod
+</code></pre></div>
+<p>That name is your:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>RESOURCE_GROUP
+</code></pre></div>
+<h4 id="event-hub-namespace">EVENT HUB NAMESPACE</h4>
+<p>Go to:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>Azure Portal
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>→ Event Hubs
+</code></pre></div>
+<p>Click your namespace (not event hub itself)</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>log-namespace-prod
+</code></pre></div>
+<p>That is your:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>NAMESPACE
+</code></pre></div>
+<h4 id="very-important-step-most-people-miss-this">VERY IMPORTANT STEP (Most People Miss This)</h4>
+<p>After creating App Registration, it has NO permission by default.</p>
+<p>You must assign a role.</p>
+<h5 id="give-permission-to-app">Give Permission to App</h5>
+<p>Go to:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>Resource Group → Access Control (IAM)
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>→ Add role assignment
+</code></pre></div>
+<p>Assign:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>Reader role
+</code></pre></div>
+<p>to your App Registration.</p>
+<h5 id="why-reader-role">Why Reader Role?</h5>
+<p>Because your script only needs:</p>
+<ul>
+<li>Read metrics</li>
+<li>Read Event Hub status</li>
+</ul>
+<p>No write access needed.</p>
+<h3 id="55-final-mapping-summary">5.5 Final Mapping Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Where to Get</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tenant_id</code></td>
+<td>Microsoft Entra ID → Overview</td>
+</tr>
+<tr>
+<td><code>client_id</code></td>
+<td>App Registration → Overview</td>
+</tr>
+<tr>
+<td><code>client_secret</code></td>
+<td>App Registration → Certificates &amp; Secrets</td>
+</tr>
+<tr>
+<td><code>subscription_id</code></td>
+<td>Azure Subscriptions</td>
+</tr>
+<tr>
+<td><code>resource_group</code></td>
+<td>Resource Groups</td>
+</tr>
+<tr>
+<td><code>namespace</code></td>
+<td>Event Hubs → Namespace name</td>
+</tr>
+</tbody>
+</table>
+<h3 id="56-simple-mental-model">5.6 Simple Mental Model</h3>
+<p>Think like this:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>Tenant ID       → Company identity
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>Client ID       → Application identity
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>Client Secret   → Password
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>Subscription    → Billing + container
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>Resource Group  → Folder
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>Namespace       → Actual Event Hub service
+</code></pre></div>
+<p><strong>Note:</strong> After adding all the required information to the Python script, make sure ports are opened between the VMs, otherwise you will get errors while running the script.</p>
+<p>To make sure the connection is good before running the script directly, try to perform the following manually first:</p>
+<h3 id="57-test-index-creation-first">5.7 Test Index Creation First</h3>
+<p>Before running the Python script, create the index manually.</p>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>username:Password<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span><span class="s2">&quot;https://XXX.XXX.XX.43:9200/azure-health-status&quot;</span>
+</code></pre></div>
+<p>Expected:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="p">{</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">  </span><span class="nt">&quot;acknowledged&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>If it already exists:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="p">{</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="s2">&quot;resource_already_exists_exception&quot;</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>That's fine.</p>
+<h3 id="58-test-document-insert-manually">5.8 Test Document Insert Manually</h3>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>username:Password<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">  </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">  </span><span class="s2">&quot;https://XXX.XXX.XX.43:9200/azure-health-status/_doc&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="s1">    &quot;@timestamp&quot;:&quot;2026-07-08T12:00:00Z&quot;,</span>
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="s1">    &quot;status&quot;:&quot;active&quot;,</span>
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="s1">    &quot;service&quot;:&quot;eventhub&quot;</span>
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="s1">  }&#39;</span>
+</code></pre></div>
+<p>Expected:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="p">{</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">  </span><span class="nt">&quot;result&quot;</span><span class="p">:</span><span class="s2">&quot;created&quot;</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="59-verify-document-exists">5.9 Verify Document Exists</h3>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>username:Password<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">  </span><span class="s2">&quot;https://XXX.XXX.XX.43:9200/azure-health-status/_search?pretty&quot;</span>
+</code></pre></div>
+<p>You should see:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="p">{</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">  </span><span class="nt">&quot;hits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">    </span><span class="nt">&quot;hits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">      </span><span class="p">{</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w">        </span><span class="nt">&quot;_source&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="w">          </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;active&quot;</span>
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="w">    </span><span class="p">]</span>
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="6-step-4-make-script-executable">6. STEP 4 — MAKE SCRIPT EXECUTABLE</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>chmod<span class="w"> </span>+x<span class="w"> </span>azure_eventhub_health.py
+</code></pre></div>
+<hr />
+<h2 id="7-step-5-run-manually-test">7. STEP 5 — RUN MANUALLY TEST</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>python3<span class="w"> </span>azure_eventhub_health.py
+</code></pre></div>
+<h3 id="expected-output">Expected Output:</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>Status: idle
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>Reason: no events but service running
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>OpenSearch response: 201
+</code></pre></div>
+<p>If you see 201, data is successfully reaching Wazuh Indexer.</p>
+<hr />
+<h2 id="8-step-6-verify-in-wazuh-indexer">8. STEP 6 — VERIFY IN WAZUH INDEXER</h2>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>username:Password<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">  </span><span class="s2">&quot;https://XXX.XXX.XX.43:9200/azure-health-status/_search?pretty&quot;</span>
+</code></pre></div>
+<p>Expected:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="p">{</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="w">  </span><span class="nt">&quot;hits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="w">    </span><span class="nt">&quot;hits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="w">      </span><span class="p">{</span>
+<a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="w">        </span><span class="nt">&quot;_source&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a><span class="w">          </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">,</span>
+<a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a><span class="w">          </span><span class="nt">&quot;service&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eventhub&quot;</span>
+<a id="__codelineno-35-8" name="__codelineno-35-8" href="#__codelineno-35-8"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-35-9" name="__codelineno-35-9" href="#__codelineno-35-9"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-35-10" name="__codelineno-35-10" href="#__codelineno-35-10"></a><span class="w">    </span><span class="p">]</span>
+<a id="__codelineno-35-11" name="__codelineno-35-11" href="#__codelineno-35-11"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-35-12" name="__codelineno-35-12" href="#__codelineno-35-12"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="9-step-7-automate-every-1-minute-cron">9. STEP 7 — AUTOMATE EVERY 1 MINUTE (CRON)</h2>
+<h3 id="91-create-a-log-file">9.1 Create a Log File</h3>
+<p>Create a directory for script logs.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/var/log/azure-health-monitor
+</code></pre></div>
+<p>Create a log file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>sudo<span class="w"> </span>touch<span class="w"> </span>/var/log/azure-health-monitor/azure_health.log
+</code></pre></div>
+<p>Set permissions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">666</span><span class="w"> </span>/var/log/azure-health-monitor/azure_health.log
+</code></pre></div>
+<h4 id="purpose">Purpose</h4>
+<p>If the cron job fails later, you'll have a place to see errors.</p>
+<h3 id="92-find-python-location">9.2 Find Python Location</h3>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>which<span class="w"> </span>python3
+</code></pre></div>
+<p>Example output:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>/usr/bin/python3
+</code></pre></div>
+<p>Remember this path.</p>
+<h4 id="purpose_1">Purpose</h4>
+<p>Cron jobs use a minimal environment and often cannot find Python automatically.</p>
+<h3 id="93-test-using-full-path">9.3 Test Using Full Path</h3>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>/usr/bin/python3<span class="w"> </span>/opt/azure-health-monitor/azure_eventhub_health.py
+</code></pre></div>
+<p>If it works, you're ready for automation.</p>
+<h3 id="94-open-crontab">9.4 Open Crontab</h3>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>crontab<span class="w"> </span>-e
+</code></pre></div>
+<p>If prompted:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>Select an editor
+</code></pre></div>
+<p>Choose:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>1
+</code></pre></div>
+<p>for nano.</p>
+<h3 id="95-add-cron-entry">9.5 Add Cron Entry</h3>
+<p>Add this line at the bottom:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>* * * * * /usr/bin/python3 /opt/azure-health-monitor/azure_eventhub_health.py &gt;&gt; /var/log/azure-health-monitor/azure_health.log 2&gt;&amp;1
+</code></pre></div>
+<p>Save and exit.</p>
+<p>For nano:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>CTRL+X
+<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>Y
+<a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a>ENTER
+</code></pre></div>
+<h3 id="96-understanding-the-cron-syntax">9.6 Understanding the Cron Syntax</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>* * * * *
+<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>│ │ │ │ │
+<a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a>│ │ │ │ └── Day of week
+<a id="__codelineno-47-4" name="__codelineno-47-4" href="#__codelineno-47-4"></a>│ │ │ └──── Month
+<a id="__codelineno-47-5" name="__codelineno-47-5" href="#__codelineno-47-5"></a>│ │ └────── Day of month
+<a id="__codelineno-47-6" name="__codelineno-47-6" href="#__codelineno-47-6"></a>│ └──────── Hour
+<a id="__codelineno-47-7" name="__codelineno-47-7" href="#__codelineno-47-7"></a>└────────── Minute
+</code></pre></div>
+<p>So:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>* * * * *
+</code></pre></div>
+<p>means:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>Every minute
+</code></pre></div>
+<h3 id="97-understanding-the-command">9.7 Understanding the Command</h3>
+<p><code>/usr/bin/python3</code></p>
+<p>Runs Python.</p>
+<p><code>/opt/azure-health-monitor/azure_eventhub_health.py</code></p>
+<p>Your monitoring script.</p>
+<p><code>&gt;&gt;</code></p>
+<p>Append output to a file.</p>
+<p><code>/var/log/azure-health-monitor/azure_health.log</code></p>
+<p>Log file location.</p>
+<p><code>2&gt;&amp;1</code></p>
+<p>Redirect errors to the same log file.</p>
+<p>Without this, Python errors are lost.</p>
+<h3 id="98-verify-cron-is-installed">9.8 Verify Cron Is Installed</h3>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>crontab<span class="w"> </span>-l
+</code></pre></div>
+<p>Expected:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>* * * * * /usr/bin/python3 /opt/azure-health-monitor/azure_eventhub_health.py &gt;&gt; /var/log/azure-health-monitor/azure_health.log 2&gt;&amp;1
+</code></pre></div>
+<h4 id="purpose_2">Purpose</h4>
+<p>Confirms cron saved correctly.</p>
+<h3 id="99-wait-2-minutes">9.9 Wait 2 Minutes</h3>
+<p>Wait about 2–3 minutes.</p>
+<p>Then check:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>cat<span class="w"> </span>/var/log/azure-health-monitor/azure_health.log
+</code></pre></div>
+<p>Expected:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>Status: active
+<a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a>Reason: events flowing
+<a id="__codelineno-53-3" name="__codelineno-53-3" href="#__codelineno-53-3"></a>OpenSearch response: 201
+<a id="__codelineno-53-4" name="__codelineno-53-4" href="#__codelineno-53-4"></a>
+<a id="__codelineno-53-5" name="__codelineno-53-5" href="#__codelineno-53-5"></a>Status: active
+<a id="__codelineno-53-6" name="__codelineno-53-6" href="#__codelineno-53-6"></a>Reason: events flowing
+<a id="__codelineno-53-7" name="__codelineno-53-7" href="#__codelineno-53-7"></a>OpenSearch response: 201
+</code></pre></div>
+<p>Every minute you should see a new entry.</p>
+<h3 id="910-verify-new-documents-are-arriving">9.10 Verify New Documents Are Arriving</h3>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>username:Password<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a><span class="w">  </span><span class="s2">&quot;https://XXX.XXX.XX.43:9200/azure-health-status/_count?pretty&quot;</span>
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a><span class="p">{</span>
+<a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a><span class="w">  </span><span class="nt">&quot;count&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
+<a id="__codelineno-55-3" name="__codelineno-55-3" href="#__codelineno-55-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>Wait one minute.</p>
+<p>Run again:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>username:Password<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a><span class="w">  </span><span class="s2">&quot;https://XXX.XXX.XX.43:9200/azure-health-status/_count?pretty&quot;</span>
+</code></pre></div>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a><span class="p">{</span>
+<a id="__codelineno-57-2" name="__codelineno-57-2" href="#__codelineno-57-2"></a><span class="w">  </span><span class="nt">&quot;count&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">16</span>
+<a id="__codelineno-57-3" name="__codelineno-57-3" href="#__codelineno-57-3"></a><span class="p">}</span>
+</code></pre></div>
+<h4 id="purpose_3">Purpose</h4>
+<p>Confirms the automation is continuously creating health records.</p>
+<h3 id="911-verify-latest-status-document">9.11 Verify Latest Status Document</h3>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-u<span class="w"> </span>username:Password<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a><span class="w">  </span><span class="s2">&quot;https://XXX.XXX.XX.43:9200/azure-health-status/_search?size=1&amp;sort=@timestamp:desc&amp;pretty&quot;</span>
+</code></pre></div>
+<p>This shows the most recent health record.</p>
+<hr />
+<h2 id="10-for-visualization">10. FOR VISUALIZATION</h2>
+<p>Login into Wazuh.</p>
+<h3 id="101-create-new-vega-visualization">10.1 Create New Vega Visualization</h3>
+<p>☰ menu → Visualize → Create visualization
+Scroll down and select: Vega</p>
+<p>You will see a text editor with sample Vega code. <strong>Delete everything</strong> in that editor and paste the exact code below.</p>
+<h3 id="102-paste-this-complete-vega-script">10.2 Paste This Complete Vega Script</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a><span class="p">{</span>
+<a id="__codelineno-59-2" name="__codelineno-59-2" href="#__codelineno-59-2"></a><span class="w">  </span><span class="nt">&quot;$schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://vega.github.io/schema/vega/v5.json&quot;</span><span class="p">,</span>
+<a id="__codelineno-59-3" name="__codelineno-59-3" href="#__codelineno-59-3"></a><span class="w">  </span><span class="nt">&quot;autosize&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+<a id="__codelineno-59-4" name="__codelineno-59-4" href="#__codelineno-59-4"></a><span class="w">  </span><span class="nt">&quot;width&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span>
+<a id="__codelineno-59-5" name="__codelineno-59-5" href="#__codelineno-59-5"></a><span class="w">  </span><span class="nt">&quot;height&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
+<a id="__codelineno-59-6" name="__codelineno-59-6" href="#__codelineno-59-6"></a><span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-7" name="__codelineno-59-7" href="#__codelineno-59-7"></a><span class="w">    </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Azure EventHub Health&quot;</span><span class="p">,</span>
+<a id="__codelineno-59-8" name="__codelineno-59-8" href="#__codelineno-59-8"></a><span class="w">    </span><span class="nt">&quot;fontSize&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
+<a id="__codelineno-59-9" name="__codelineno-59-9" href="#__codelineno-59-9"></a><span class="w">    </span><span class="nt">&quot;anchor&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;start&quot;</span>
+<a id="__codelineno-59-10" name="__codelineno-59-10" href="#__codelineno-59-10"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-59-11" name="__codelineno-59-11" href="#__codelineno-59-11"></a><span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-59-12" name="__codelineno-59-12" href="#__codelineno-59-12"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-59-13" name="__codelineno-59-13" href="#__codelineno-59-13"></a><span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;health&quot;</span><span class="p">,</span>
+<a id="__codelineno-59-14" name="__codelineno-59-14" href="#__codelineno-59-14"></a><span class="w">      </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-15" name="__codelineno-59-15" href="#__codelineno-59-15"></a><span class="w">        </span><span class="nt">&quot;%context%&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-59-16" name="__codelineno-59-16" href="#__codelineno-59-16"></a><span class="w">        </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;azure-health-status&quot;</span><span class="p">,</span>
+<a id="__codelineno-59-17" name="__codelineno-59-17" href="#__codelineno-59-17"></a><span class="w">        </span><span class="nt">&quot;body&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-18" name="__codelineno-59-18" href="#__codelineno-59-18"></a><span class="w">          </span><span class="nt">&quot;size&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-59-19" name="__codelineno-59-19" href="#__codelineno-59-19"></a><span class="w">          </span><span class="nt">&quot;sort&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-59-20" name="__codelineno-59-20" href="#__codelineno-59-20"></a><span class="w">            </span><span class="p">{</span>
+<a id="__codelineno-59-21" name="__codelineno-59-21" href="#__codelineno-59-21"></a><span class="w">              </span><span class="nt">&quot;@timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-22" name="__codelineno-59-22" href="#__codelineno-59-22"></a><span class="w">                </span><span class="nt">&quot;order&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;desc&quot;</span>
+<a id="__codelineno-59-23" name="__codelineno-59-23" href="#__codelineno-59-23"></a><span class="w">              </span><span class="p">}</span>
+<a id="__codelineno-59-24" name="__codelineno-59-24" href="#__codelineno-59-24"></a><span class="w">            </span><span class="p">}</span>
+<a id="__codelineno-59-25" name="__codelineno-59-25" href="#__codelineno-59-25"></a><span class="w">          </span><span class="p">]</span>
+<a id="__codelineno-59-26" name="__codelineno-59-26" href="#__codelineno-59-26"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-59-27" name="__codelineno-59-27" href="#__codelineno-59-27"></a><span class="w">      </span><span class="p">},</span>
+<a id="__codelineno-59-28" name="__codelineno-59-28" href="#__codelineno-59-28"></a><span class="w">      </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-29" name="__codelineno-59-29" href="#__codelineno-59-29"></a><span class="w">        </span><span class="nt">&quot;property&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hits.hits&quot;</span>
+<a id="__codelineno-59-30" name="__codelineno-59-30" href="#__codelineno-59-30"></a><span class="w">      </span><span class="p">},</span>
+<a id="__codelineno-59-31" name="__codelineno-59-31" href="#__codelineno-59-31"></a><span class="w">      </span><span class="nt">&quot;transform&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-59-32" name="__codelineno-59-32" href="#__codelineno-59-32"></a><span class="w">        </span><span class="p">{</span>
+<a id="__codelineno-59-33" name="__codelineno-59-33" href="#__codelineno-59-33"></a><span class="w">          </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;window&quot;</span><span class="p">,</span>
+<a id="__codelineno-59-34" name="__codelineno-59-34" href="#__codelineno-59-34"></a><span class="w">          </span><span class="nt">&quot;ops&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;row_number&quot;</span><span class="p">],</span>
+<a id="__codelineno-59-35" name="__codelineno-59-35" href="#__codelineno-59-35"></a><span class="w">          </span><span class="nt">&quot;as&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;row&quot;</span><span class="p">]</span>
+<a id="__codelineno-59-36" name="__codelineno-59-36" href="#__codelineno-59-36"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-59-37" name="__codelineno-59-37" href="#__codelineno-59-37"></a><span class="w">      </span><span class="p">]</span>
+<a id="__codelineno-59-38" name="__codelineno-59-38" href="#__codelineno-59-38"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-59-39" name="__codelineno-59-39" href="#__codelineno-59-39"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-59-40" name="__codelineno-59-40" href="#__codelineno-59-40"></a><span class="w">  </span><span class="nt">&quot;marks&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-59-41" name="__codelineno-59-41" href="#__codelineno-59-41"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-59-42" name="__codelineno-59-42" href="#__codelineno-59-42"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;text&quot;</span><span class="p">,</span>
+<a id="__codelineno-59-43" name="__codelineno-59-43" href="#__codelineno-59-43"></a><span class="w">      </span><span class="nt">&quot;encode&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-44" name="__codelineno-59-44" href="#__codelineno-59-44"></a><span class="w">        </span><span class="nt">&quot;enter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-45" name="__codelineno-59-45" href="#__codelineno-59-45"></a><span class="w">          </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">50</span><span class="p">},</span>
+<a id="__codelineno-59-46" name="__codelineno-59-46" href="#__codelineno-59-46"></a><span class="w">          </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">},</span>
+<a id="__codelineno-59-47" name="__codelineno-59-47" href="#__codelineno-59-47"></a><span class="w">          </span><span class="nt">&quot;fontSize&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span>
+<a id="__codelineno-59-48" name="__codelineno-59-48" href="#__codelineno-59-48"></a><span class="w">          </span><span class="nt">&quot;fontWeight&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bold&quot;</span><span class="p">},</span>
+<a id="__codelineno-59-49" name="__codelineno-59-49" href="#__codelineno-59-49"></a><span class="w">          </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Status&quot;</span><span class="p">}</span>
+<a id="__codelineno-59-50" name="__codelineno-59-50" href="#__codelineno-59-50"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-59-51" name="__codelineno-59-51" href="#__codelineno-59-51"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-59-52" name="__codelineno-59-52" href="#__codelineno-59-52"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-59-53" name="__codelineno-59-53" href="#__codelineno-59-53"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-59-54" name="__codelineno-59-54" href="#__codelineno-59-54"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;text&quot;</span><span class="p">,</span>
+<a id="__codelineno-59-55" name="__codelineno-59-55" href="#__codelineno-59-55"></a><span class="w">      </span><span class="nt">&quot;encode&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-56" name="__codelineno-59-56" href="#__codelineno-59-56"></a><span class="w">        </span><span class="nt">&quot;enter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-57" name="__codelineno-59-57" href="#__codelineno-59-57"></a><span class="w">          </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">250</span><span class="p">},</span>
+<a id="__codelineno-59-58" name="__codelineno-59-58" href="#__codelineno-59-58"></a><span class="w">          </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">},</span>
+<a id="__codelineno-59-59" name="__codelineno-59-59" href="#__codelineno-59-59"></a><span class="w">          </span><span class="nt">&quot;fontSize&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span>
+<a id="__codelineno-59-60" name="__codelineno-59-60" href="#__codelineno-59-60"></a><span class="w">          </span><span class="nt">&quot;fontWeight&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bold&quot;</span><span class="p">},</span>
+<a id="__codelineno-59-61" name="__codelineno-59-61" href="#__codelineno-59-61"></a><span class="w">          </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Service&quot;</span><span class="p">}</span>
+<a id="__codelineno-59-62" name="__codelineno-59-62" href="#__codelineno-59-62"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-59-63" name="__codelineno-59-63" href="#__codelineno-59-63"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-59-64" name="__codelineno-59-64" href="#__codelineno-59-64"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-59-65" name="__codelineno-59-65" href="#__codelineno-59-65"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-59-66" name="__codelineno-59-66" href="#__codelineno-59-66"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;text&quot;</span><span class="p">,</span>
+<a id="__codelineno-59-67" name="__codelineno-59-67" href="#__codelineno-59-67"></a><span class="w">      </span><span class="nt">&quot;encode&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-68" name="__codelineno-59-68" href="#__codelineno-59-68"></a><span class="w">        </span><span class="nt">&quot;enter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-69" name="__codelineno-59-69" href="#__codelineno-59-69"></a><span class="w">          </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">450</span><span class="p">},</span>
+<a id="__codelineno-59-70" name="__codelineno-59-70" href="#__codelineno-59-70"></a><span class="w">          </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">},</span>
+<a id="__codelineno-59-71" name="__codelineno-59-71" href="#__codelineno-59-71"></a><span class="w">          </span><span class="nt">&quot;fontSize&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="p">},</span>
+<a id="__codelineno-59-72" name="__codelineno-59-72" href="#__codelineno-59-72"></a><span class="w">          </span><span class="nt">&quot;fontWeight&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bold&quot;</span><span class="p">},</span>
+<a id="__codelineno-59-73" name="__codelineno-59-73" href="#__codelineno-59-73"></a><span class="w">          </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Reason&quot;</span><span class="p">}</span>
+<a id="__codelineno-59-74" name="__codelineno-59-74" href="#__codelineno-59-74"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-59-75" name="__codelineno-59-75" href="#__codelineno-59-75"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-59-76" name="__codelineno-59-76" href="#__codelineno-59-76"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-59-77" name="__codelineno-59-77" href="#__codelineno-59-77"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-59-78" name="__codelineno-59-78" href="#__codelineno-59-78"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+<a id="__codelineno-59-79" name="__codelineno-59-79" href="#__codelineno-59-79"></a><span class="w">      </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-80" name="__codelineno-59-80" href="#__codelineno-59-80"></a><span class="w">        </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;health&quot;</span>
+<a id="__codelineno-59-81" name="__codelineno-59-81" href="#__codelineno-59-81"></a><span class="w">      </span><span class="p">},</span>
+<a id="__codelineno-59-82" name="__codelineno-59-82" href="#__codelineno-59-82"></a><span class="w">      </span><span class="nt">&quot;encode&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-83" name="__codelineno-59-83" href="#__codelineno-59-83"></a><span class="w">        </span><span class="nt">&quot;enter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-84" name="__codelineno-59-84" href="#__codelineno-59-84"></a><span class="w">          </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">},</span>
+<a id="__codelineno-59-85" name="__codelineno-59-85" href="#__codelineno-59-85"></a><span class="w">          </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-86" name="__codelineno-59-86" href="#__codelineno-59-86"></a><span class="w">            </span><span class="nt">&quot;signal&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;40 + datum.row * 30&quot;</span>
+<a id="__codelineno-59-87" name="__codelineno-59-87" href="#__codelineno-59-87"></a><span class="w">          </span><span class="p">},</span>
+<a id="__codelineno-59-88" name="__codelineno-59-88" href="#__codelineno-59-88"></a><span class="w">          </span><span class="nt">&quot;size&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">250</span><span class="p">},</span>
+<a id="__codelineno-59-89" name="__codelineno-59-89" href="#__codelineno-59-89"></a><span class="w">          </span><span class="nt">&quot;shape&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;circle&quot;</span><span class="p">}</span>
+<a id="__codelineno-59-90" name="__codelineno-59-90" href="#__codelineno-59-90"></a><span class="w">        </span><span class="p">},</span>
+<a id="__codelineno-59-91" name="__codelineno-59-91" href="#__codelineno-59-91"></a><span class="w">        </span><span class="nt">&quot;update&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-92" name="__codelineno-59-92" href="#__codelineno-59-92"></a><span class="w">          </span><span class="nt">&quot;fill&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-93" name="__codelineno-59-93" href="#__codelineno-59-93"></a><span class="w">            </span><span class="nt">&quot;signal&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;datum._source.status === &#39;Active&#39; ? &#39;#22c55e&#39; : datum._source.status === &#39;Idle&#39; ? &#39;#f59e0b&#39; : &#39;#ef4444&#39;&quot;</span>
+<a id="__codelineno-59-94" name="__codelineno-59-94" href="#__codelineno-59-94"></a><span class="w">          </span><span class="p">}</span>
+<a id="__codelineno-59-95" name="__codelineno-59-95" href="#__codelineno-59-95"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-59-96" name="__codelineno-59-96" href="#__codelineno-59-96"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-59-97" name="__codelineno-59-97" href="#__codelineno-59-97"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-59-98" name="__codelineno-59-98" href="#__codelineno-59-98"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-59-99" name="__codelineno-59-99" href="#__codelineno-59-99"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;text&quot;</span><span class="p">,</span>
+<a id="__codelineno-59-100" name="__codelineno-59-100" href="#__codelineno-59-100"></a><span class="w">      </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-101" name="__codelineno-59-101" href="#__codelineno-59-101"></a><span class="w">        </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;health&quot;</span>
+<a id="__codelineno-59-102" name="__codelineno-59-102" href="#__codelineno-59-102"></a><span class="w">      </span><span class="p">},</span>
+<a id="__codelineno-59-103" name="__codelineno-59-103" href="#__codelineno-59-103"></a><span class="w">      </span><span class="nt">&quot;encode&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-104" name="__codelineno-59-104" href="#__codelineno-59-104"></a><span class="w">        </span><span class="nt">&quot;enter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-105" name="__codelineno-59-105" href="#__codelineno-59-105"></a><span class="w">          </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">80</span><span class="p">},</span>
+<a id="__codelineno-59-106" name="__codelineno-59-106" href="#__codelineno-59-106"></a><span class="w">          </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-107" name="__codelineno-59-107" href="#__codelineno-59-107"></a><span class="w">            </span><span class="nt">&quot;signal&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;45 + datum.row * 30&quot;</span>
+<a id="__codelineno-59-108" name="__codelineno-59-108" href="#__codelineno-59-108"></a><span class="w">          </span><span class="p">},</span>
+<a id="__codelineno-59-109" name="__codelineno-59-109" href="#__codelineno-59-109"></a><span class="w">          </span><span class="nt">&quot;fontSize&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">13</span><span class="p">},</span>
+<a id="__codelineno-59-110" name="__codelineno-59-110" href="#__codelineno-59-110"></a><span class="w">          </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-111" name="__codelineno-59-111" href="#__codelineno-59-111"></a><span class="w">            </span><span class="nt">&quot;signal&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;datum._source.status&quot;</span>
+<a id="__codelineno-59-112" name="__codelineno-59-112" href="#__codelineno-59-112"></a><span class="w">          </span><span class="p">}</span>
+<a id="__codelineno-59-113" name="__codelineno-59-113" href="#__codelineno-59-113"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-59-114" name="__codelineno-59-114" href="#__codelineno-59-114"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-59-115" name="__codelineno-59-115" href="#__codelineno-59-115"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-59-116" name="__codelineno-59-116" href="#__codelineno-59-116"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-59-117" name="__codelineno-59-117" href="#__codelineno-59-117"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;text&quot;</span><span class="p">,</span>
+<a id="__codelineno-59-118" name="__codelineno-59-118" href="#__codelineno-59-118"></a><span class="w">      </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-119" name="__codelineno-59-119" href="#__codelineno-59-119"></a><span class="w">        </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;health&quot;</span>
+<a id="__codelineno-59-120" name="__codelineno-59-120" href="#__codelineno-59-120"></a><span class="w">      </span><span class="p">},</span>
+<a id="__codelineno-59-121" name="__codelineno-59-121" href="#__codelineno-59-121"></a><span class="w">      </span><span class="nt">&quot;encode&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-122" name="__codelineno-59-122" href="#__codelineno-59-122"></a><span class="w">        </span><span class="nt">&quot;enter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-123" name="__codelineno-59-123" href="#__codelineno-59-123"></a><span class="w">          </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">250</span><span class="p">},</span>
+<a id="__codelineno-59-124" name="__codelineno-59-124" href="#__codelineno-59-124"></a><span class="w">          </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-125" name="__codelineno-59-125" href="#__codelineno-59-125"></a><span class="w">            </span><span class="nt">&quot;signal&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;45 + datum.row * 30&quot;</span>
+<a id="__codelineno-59-126" name="__codelineno-59-126" href="#__codelineno-59-126"></a><span class="w">          </span><span class="p">},</span>
+<a id="__codelineno-59-127" name="__codelineno-59-127" href="#__codelineno-59-127"></a><span class="w">          </span><span class="nt">&quot;fontSize&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">13</span><span class="p">},</span>
+<a id="__codelineno-59-128" name="__codelineno-59-128" href="#__codelineno-59-128"></a><span class="w">          </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-129" name="__codelineno-59-129" href="#__codelineno-59-129"></a><span class="w">            </span><span class="nt">&quot;signal&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;datum._source.service&quot;</span>
+<a id="__codelineno-59-130" name="__codelineno-59-130" href="#__codelineno-59-130"></a><span class="w">          </span><span class="p">}</span>
+<a id="__codelineno-59-131" name="__codelineno-59-131" href="#__codelineno-59-131"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-59-132" name="__codelineno-59-132" href="#__codelineno-59-132"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-59-133" name="__codelineno-59-133" href="#__codelineno-59-133"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-59-134" name="__codelineno-59-134" href="#__codelineno-59-134"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-59-135" name="__codelineno-59-135" href="#__codelineno-59-135"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;text&quot;</span><span class="p">,</span>
+<a id="__codelineno-59-136" name="__codelineno-59-136" href="#__codelineno-59-136"></a><span class="w">      </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-137" name="__codelineno-59-137" href="#__codelineno-59-137"></a><span class="w">        </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;health&quot;</span>
+<a id="__codelineno-59-138" name="__codelineno-59-138" href="#__codelineno-59-138"></a><span class="w">      </span><span class="p">},</span>
+<a id="__codelineno-59-139" name="__codelineno-59-139" href="#__codelineno-59-139"></a><span class="w">      </span><span class="nt">&quot;encode&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-140" name="__codelineno-59-140" href="#__codelineno-59-140"></a><span class="w">        </span><span class="nt">&quot;enter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-141" name="__codelineno-59-141" href="#__codelineno-59-141"></a><span class="w">          </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">450</span><span class="p">},</span>
+<a id="__codelineno-59-142" name="__codelineno-59-142" href="#__codelineno-59-142"></a><span class="w">          </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-143" name="__codelineno-59-143" href="#__codelineno-59-143"></a><span class="w">            </span><span class="nt">&quot;signal&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;45 + datum.row * 30&quot;</span>
+<a id="__codelineno-59-144" name="__codelineno-59-144" href="#__codelineno-59-144"></a><span class="w">          </span><span class="p">},</span>
+<a id="__codelineno-59-145" name="__codelineno-59-145" href="#__codelineno-59-145"></a><span class="w">          </span><span class="nt">&quot;fontSize&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">13</span><span class="p">},</span>
+<a id="__codelineno-59-146" name="__codelineno-59-146" href="#__codelineno-59-146"></a><span class="w">          </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-59-147" name="__codelineno-59-147" href="#__codelineno-59-147"></a><span class="w">            </span><span class="nt">&quot;signal&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;datum._source.reason&quot;</span>
+<a id="__codelineno-59-148" name="__codelineno-59-148" href="#__codelineno-59-148"></a><span class="w">          </span><span class="p">}</span>
+<a id="__codelineno-59-149" name="__codelineno-59-149" href="#__codelineno-59-149"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-59-150" name="__codelineno-59-150" href="#__codelineno-59-150"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-59-151" name="__codelineno-59-151" href="#__codelineno-59-151"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-59-152" name="__codelineno-59-152" href="#__codelineno-59-152"></a><span class="w">  </span><span class="p">]</span>
+<a id="__codelineno-59-153" name="__codelineno-59-153" href="#__codelineno-59-153"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="103-click-update">10.3 Click Update</h3>
+<p>Click the blue "Update" button at the bottom of the editor.</p>
+<p>You will immediately see a table-style panel with one row for the eventhub service showing a green circle + "Active" or red circle + "Inactive" or orange circle + "Idle". It is something like the image below.</p>
+<p><img alt="Image 1" src="../../../../assets/images/POC%27s/Sai%20krishna/Implementation_Process_to_Monitor_Azure_EventHub_Health/image1.png" /></p>
+<h3 id="104-save">10.4 Save</h3>
+<p>Click Save top right
+Name: <code>azure eventhub health status panel</code>
+Click Save</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.top", "navigation.tracking", "navigation.indexes", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
